@@ -22,7 +22,7 @@ readme = "README.md"
 [workspace.dependencies]
 # --- Core foundations ---
 thiserror = "2.0.18"
-chrono = { version = "0.4.41", default-features = false, features = ["std"] }
+chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 
 # --- PDF engines ---
 lopdf = { version = "0.34", features = ["nom_parser"] }
@@ -30,18 +30,19 @@ printpdf = { version = "0.8", default-features = false, features = ["png", "html
 # justpdf = "0.1"  # Future alternative reader
 
 # --- Image handling ---
-image = { version = "0.25", default-features = false }
+image = { version = "0.25.9", default-features = false }
 
 # --- Proc-macro ---
-syn = { version = "2.0.104", features = ["full"] }
-quote = "1.0.40"
-proc-macro2 = "1.0.103"
-proc-macro-crate = "3.4.0"
+syn = { version = "2.0.119", features = ["full"] }
+quote = "1.0.47"
+proc-macro2 = "1.0.107"
+proc-macro-crate = "3.5.0"
 
 # --- Testing ---
-tempfile = "3.20.0"
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+tempfile = "3.27.0"
+trybuild = "1.0.116"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

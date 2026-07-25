@@ -19,4 +19,4 @@ proc-macro-crate.workspace = true
 
 [dev-dependencies]
 easypdf-core = { path = "../easypdf-core" }
-trybuild = { version = "1", features = ["diff"] }
+trybuild = { workspace = true, features = ["diff"] }
