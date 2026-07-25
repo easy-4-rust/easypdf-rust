@@ -89,8 +89,8 @@ impl PdfReader {
             .and_then(|dict| {
                 dict.get(b"Title")
                     .ok()
-                    .and_then(|v| v.as_string().ok())
-                    .map(|s| s.to_string())
+                    .and_then(|v| v.as_str().ok())
+                    .map(|s| String::from_utf8_lossy(s).into_owned())
             });
 
         let author = doc
@@ -105,8 +105,8 @@ impl PdfReader {
             .and_then(|dict| {
                 dict.get(b"Author")
                     .ok()
-                    .and_then(|v| v.as_string().ok())
-                    .map(|s| s.to_string())
+                    .and_then(|v| v.as_str().ok())
+                    .map(|s| String::from_utf8_lossy(s).into_owned())
             });
 
         Ok(PdfMetadata {

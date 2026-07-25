@@ -504,7 +504,7 @@ dependencies = [
  "easypdf-reader",
  "easypdf-template",
  "easypdf-writer",
- "lopdf 0.34.0",
+ "lopdf",
  "printpdf",
  "tempfile",
 ]
@@ -542,7 +542,7 @@ name = "easypdf-manipulate"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
- "lopdf 0.34.0",
+ "lopdf",
 ]
 
 [[package]]
@@ -550,7 +550,7 @@ name = "easypdf-reader"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
- "lopdf 0.34.0",
+ "lopdf",
 ]
 
 [[package]]
@@ -559,7 +559,7 @@ version = "0.1.0"
 dependencies = [
  "easypdf-core",
  "easypdf-writer",
- "lopdf 0.34.0",
+ "lopdf",
 ]
 
 [[package]]
@@ -1011,32 +1011,13 @@ checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 
 [[package]]
 name = "lopdf"
-version = "0.34.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5c8ecfc6c72051981c0459f75ccc585e7ff67c70829560cda8e647882a9abff"
-dependencies = [
- "chrono",
- "encoding_rs",
- "flate2",
- "indexmap",
- "itoa 1.0.18",
- "log",
- "md-5",
- "nom",
- "rangemap",
- "rayon",
- "time",
- "weezl",
-]
-
-[[package]]
-name = "lopdf"
 version = "0.35.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c7c1d3350d071cb86987a6bcb205c7019a0eb70dcad92b454fec722cca8d68b"
 dependencies = [
  "aes",
  "cbc",
+ "chrono",
  "encoding_rs",
  "flate2",
  "indexmap",
@@ -1046,6 +1027,7 @@ dependencies = [
  "nom",
  "nom_locate",
  "rangemap",
+ "rayon",
  "thiserror",
  "time",
  "weezl",
@@ -1425,7 +1407,7 @@ dependencies = [
  "flate2",
  "image",
  "kuchiki",
- "lopdf 0.35.0",
+ "lopdf",
  "rust-fontconfig",
  "serde",
  "serde_derive",
