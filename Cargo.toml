@@ -25,15 +25,15 @@ thiserror = "2.0.18"
 chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 
 # --- PDF engines ---
-lopdf = { version = "0.35", features = ["nom_parser"] }
-printpdf = { version = "0.8", default-features = false, features = ["png", "html"] }
+lopdf = { version = "0.44.0", features = ["nom_parser"] }
+printpdf = { version = "0.12.4", default-features = false, features = ["png", "html"] }
 # justpdf = "0.1"  # Future alternative reader
 
 # --- Image handling ---
 image = { version = "0.25.9", default-features = false }
 
 # --- Proc-macro ---
-syn = { version = "2.0.119", features = ["full"] }
+syn = { version = "3.0.3", features = ["full"] }
 quote = "1.0.47"
 proc-macro2 = "1.0.107"
 proc-macro-crate = "3.5.0"
