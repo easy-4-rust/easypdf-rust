@@ -1,6 +1,5 @@
 //! Shape drawing methods for PdfWriter.
 
-use easypdf_core::error::Result;
 use crate::writer::PdfWriter;
 use printpdf::{Line, LinePoint, Op, Point, Pt};
 

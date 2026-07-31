@@ -5,7 +5,7 @@ use easypdf_core::{
     FontFamily, Orientation, PageSize, PdfColor, PdfFont, PdfImage, PdfMetadata, PdfText,
     PdfWriteHandler,
 };
-use printpdf::{Mm, Op, PdfDocument, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
+use printpdf::{Mm, Op, PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -112,8 +112,8 @@ impl PdfWriter {
         let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
         let ops = vec![
             Op::StartTextSection, Op::SetTextCursor { pos },
-            Op::SetFontSize { size: Pt(font_size as f32), font: font_id.clone() },
-            Op::WriteText { items: vec![TextItem::Text(text.to_string())], font: font_id },
+            Op::SetFont { font: PdfFontHandle::External(font_id), size: Pt(font_size as f32) },
+            Op::ShowText { items: vec![TextItem::Text(text.to_string())] },
             Op::EndTextSection,
         ];
         self.current_page_ops.extend(ops);
@@ -154,8 +154,8 @@ impl PdfWriter {
                 let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
                 let ops = vec![
                     Op::StartTextSection, Op::SetTextCursor { pos },
-                    Op::SetFontSize { size: Pt(text.font.size as f32), font: font_id.clone() },
-                    Op::WriteText { items: vec![TextItem::Text(text.content.clone())], font: font_id.clone() },
+                    Op::SetFont { font: PdfFontHandle::External(font_id.clone()), size: Pt(text.font.size as f32) },
+                    Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
                     Op::EndTextSection,
                 ];
                 self.current_page_ops.extend(ops);
@@ -166,8 +166,8 @@ impl PdfWriter {
         let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
         let ops = vec![
             Op::StartTextSection, Op::SetTextCursor { pos },
-            Op::SetFontSizeBuiltinFont { size: Pt(text.font.size as f32), font: bf },
-            Op::WriteTextBuiltinFont { items: vec![TextItem::Text(text.content.clone())], font: bf },
+            Op::SetFont { font: PdfFontHandle::Builtin(bf), size: Pt(text.font.size as f32) },
+            Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
             Op::EndTextSection,
         ];
         self.current_page_ops.extend(ops);

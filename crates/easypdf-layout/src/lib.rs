@@ -22,6 +22,7 @@ pub enum Direction {
 
 /// Automatic vertical/horizontal layout engine.
 pub struct FlowLayout {
+    #[allow(dead_code)] // 预留：横向布局（Direction::Horizontal）尚未实现，字段保留供后续使用
     direction: Direction,
     margins: f64,
     spacing: f64,

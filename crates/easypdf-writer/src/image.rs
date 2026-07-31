@@ -17,7 +17,7 @@ impl PdfWriter {
         let transform = XObjectTransform {
             translate_x: Some(Pt(x_pt as f32)), translate_y: Some(Pt(y_pt as f32)),
             scale_x: Some(w as f32), scale_y: Some(h as f32),
-            rotate: None, dpi: None,
+            rotate: None, dpi: None, no_auto_scale: false,
         };
         self.current_page_ops.push(Op::UseXobject { id: xobj_id, transform });
         Ok(())
@@ -32,7 +32,7 @@ impl PdfWriter {
         let transform = XObjectTransform {
             translate_x: Some(Pt(x_pt as f32)), translate_y: Some(Pt(y_pt as f32)),
             scale_x: Some(w_pt as f32), scale_y: Some(h_pt as f32),
-            rotate: None, dpi: None,
+            rotate: None, dpi: None, no_auto_scale: false,
         };
         self.current_page_ops.push(Op::UseXobject { id: xobj_id, transform });
         Ok(())

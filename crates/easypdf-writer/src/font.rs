@@ -1,6 +1,6 @@
 //! Font mapping and font registration logic.
 
-use easypdf_core::{BuiltInFont, FontFamily, FontStyle, PdfFont};
+use easypdf_core::{BuiltInFont, FontFamily, PdfFont};
 use printpdf::BuiltinFont;
 
 /// Map easypdf-core's FontFamily to printpdf's BuiltinFont.

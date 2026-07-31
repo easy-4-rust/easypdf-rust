@@ -25,8 +25,8 @@ thiserror = "2.0.18"
 chrono = { version = "0.4.45", default-features = false, features = ["std"] }
 
 # --- PDF engines ---
-lopdf = { version = "0.44.0", features = ["nom_parser"] }
-printpdf = { version = "0.12.4", default-features = false, features = ["png", "html"] }
+lopdf = "0.44.0"
+printpdf = { version = "0.12.4", default-features = false, features = ["png", "html", "svg"] }
 # justpdf = "0.1"  # Future alternative reader
 
 # --- Image handling ---
