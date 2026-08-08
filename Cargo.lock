@@ -449,12 +449,14 @@ version = "0.1.0"
 dependencies = [
  "easypdf-core",
  "easypdf-derive",
+ "easypdf-io",
  "easypdf-layout",
  "easypdf-manipulate",
+ "easypdf-markdown",
+ "easypdf-model",
  "easypdf-reader",
  "easypdf-template",
  "easypdf-writer",
- "lopdf",
  "printpdf",
  "tempfile",
 ]
@@ -480,11 +482,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "easypdf-io"
+version = "0.1.0"
+dependencies = [
+ "easypdf-core",
+ "tempfile",
+]
+
+[[package]]
 name = "easypdf-layout"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
- "easypdf-writer",
 ]
 
 [[package]]
@@ -492,7 +501,27 @@ name = "easypdf-manipulate"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
+ "easypdf-io",
  "lopdf",
+]
+
+[[package]]
+name = "easypdf-markdown"
+version = "0.1.0"
+dependencies = [
+ "easypdf-core",
+ "easypdf-io",
+ "easypdf-model",
+ "easypdf-reader",
+ "lopdf",
+ "tempfile",
+]
+
+[[package]]
+name = "easypdf-model"
+version = "0.1.0"
+dependencies = [
+ "easypdf-core",
 ]
 
 [[package]]
@@ -500,7 +529,10 @@ name = "easypdf-reader"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
+ "easypdf-io",
+ "easypdf-model",
  "lopdf",
+ "tempfile",
 ]
 
 [[package]]
@@ -508,6 +540,7 @@ name = "easypdf-template"
 version = "0.1.0"
 dependencies = [
  "easypdf-core",
+ "easypdf-io",
  "easypdf-writer",
  "lopdf",
 ]
@@ -518,7 +551,10 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "easypdf-core",
+ "easypdf-io",
+ "easypdf-layout",
  "image",
+ "lopdf",
  "printpdf",
 ]
 

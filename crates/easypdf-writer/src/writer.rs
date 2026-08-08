@@ -5,10 +5,11 @@ use easypdf_core::{
     FontFamily, Orientation, PageSize, PdfColor, PdfFont, PdfImage, PdfMetadata, PdfText,
     PdfWriteHandler,
 };
+use easypdf_io::AtomicFileOutput;
+use easypdf_layout::LayoutSink;
 use printpdf::{Mm, Op, PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufWriter, Write};
+use std::io::Write;
 use std::path::Path;
 
 use crate::font::map_builtin_font;
@@ -34,6 +35,10 @@ pub struct PdfWriter {
     current_page_size: (f64, f64),
     /// Current page number (1-based).
     current_page_number: usize,
+    /// Whether the current page still accepts content and awaits finalization.
+    current_page_open: bool,
+    /// Whether the document lifecycle has started.
+    document_started: bool,
     /// Registered custom font IDs keyed by path.
     custom_fonts: HashMap<String, printpdf::FontId>,
     /// Document metadata.
@@ -56,6 +61,8 @@ impl PdfWriter {
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,
+            current_page_open: false,
+            document_started: false,
             custom_fonts: HashMap::new(),
             metadata: PdfMetadata::default(),
             handlers: Vec::new(),
@@ -123,22 +130,43 @@ impl PdfWriter {
     /// Add a new page.
     pub fn add_page(&mut self, size: PageSize, orientation: Orientation) -> Result<usize> {
         self.finalize_current_page()?;
+        self.ensure_document_started()?;
         self.current_page_number += 1;
-        self.current_page_size = size.dimensions();
+        let (width, height) = size.dimensions();
+        self.current_page_size = match orientation {
+            Orientation::Portrait => (width, height),
+            Orientation::Landscape => (height, width),
+        };
         self.text_cursor = (DEFAULT_MARGIN, self.current_page_size.1 - DEFAULT_MARGIN);
-        let _ = orientation;
         for handler in &mut self.handlers {
             handler.before_page(self.current_page_number)?;
-            handler.after_page(self.current_page_number)?;
         }
+        self.current_page_open = true;
         Ok(self.current_page_number)
     }
 
     fn finalize_current_page(&mut self) -> Result<()> {
+        if !self.current_page_open {
+            return Ok(());
+        }
+        for handler in &mut self.handlers {
+            handler.after_page(self.current_page_number)?;
+        }
         let ops = std::mem::take(&mut self.current_page_ops);
-        if ops.is_empty() && self.pages.is_empty() { return Ok(()); }
         let (w, h) = self.current_page_size;
         self.pages.push(PdfPage::new(Mm(w as f32 * PT_TO_MM as f32), Mm(h as f32 * PT_TO_MM as f32), ops));
+        self.current_page_open = false;
+        Ok(())
+    }
+
+    fn ensure_document_started(&mut self) -> Result<()> {
+        if self.document_started {
+            return Ok(());
+        }
+        for handler in &mut self.handlers {
+            handler.before_document()?;
+        }
+        self.document_started = true;
         Ok(())
     }
 
@@ -201,19 +229,18 @@ impl PdfWriter {
 
     /// Write the document to a file.
     pub fn finish(mut self, path: impl AsRef<Path>) -> Result<()> {
-        for handler in &mut self.handlers { handler.after_document()?; }
+        if self.current_page_number == 0 {
+            self.add_page(PageSize::A4, Orientation::Portrait)?;
+        }
         self.finalize_current_page()?;
-        if self.pages.is_empty() {
-            let (w, h) = self.current_page_size;
-            self.pages.push(PdfPage::new(Mm(w as f32 * PT_TO_MM as f32), Mm(h as f32 * PT_TO_MM as f32), Vec::new()));
+        for handler in &mut self.handlers {
+            handler.after_document()?;
         }
         self.doc.with_pages(self.pages);
-        let file = File::create(path)?;
-        let mut bw = BufWriter::new(file);
         let opts = PdfSaveOptions::default();
         let mut warnings = Vec::new();
-        self.doc.save_writer(&mut bw, &opts, &mut warnings);
-        Ok(())
+        let bytes = self.doc.save(&opts, &mut warnings);
+        AtomicFileOutput::new(path.as_ref()).write(&bytes)
     }
 
     /// Flush to the pre-configured output stream (hutool pattern).
@@ -233,5 +260,19 @@ impl PdfWriter {
         let mut warnings = Vec::new();
         if let Some(ref mut w) = self.output { self.doc.save_writer(w, &opts, &mut warnings); }
         Ok(())
+    }
+}
+
+impl LayoutSink for PdfWriter {
+    fn add_page(&mut self, size: PageSize, orientation: Orientation) -> Result<usize> {
+        Self::add_page(self, size, orientation)
+    }
+
+    fn write_text(&mut self, text: &PdfText, x: f64, y: f64) -> Result<()> {
+        Self::write_text(self, text, x, y)
+    }
+
+    fn finish(self, path: &Path) -> Result<()> {
+        Self::finish(self, path)
     }
 }

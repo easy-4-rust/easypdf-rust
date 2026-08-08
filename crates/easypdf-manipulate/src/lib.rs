@@ -8,6 +8,7 @@
 
 use easypdf_core::Rotation;
 use easypdf_core::error::{PdfError, Result};
+use easypdf_io::AtomicFileOutput;
 use std::path::Path;
 
 /// A manipulator for performing operations on existing PDF documents.
@@ -42,8 +43,6 @@ impl PdfManipulator {
             return Err(PdfError::Other("No input files specified".into()));
         }
 
-        // For now, implement merge by concatenating at the raw page level.
-        // Load the first document as the base, then append pages from others.
         let mut base_doc = lopdf::Document::load(&paths[0]).map_err(|e| {
             PdfError::Parse(format!(
                 "Failed to load {}: {}",
@@ -51,28 +50,21 @@ impl PdfManipulator {
                 e
             ))
         })?;
+        let base_pages_id = root_pages_id(&base_doc)?;
 
         for path in &paths[1..] {
-            let other_doc = lopdf::Document::load(path).map_err(|e| {
+            let mut other_doc = lopdf::Document::load(path).map_err(|e| {
                 PdfError::Parse(format!("Failed to load {}: {}", path.as_ref().display(), e))
             })?;
-
-            let other_pages = other_doc.get_pages();
-
-            // For each page in the other document, copy its objects and add to base
-            for (_page_num, page_id) in &other_pages {
-                // Get the page dictionary
-                if let Ok(page_obj) = other_doc.get_object(*page_id) {
-                    // Deep clone the page object into the base document
-                    let cloned = clone_object_into(&other_doc, &mut base_doc, page_obj)?;
-                    // Add to page tree via catalog
-                    add_page_to_tree(&mut base_doc, cloned)?;
-                }
-            }
+            let page_count = other_doc.get_pages().len();
+            other_doc.renumber_objects_with(base_doc.max_id + 1);
+            let other_pages_id = root_pages_id(&other_doc)?;
+            base_doc.max_id = base_doc.max_id.max(other_doc.max_id);
+            base_doc.objects.extend(other_doc.objects);
+            append_page_tree(&mut base_doc, base_pages_id, other_pages_id, page_count)?;
         }
 
-        base_doc.save(output)?;
-        Ok(())
+        save_document_atomically(base_doc, output)
     }
 
     /// Rotate a specific page (1-based index).
@@ -156,20 +148,25 @@ impl PdfManipulator {
     /// Returns `PdfError::InvalidPage` if the range is out of bounds.
     pub fn extract_pages(&self, range: std::ops::Range<usize>) -> Result<lopdf::Document> {
         let pages: Vec<lopdf::ObjectId> = self.doc.page_iter().collect();
-        let mut new_doc = lopdf::Document::new();
-
-        for idx in range {
-            let page_id = pages
-                .get(idx)
-                .copied()
-                .ok_or(PdfError::InvalidPage(idx))?;
-
-            if let Ok(page_obj) = self.doc.get_object(page_id) {
-                let cloned = clone_object_into(&self.doc, &mut new_doc, page_obj)?;
-                add_page_to_tree(&mut new_doc, cloned)?;
-            }
+        let selected = range
+            .map(|index| {
+                pages
+                    .get(index)
+                    .copied()
+                    .ok_or(PdfError::InvalidPage(index))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let mut new_doc = self.doc.clone();
+        let pages_id = root_pages_id(&new_doc)?;
+        for page_id in &selected {
+            let page = new_doc
+                .get_object_mut(*page_id)
+                .map_err(|error| PdfError::Parse(error.to_string()))?
+                .as_dict_mut()
+                .map_err(|error| PdfError::Parse(error.to_string()))?;
+            page.set("Parent", lopdf::Object::Reference(pages_id));
         }
-
+        replace_page_tree_kids(&mut new_doc, pages_id, &selected)?;
         Ok(new_doc)
     }
 
@@ -211,9 +208,8 @@ impl PdfManipulator {
     /// # Errors
     ///
     /// Returns `PdfError::Io` if the file cannot be written.
-    pub fn save(mut self, path: impl AsRef<Path>) -> Result<()> {
-        self.doc.save(path)?;
-        Ok(())
+    pub fn save(self, path: impl AsRef<Path>) -> Result<()> {
+        save_document_atomically(self.doc, path)
     }
 
     /// Consume and return the inner `lopdf::Document` for advanced use.
@@ -276,47 +272,80 @@ impl PdfManipulator {
 
 // --- Internal helpers ---
 
-/// Clone a PDF object from source document into the destination document.
-/// Returns the new ObjectId in the destination.
-fn clone_object_into(
-    _src: &lopdf::Document,
-    dest: &mut lopdf::Document,
-    obj: &lopdf::Object,
-) -> Result<lopdf::ObjectId> {
-    // Simple approach: clone the object, assign a new ID
-    // Note: lopdf v0.34 doesn't expose new_object_id on Document directly.
-    // We use a workaround: find the max existing ID and increment.
-    let new_id = next_object_id(dest);
-    let cloned = obj.clone();
-    // Update the ID within the cloned object
-    dest.objects.insert(new_id, cloned);
-    Ok(new_id)
+fn root_pages_id(document: &lopdf::Document) -> Result<lopdf::ObjectId> {
+    document
+        .catalog()
+        .and_then(|catalog| catalog.get(b"Pages"))
+        .and_then(lopdf::Object::as_reference)
+        .map_err(|error| PdfError::Parse(format!("invalid PDF page tree: {error}")))
 }
 
-/// Get the next available ObjectId for a document.
-fn next_object_id(doc: &lopdf::Document) -> lopdf::ObjectId {
-    let max_existing = doc.objects.keys().copied().max();
-    match max_existing {
-        Some((id, generation)) => {
-            if id == u32::MAX {
-                (0, generation + 1)
-            } else {
-                (id + 1, generation)
-            }
-        }
-        None => (1, 0),
-    }
-}
+fn append_page_tree(
+    document: &mut lopdf::Document,
+    destination_pages_id: lopdf::ObjectId,
+    source_pages_id: lopdf::ObjectId,
+    source_page_count: usize,
+) -> Result<()> {
+    let source_pages = document
+        .get_object_mut(source_pages_id)
+        .map_err(|error| PdfError::Parse(error.to_string()))?
+        .as_dict_mut()
+        .map_err(|error| PdfError::Parse(error.to_string()))?;
+    source_pages.set("Parent", lopdf::Object::Reference(destination_pages_id));
 
-/// Add a page object to the document's page tree.
-fn add_page_to_tree(_doc: &mut lopdf::Document, _page_id: lopdf::ObjectId) -> Result<()> {
-    // For v0.1, add the page to the object store and reference it in the page tree.
-    // This is a simplified implementation — full page tree manipulation requires
-    // modifying the catalog's /Pages entry.
-    //
-    // In practice, the merged document will contain all pages but may need
-    // manual page tree cleanup for full PDF spec compliance.
+    let destination_pages = document
+        .get_object_mut(destination_pages_id)
+        .map_err(|error| PdfError::Parse(error.to_string()))?
+        .as_dict_mut()
+        .map_err(|error| PdfError::Parse(error.to_string()))?;
+    let current_count = destination_pages
+        .get(b"Count")
+        .and_then(lopdf::Object::as_i64)
+        .map_err(|error| PdfError::Parse(error.to_string()))?;
+    let source_count = i64::try_from(source_page_count)
+        .map_err(|_| PdfError::Other("page count exceeds i64".to_string()))?;
+    let kids = destination_pages
+        .get_mut(b"Kids")
+        .and_then(lopdf::Object::as_array_mut)
+        .map_err(|error| PdfError::Parse(error.to_string()))?;
+    kids.push(lopdf::Object::Reference(source_pages_id));
+    destination_pages.set("Count", lopdf::Object::Integer(current_count + source_count));
     Ok(())
+}
+
+fn replace_page_tree_kids(
+    document: &mut lopdf::Document,
+    pages_id: lopdf::ObjectId,
+    page_ids: &[lopdf::ObjectId],
+) -> Result<()> {
+    let pages = document
+        .get_object_mut(pages_id)
+        .map_err(|error| PdfError::Parse(error.to_string()))?
+        .as_dict_mut()
+        .map_err(|error| PdfError::Parse(error.to_string()))?;
+    let count = i64::try_from(page_ids.len())
+        .map_err(|_| PdfError::Other("page count exceeds i64".to_string()))?;
+    pages.set("Count", lopdf::Object::Integer(count));
+    pages.set(
+        "Kids",
+        lopdf::Object::Array(
+            page_ids
+                .iter()
+                .copied()
+                .map(lopdf::Object::Reference)
+                .collect(),
+        ),
+    );
+    Ok(())
+}
+
+fn save_document_atomically(
+    mut document: lopdf::Document,
+    path: impl AsRef<Path>,
+) -> Result<()> {
+    let mut bytes = Vec::new();
+    document.save_to(&mut bytes)?;
+    AtomicFileOutput::new(path.as_ref()).write(&bytes)
 }
 
 #[cfg(test)]
@@ -395,10 +424,9 @@ mod tests {
         let out = dir.join("easypdf_merged.pdf");
         make_test_pdf(&path1);
         make_test_pdf(&path2);
-        // Merge should succeed even if page tree isn't perfectly traversable
-        let result = PdfManipulator::merge_files(&[&path1, &path2], &out);
-        // May fail due to page tree issues, just verify no panic
-        let _ = result;
+        PdfManipulator::merge_files(&[&path1, &path2], &out).unwrap();
+        let merged = lopdf::Document::load(&out).unwrap();
+        assert_eq!(merged.get_pages().len(), 2);
         let _ = std::fs::remove_file(&path1);
         let _ = std::fs::remove_file(&path2);
         let _ = std::fs::remove_file(&out);
@@ -421,9 +449,8 @@ mod tests {
         let path = dir.join("easypdf_extract.pdf");
         make_test_pdf(&path);
         let m = PdfManipulator::open(&path).unwrap();
-        // Extracting pages may fail if page tree isn't traversable
-        let result = m.extract_pages(0..1);
-        let _ = result;
+        let result = m.extract_pages(0..1).unwrap();
+        assert_eq!(result.get_pages().len(), 1);
         let _ = std::fs::remove_file(&path);
     }
 
@@ -450,11 +477,4 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
-    #[test]
-    fn test_clone_object_into() {
-        let mut dest = lopdf::Document::new();
-        let obj = lopdf::Object::Integer(42);
-        let result = clone_object_into(&lopdf::Document::new(), &mut dest, &obj);
-        assert!(result.is_ok());
-    }
 }

@@ -10,17 +10,20 @@ description = "Easy PDF manipulation library for Rust — builder API for creati
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
+easypdf-model = { path = "../easypdf-model" }
+easypdf-io = { path = "../easypdf-io" }
 easypdf-derive = { path = "../easypdf-derive" }
 easypdf-reader = { path = "../easypdf-reader" }
 easypdf-writer = { path = "../easypdf-writer" }
 easypdf-manipulate = { path = "../easypdf-manipulate" }
 easypdf-template = { path = "../easypdf-template" }
 easypdf-layout = { path = "../easypdf-layout" }
-lopdf = { workspace = true }
+easypdf-markdown = { path = "../easypdf-markdown", optional = true }
 
 [features]
-default = []
+default = ["markdown"]
 html = ["printpdf/html"]
+markdown = ["dep:easypdf-markdown"]
 
 [dependencies.printpdf]
 workspace = true

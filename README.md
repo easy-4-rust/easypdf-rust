@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.88%2B-orange.svg)](https://www.rust-lang.org)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance)
-[![tests](https://img.shields.io/badge/tests-137%20passed-green.svg)]()
+[![tests](https://img.shields.io/badge/tests-136%20passed-green.svg)]()
 [![coverage](https://img.shields.io/badge/coverage-89%25%20non--derive-blue.svg)]()
 
 ---
@@ -55,6 +55,7 @@
 |:---|:---:|:---|:---|
 | Create PDF (text, fonts, metadata) | ✅ v0.1 | printpdf | 创建含文本、字体的 PDF |
 | Read / extract text + metadata | ✅ v0.1 | lopdf | 读取提取文本、元数据 |
+| PDF → Markdown | ✅ v0.1 | lopdf | GFM / LLM / Plain 输出、页范围、转换报告 |
 | Merge PDF files | ✅ v0.1 | lopdf | 合并多个 PDF |
 | Split PDF into pages | ✅ v0.1 | lopdf | 拆分 PDF 为单页 |
 | Rotate pages | ✅ v0.1 | lopdf | 旋转页面 |
@@ -76,29 +77,43 @@
 
 ## Architecture  |  架构
 
-```
-┌───────────────────────────────────────────────┐
-│                  easypdf                       │
-│         (facade · Builder entry points)        │
-│    EasyPdf::create()  read()  merge()  ...     │
-├───────┬───────┬───────┬───────┬───────────────┤
-│ core  │derive │reader │writer │manipulate     │
-│ types │macro  │lopdf  │printpdf│lopdf   │tmpl  │
-│enums  │#[derive│       │       │        │lopdf │
-│errors │(PdfMo-│       │       │        │      │
-│traits │ del)  │       │       │        │      │
-└───────┴───────┴───────┴───────┴────────┴──────┘
+```mermaid
+flowchart TB
+    facade["easypdf<br/>EasyPdf facade"]
+    markdown["easypdf-markdown<br/>PDF to Markdown pipeline"]
+    reader["easypdf-reader<br/>single-parse session"]
+    writer["easypdf-writer<br/>printpdf backend"]
+    manipulate["easypdf-manipulate<br/>merge/split/edit"]
+    template["easypdf-template<br/>AcroForm filling"]
+    layout["easypdf-layout<br/>backend-neutral layout"]
+    model["easypdf-model<br/>semantic IR"]
+    io["easypdf-io<br/>limits + atomic output"]
+    core["easypdf-core<br/>types + errors"]
+
+    facade --> markdown & reader & writer & manipulate & template
+    markdown --> reader & model & io
+    reader --> model & io & core
+    writer --> layout & io & core
+    manipulate --> io & core
+    template --> io & core
+    layout --> core
+    model --> core
+    io --> core
 ```
 
 | Crate 子包 | Purpose 用途 | Dependencies 依赖 |
 |:---|:---|---|
 | **easypdf** | Facade + Builder entry points 外观入口 | All sub-crates |
 | **easypdf-core** | Types, traits, enums, errors 核心抽象 | thiserror, chrono |
+| **easypdf-model** | Engine-neutral semantic IR 引擎无关语义模型 | easypdf-core |
+| **easypdf-io** | Resource limits + atomic output 资源限制与原子输出 | easypdf-core, tempfile |
 | **easypdf-derive** | `#[derive(PdfModel)]` proc-macro 编译期反射 | syn, quote, proc-macro2 |
 | **easypdf-reader** | PDF parsing & extraction PDF 读取提取 | lopdf |
 | **easypdf-writer** | PDF creation & writing PDF 创建写入 | printpdf, image |
+| **easypdf-layout** | Backend-neutral flow layout 后端无关布局 | easypdf-core |
 | **easypdf-manipulate** | Merge / split / rotate / reorder 页面操作 | lopdf |
 | **easypdf-template** | Form filling 表单填充 | lopdf |
+| **easypdf-markdown** | Deterministic PDF → Markdown 确定性转换 | reader, model, io |
 
 ---
 
@@ -170,6 +185,36 @@ impl PdfReadListener for MyListener {
 
 let mut listener = MyListener { texts: vec![] };
 PdfReader::open("input.pdf")?.read_with_listener(&mut listener)?;
+```
+
+### PDF to Markdown  |  PDF 转 Markdown
+
+```rust
+use easypdf::prelude::*;
+
+let result = EasyPdf::export_markdown("input.pdf", "output.md")
+    .pages(0..20) // zero-based, end-exclusive
+    .profile(MarkdownProfile::Llm)
+    .tables(TablePolicy::Detect)
+    .images(ImagePolicy::Reference)
+    .ocr(OcrPolicy::Auto)
+    .do_export()?;
+
+println!("converted {} pages", result.report().pages_read());
+for warning in result.report().warnings() {
+    eprintln!("warning: {warning:?}");
+}
+```
+
+The current backend extracts native PDF text into semantic paragraph blocks.
+Table detection and OCR requests are reported as structured warnings until their optional backends are enabled; no capability is silently simulated.
+
+当前后端会把 PDF 原生文本提取为语义段落。表格检测与 OCR 在可选后端尚未启用时会返回结构化警告，不会伪造成功结果。
+
+Reader performance can be measured with the checked-in single-parse regression benchmark:
+
+```bash
+cargo bench -p easypdf-reader --bench reader_session
 ```
 
 ### 3. Merge PDFs  |  合并 PDF
@@ -246,6 +291,7 @@ EasyPdf::fill_form("template.pdf", &MyForm::default())
 |:---|---|:---|
 | `create` | `(path: impl Into<PathBuf>)` | `PdfCreateBuilder` |
 | `read` | `(path: impl Into<PathBuf>)` | `PdfReadBuilder` |
+| `export_markdown` | `(input, output)` | `PdfMarkdownExportBuilder` |
 | `merge` | `(inputs: &[impl AsRef<Path>], output: impl AsRef<Path>)` | `Result<()>` |
 | `split` | `(path: impl Into<PathBuf>)` | `PdfSplitBuilder` |
 | `manipulate` | `(path: impl Into<PathBuf>)` | `PdfManipulateBuilder` |

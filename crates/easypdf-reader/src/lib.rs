@@ -7,16 +7,21 @@
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
 
-use easypdf_core::error::{PdfError, Result};
-use easypdf_core::{PdfMetadata, PdfReadListener};
+use std::ops::Range;
 use std::path::Path;
+
+use easypdf_core::error::{PdfError, Result};
+use easypdf_core::{PageIndex, PageRange, PdfMetadata, PdfReadListener};
+use easypdf_io::{PdfInput, ResourceLimits};
+use easypdf_model::{PdfBlock, PdfDocumentModel, PdfPageModel, SourceLocation};
 
 /// A reader for extracting content from PDF documents.
 ///
 /// Backed by the `lopdf` crate for low-level PDF parsing.
 pub struct PdfReader {
-    path: std::path::PathBuf,
-    pages: Option<std::ops::Range<usize>>,
+    document: lopdf::Document,
+    pages: Option<PageRange>,
+    limits: ResourceLimits,
 }
 
 impl PdfReader {
@@ -26,17 +31,66 @@ impl PdfReader {
     ///
     /// Returns `PdfError::Parse` if the file cannot be opened or is not a valid PDF.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
-        let path = path.as_ref().to_path_buf();
-        // Verify the file exists and can be opened
-        let _doc = lopdf::Document::load(&path).map_err(|e| PdfError::Parse(e.to_string()))?;
-        Ok(Self { path, pages: None })
+        Self::open_with_limits(
+            &PdfInput::from_path(path.as_ref()),
+            ResourceLimits::default(),
+        )
+    }
+
+    /// Open a PDF from in-memory bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PdfError::Parse`] when the bytes are not a valid PDF.
+    pub fn from_bytes(bytes: impl Into<Vec<u8>>) -> Result<Self> {
+        Self::open_with_limits(&PdfInput::from_bytes(bytes), ResourceLimits::default())
+    }
+
+    /// Open a PDF input with explicit resource limits.
+    ///
+    /// The document is parsed exactly once and retained by the reader session.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when input limits are exceeded or parsing fails.
+    pub fn open_with_limits(input: &PdfInput, limits: ResourceLimits) -> Result<Self> {
+        let bytes = input.read(limits)?;
+        let document = lopdf::Document::load_mem(&bytes)
+            .map_err(|error| PdfError::Parse(error.to_string()))?;
+        let page_count = document.get_pages().len();
+        if page_count > limits.max_pages() {
+            return Err(PdfError::ResourceLimitExceeded {
+                resource: "pages",
+                limit: usize_to_u64_saturating(limits.max_pages()),
+                actual: usize_to_u64_saturating(page_count),
+            });
+        }
+        Ok(Self {
+            document,
+            pages: None,
+            limits,
+        })
     }
 
     /// Limit extraction to a specific page range (0-based).
     #[must_use]
-    pub fn pages(mut self, range: std::ops::Range<usize>) -> Self {
-        self.pages = Some(range);
+    pub fn pages(mut self, range: Range<usize>) -> Self {
+        let start = range.start;
+        self.pages = Some(match PageRange::new(range) {
+            Ok(pages) => pages,
+            Err(_) => PageRange::empty_at(start),
+        });
         self
+    }
+
+    /// Try to limit extraction to a validated zero-based page range.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the range is inverted.
+    pub fn try_pages(mut self, range: Range<usize>) -> Result<Self> {
+        self.pages = Some(PageRange::new(range)?);
+        Ok(self)
     }
 
     /// Extract text from all selected pages, joined with newlines.
@@ -45,25 +99,14 @@ impl PdfReader {
     ///
     /// Returns `PdfError::Parse` if the PDF content cannot be read.
     pub fn extract_text(&self) -> Result<String> {
-        let doc = lopdf::Document::load(&self.path).map_err(|e| PdfError::Parse(e.to_string()))?;
-        let pages_map = doc.get_pages();
-        let page_count = pages_map.len();
-        let range = self.pages.clone().unwrap_or(0..page_count);
-
         let mut all_text = String::new();
-        // get_pages() returns BTreeMap<u32, ObjectId>, sorted by page number
-        for (page_num, _page_id) in &pages_map {
-            let idx = *page_num as usize;
-            if !range.contains(&idx) {
-                continue;
+        for (_, page_number) in self.selected_pages() {
+            let text = self.extract_page_text(page_number)?;
+            if !all_text.is_empty() {
+                all_text.push('\n');
             }
-            // extract_text takes &[u32] — page numbers
-            if let Ok(text) = doc.extract_text(&[*page_num]) {
-                if !all_text.is_empty() {
-                    all_text.push('\n');
-                }
-                all_text.push_str(&text);
-            }
+            self.ensure_text_limit(all_text.len() + text.len())?;
+            all_text.push_str(&text);
         }
         Ok(all_text)
     }
@@ -74,16 +117,14 @@ impl PdfReader {
     ///
     /// Returns `PdfError::Parse` if the document cannot be read.
     pub fn extract_metadata(&self) -> Result<PdfMetadata> {
-        let doc = lopdf::Document::load(&self.path).map_err(|e| PdfError::Parse(e.to_string()))?;
-
         // Try to read the /Info dictionary from the trailer
-        let title = doc
+        let title = self.document
             .trailer
             .get(b"Info")
             .ok()
             .and_then(|info| {
                 let info_id = info.as_reference().ok()?;
-                doc.get_object(info_id).ok()
+                self.document.get_object(info_id).ok()
             })
             .and_then(|obj| obj.as_dict().ok())
             .and_then(|dict| {
@@ -93,13 +134,13 @@ impl PdfReader {
                     .map(|s| String::from_utf8_lossy(s).into_owned())
             });
 
-        let author = doc
+        let author = self.document
             .trailer
             .get(b"Info")
             .ok()
             .and_then(|info| {
                 let info_id = info.as_reference().ok()?;
-                doc.get_object(info_id).ok()
+                self.document.get_object(info_id).ok()
             })
             .and_then(|obj| obj.as_dict().ok())
             .and_then(|dict| {
@@ -125,8 +166,32 @@ impl PdfReader {
     ///
     /// Returns `PdfError::Parse` if the document cannot be read.
     pub fn page_count(&self) -> Result<usize> {
-        let doc = lopdf::Document::load(&self.path).map_err(|e| PdfError::Parse(e.to_string()))?;
-        Ok(doc.get_pages().len())
+        Ok(self.document.get_pages().len())
+    }
+
+    /// Extract an engine-neutral semantic document model.
+    ///
+    /// The initial reader backend emits paragraph blocks. Higher-level analyzers can
+    /// later enrich these blocks with headings, tables, images, and OCR results.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when text extraction fails or a resource limit is exceeded.
+    pub fn extract_document_model(&self) -> Result<PdfDocumentModel> {
+        let mut pages = Vec::new();
+        let mut extracted_bytes = 0usize;
+        for (page_index, page_number) in self.selected_pages() {
+            let text = self.extract_page_text(page_number)?;
+            extracted_bytes = extracted_bytes.saturating_add(text.len());
+            self.ensure_text_limit(extracted_bytes)?;
+            let source = SourceLocation::new(PageIndex::new(page_index), 1.0);
+            let mut page = PdfPageModel::new(PageIndex::new(page_index));
+            for paragraph in split_paragraphs(&text) {
+                page = page.with_block(PdfBlock::paragraph(paragraph, source));
+            }
+            pages.push(page);
+        }
+        Ok(PdfDocumentModel::new(self.extract_metadata()?, pages))
     }
 
     /// Read the document with an event-driven listener.
@@ -135,21 +200,62 @@ impl PdfReader {
     ///
     /// Returns `PdfError::Parse` if the document cannot be read.
     pub fn read_with_listener(&self, listener: &mut dyn PdfReadListener) -> Result<()> {
-        let text = self.extract_text()?;
-        // Split by double newline as a crude page separator
-        let pages: Vec<&str> = text.split("\n\n").filter(|p| !p.is_empty()).collect();
-
-        for (i, page_text) in pages.iter().enumerate() {
-            listener.on_page_start(i + 1)?;
-            listener.on_text(i + 1, page_text)?;
-            listener.on_page_end(i + 1)?;
+        for (page_index, page_number) in self.selected_pages() {
+            let displayed_page = page_index + 1;
+            let page_text = self.extract_page_text(page_number)?;
+            listener.on_page_start(displayed_page)?;
+            if !page_text.is_empty() {
+                listener.on_text(displayed_page, &page_text)?;
+            }
+            listener.on_page_end(displayed_page)?;
         }
         listener.on_document_end()?;
         Ok(())
     }
+
+    fn selected_pages(&self) -> impl Iterator<Item = (usize, u32)> + '_ {
+        self.document
+            .get_pages()
+            .into_keys()
+            .enumerate()
+            .filter(|(index, _)| {
+                self.pages
+                    .as_ref()
+                    .is_none_or(|range| range.contains(*index))
+            })
+    }
+
+    fn extract_page_text(&self, page_number: u32) -> Result<String> {
+        self.document
+            .extract_text(&[page_number])
+            .map_err(|error| PdfError::Parse(error.to_string()))
+    }
+
+    fn ensure_text_limit(&self, bytes: usize) -> Result<()> {
+        if bytes > self.limits.max_extracted_text_bytes() {
+            return Err(PdfError::ResourceLimitExceeded {
+                resource: "extracted_text_bytes",
+                limit: usize_to_u64_saturating(self.limits.max_extracted_text_bytes()),
+                actual: usize_to_u64_saturating(bytes),
+            });
+        }
+        Ok(())
+    }
+}
+
+fn split_paragraphs(text: &str) -> impl Iterator<Item = String> + '_ {
+    text.split("\n\n")
+        .map(str::trim)
+        .filter(|paragraph| !paragraph.is_empty())
+        .map(ToOwned::to_owned)
+}
+
+fn usize_to_u64_saturating(value: usize) -> u64 {
+    u64::try_from(value).unwrap_or(u64::MAX)
 }
 
 #[cfg(test)]
+#[allow(clippy::items_after_statements, clippy::similar_names)]
 mod tests {
     use super::*;
     use easypdf_core::PdfReadListener;

@@ -10,4 +10,13 @@ description = "PDF reading and text extraction for easypdf-rust (lopdf backend)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
+easypdf-model = { path = "../easypdf-model" }
+easypdf-io = { path = "../easypdf-io" }
 lopdf.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[[bench]]
+name = "reader_session"
+harness = false

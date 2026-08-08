@@ -7,6 +7,7 @@
 #![deny(unsafe_code)]
 
 use easypdf_core::error::{PdfError, Result};
+use easypdf_io::AtomicFileOutput;
 use std::path::Path;
 
 /// A template filler for populating PDF forms and placeholders.
@@ -94,8 +95,9 @@ impl PdfTemplateFiller {
     ///
     /// Returns `PdfError::Io` if the file cannot be written.
     pub fn save(mut self, output_path: impl AsRef<Path>) -> Result<()> {
-        self.doc.save(output_path)?;
-        Ok(())
+        let mut bytes = Vec::new();
+        self.doc.save_to(&mut bytes)?;
+        AtomicFileOutput::new(output_path.as_ref()).write(&bytes)
     }
 
     /// Consume and return the inner `lopdf::Document` for advanced use.

@@ -9,15 +9,21 @@ pub mod enums;
 pub mod error;
 pub mod event;
 pub mod metadata;
+pub mod page_index;
+pub mod page_number;
+pub mod page_range;
 pub mod style;
 pub mod traits;
 
 // --- Convenience re-exports ---
 pub use content::*;
 pub use enums::*;
-pub use error::{PdfError, Result};
+pub use error::{PdfError, PdfErrorCode, Result};
 pub use event::*;
 pub use metadata::*;
+pub use page_index::PageIndex;
+pub use page_number::PageNumber;
+pub use page_range::PageRange;
 pub use style::*;
 pub use traits::*;
 

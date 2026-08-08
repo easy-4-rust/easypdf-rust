@@ -10,4 +10,3 @@ description = "Automatic layout engine for easypdf-rust (FlowLayout)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
-easypdf-writer = { path = "../easypdf-writer" }

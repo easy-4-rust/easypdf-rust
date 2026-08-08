@@ -39,6 +39,8 @@ fn test_merge_two_real_pdfs() {
     let result = PdfManipulator::merge_files(&[&p1, &p2], &out);
     assert!(result.is_ok());
     assert!(out.exists());
+    let merged = lopdf::Document::load(&out).unwrap();
+    assert_eq!(merged.get_pages().len(), 4);
     let _ = std::fs::remove_file(&p1);
     let _ = std::fs::remove_file(&p2);
     let _ = std::fs::remove_file(&out);
@@ -51,17 +53,14 @@ fn test_extract_pages_real() {
     let m = PdfManipulator::open(&p).unwrap();
     let count = m.page_count();
     eprintln!("page_count={count}");
-    match m.extract_pages(0..1) {
-        Ok(doc) => {
-            eprintln!("extracted pages: {}", doc.get_pages().len());
-            assert!(doc.get_pages().len() <= 2);
-        }
-        Err(e) => {
-            eprintln!("extract error: {e:?}");
-            // May fail if page tree isn't traversable; that's acceptable for coverage
-        }
-    }
+    let mut document = m.extract_pages(0..1).unwrap();
+    assert_eq!(document.get_pages().len(), 1);
+    let output = dir.join("manip_extracted.pdf");
+    document.save(&output).unwrap();
+    let reopened = lopdf::Document::load(&output).unwrap();
+    assert_eq!(reopened.get_pages().len(), 1);
     let _ = std::fs::remove_file(&p);
+    let _ = std::fs::remove_file(&output);
 }
 
 #[test]

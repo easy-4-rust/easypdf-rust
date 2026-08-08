@@ -59,4 +59,70 @@ mod tests {
     #[test] fn test_add_text_convenience() { let mut w = PdfWriter::new("t"); w.add_page(PageSize::A4, Orientation::Portrait).unwrap(); w.add_text(&PdfFont::helvetica(14.0), "L1").unwrap(); w.add_text(&PdfFont::times_roman(12.0), "L2").unwrap(); w.add_text_colored(&PdfFont::helvetica(12.0), &PdfColor::red(), "R").unwrap(); let d = std::env::temp_dir(); let p = d.join("ew_at.pdf"); w.finish(&p).unwrap(); assert!(p.exists()); let _ = std::fs::remove_file(&p); }
     #[test] fn test_add_image_from_path() { let mut w = PdfWriter::new("t"); w.add_page(PageSize::A4, Orientation::Portrait).unwrap(); let d = std::env::temp_dir(); let ip = d.join("ew_ti.png"); std::fs::write(&ip, &make_test_png()).unwrap(); w.add_image_from_path(&ip, 50.0, 50.0).unwrap(); let op = d.join("ew_ai.pdf"); w.finish(&op).unwrap(); assert!(op.exists()); let _ = std::fs::remove_file(&ip); let _ = std::fs::remove_file(&op); }
     #[test] fn test_flush_to_writer() { let mut w = PdfWriter::new_from_writer(Vec::new()); w.add_page(PageSize::A4, Orientation::Portrait).unwrap(); w.add_text(&PdfFont::helvetica(10.0), "F!").unwrap(); w.flush().unwrap(); }
+
+    #[test]
+    fn test_write_handler_lifecycle_order() {
+        use std::sync::{Arc, Mutex};
+
+        struct RecordingHandler(Arc<Mutex<Vec<String>>>);
+        impl PdfWriteHandler for RecordingHandler {
+            fn before_document(&mut self) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push("before_document".to_string());
+                Ok(())
+            }
+
+            fn before_page(&mut self, page_number: usize) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push(format!("before_page:{page_number}"));
+                Ok(())
+            }
+
+            fn after_page(&mut self, page_number: usize) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push(format!("after_page:{page_number}"));
+                Ok(())
+            }
+
+            fn after_document(&mut self) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push("after_document".to_string());
+                Ok(())
+            }
+        }
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let mut writer = PdfWriter::new("lifecycle")
+            .register_handler(Box::new(RecordingHandler(Arc::clone(&events))));
+        writer.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        writer.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        let output = std::env::temp_dir().join("easypdf_writer_lifecycle.pdf");
+        writer.finish(&output).unwrap();
+        let actual = events.lock().unwrap().clone();
+        assert_eq!(
+            actual,
+            [
+                "before_document",
+                "before_page:1",
+                "after_page:1",
+                "before_page:2",
+                "after_page:2",
+                "after_document",
+            ]
+        );
+        let _ = std::fs::remove_file(output);
+    }
+
+    #[test]
+    fn test_landscape_orientation_swaps_page_dimensions() {
+        let output = std::env::temp_dir().join("easypdf_writer_landscape.pdf");
+        let mut writer = PdfWriter::new("landscape");
+        writer.add_page(PageSize::A4, Orientation::Landscape).unwrap();
+        writer.finish(&output).unwrap();
+
+        let document = lopdf::Document::load(&output).unwrap();
+        let page_id = *document.get_pages().values().next().unwrap();
+        let page = document.get_object(page_id).unwrap().as_dict().unwrap();
+        let media_box = page.get(b"MediaBox").unwrap().as_array().unwrap();
+        let width = media_box[2].as_float().unwrap();
+        let height = media_box[3].as_float().unwrap();
+        assert!(width > height);
+        let _ = std::fs::remove_file(output);
+    }
 }

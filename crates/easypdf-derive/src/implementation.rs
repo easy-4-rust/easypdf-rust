@@ -72,7 +72,7 @@ fn parse_struct_attrs(attrs: &[syn::Attribute], core: &TokenStream) -> Result<Pd
             continue;
         }
 
-        let _ = attr.parse_nested_meta(|meta| {
+        attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("page") {
                 let value: syn::Expr = meta.value()?.parse()?;
                 page_size = quote! { #value };
@@ -189,7 +189,7 @@ fn parse_position(field: &syn::Field) -> Result<(TokenStream, TokenStream)> {
         if !attr.path().is_ident("pdf") {
             continue;
         }
-        let _ = attr.parse_nested_meta(|meta| {
+        attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("position") {
                 let content: syn::ExprTuple = meta.value()?.parse()?;
                 if content.elems.len() == 2 {
@@ -214,7 +214,7 @@ fn parse_text_attrs(field: &syn::Field, core: &TokenStream) -> Result<TokenStrea
         if !attr.path().is_ident("pdf") {
             continue;
         }
-        let _ = attr.parse_nested_meta(|meta| {
+        attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("font") {
                 let value: syn::Expr = meta.value()?.parse()?;
                 attrs.extend(quote! { .font(#value) });

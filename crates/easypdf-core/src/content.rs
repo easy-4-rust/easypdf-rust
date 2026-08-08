@@ -104,7 +104,7 @@ impl PdfTable {
 // --- Table Cell ---
 
 /// A single cell within a table.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PdfTableCell {
     /// Cell text content.
     pub content: String,
@@ -116,18 +116,6 @@ pub struct PdfTableCell {
     pub font: PdfFont,
     /// Text color.
     pub color: PdfColor,
-}
-
-impl Default for PdfTableCell {
-    fn default() -> Self {
-        Self {
-            content: String::new(),
-            h_alignment: TextAlignment::default(),
-            v_alignment: VerticalAlignment::default(),
-            font: PdfFont::default(),
-            color: PdfColor::default(),
-        }
-    }
 }
 
 // --- Image ---

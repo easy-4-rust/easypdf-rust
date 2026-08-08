@@ -3,12 +3,15 @@ resolver = "3"
 members = [
     "crates/easypdf",
     "crates/easypdf-core",
+    "crates/easypdf-model",
+    "crates/easypdf-io",
     "crates/easypdf-derive",
     "crates/easypdf-layout",
     "crates/easypdf-reader",
     "crates/easypdf-writer",
     "crates/easypdf-manipulate",
     "crates/easypdf-template",
+    "crates/easypdf-markdown",
 ]
 
 [workspace.package]

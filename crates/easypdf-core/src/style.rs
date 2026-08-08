@@ -115,7 +115,7 @@ pub enum BuiltInFont {
     CourierBoldOblique,
     /// Symbol.
     Symbol,
-    /// ZapfDingbats.
+    /// `ZapfDingbats`.
     ZapfDingbats,
 }
 

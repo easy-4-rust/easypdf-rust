@@ -10,5 +10,6 @@ description = "PDF template and form filling for easypdf-rust (lopdf backend)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
+easypdf-io = { path = "../easypdf-io" }
 easypdf-writer = { path = "../easypdf-writer" }
 lopdf.workspace = true

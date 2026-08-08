@@ -1,14 +1,16 @@
 [package]
-name = "easypdf-manipulate"
+name = "easypdf-io"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-description = "PDF manipulation (merge, split, rotate, reorder) for easypdf-rust (lopdf backend)"
+description = "Bounded input and atomic output primitives for easypdf-rust"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
-easypdf-io = { path = "../easypdf-io" }
-lopdf.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

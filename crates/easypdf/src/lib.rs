@@ -54,6 +54,17 @@ pub use easypdf_derive::PdfModel;
 // Reader
 pub use easypdf_reader::PdfReader;
 
+// Engine-neutral model and bounded I/O
+pub use easypdf_io::{AtomicFileOutput, PdfInput, ResourceLimits};
+pub use easypdf_model::{PdfBlock, PdfDocumentModel, PdfPageModel, SourceLocation};
+
+// PDF to Markdown
+#[cfg(feature = "markdown")]
+pub use easypdf_markdown::{
+    ImagePolicy, MarkdownExportReport, MarkdownExportResult, MarkdownProfile, MarkdownRenderer,
+    MarkdownWarning, OcrPolicy, PdfMarkdownExportBuilder, TablePolicy,
+};
+
 // Writer
 pub use easypdf_writer::PdfWriter;
 
@@ -124,6 +135,19 @@ impl EasyPdf {
         PdfReadBuilder::new(path)
     }
 
+    /// Start a PDF to Markdown export operation.
+    ///
+    /// The exporter parses the PDF once, applies resource limits, and atomically
+    /// replaces the output only after conversion succeeds.
+    #[cfg(feature = "markdown")]
+    #[must_use]
+    pub fn export_markdown(
+        input: impl Into<PathBuf>,
+        output: impl Into<PathBuf>,
+    ) -> PdfMarkdownExportBuilder {
+        PdfMarkdownExportBuilder::new(input, output)
+    }
+
     // --- Merge ---
 
     /// Merge multiple PDF files into a single output file.
@@ -166,67 +190,42 @@ impl EasyPdf {
 
     // --- Encrypt ---
 
-    /// Add basic password protection to an existing PDF.
+    /// Request password protection for an existing PDF.
     ///
-    /// Creates a Standard encryption dictionary with RC4 128-bit.
-    /// For AES-256 encryption, enable the `crypto` feature.
+    /// Encryption is intentionally unavailable until a standards-compliant
+    /// implementation is integrated; this method never emits a fake encryption dictionary.
     ///
     /// # Errors
     ///
     /// Returns an error if the input file cannot be read or the output cannot be written.
     pub fn encrypt(
-        input: impl AsRef<Path>,
-        output: impl AsRef<Path>,
+        _input: impl AsRef<Path>,
+        _output: impl AsRef<Path>,
         _password: &str,
     ) -> crate::Result<()> {
-        let mut doc = lopdf::Document::load(input).map_err(|e| PdfError::Parse(e.to_string()))?;
-        let mut d = lopdf::Dictionary::new();
-        d.set("Filter", lopdf::Object::Name(b"Standard".to_vec()));
-        d.set("V", lopdf::Object::Integer(2));
-        d.set("R", lopdf::Object::Integer(3));
-        d.set("Length", lopdf::Object::Integer(128));
-        d.set("P", lopdf::Object::Integer(-4));
-        d.set("O", lopdf::Object::String(vec![0u8; 32], lopdf::StringFormat::Literal));
-        d.set("U", lopdf::Object::String(vec![0u8; 32], lopdf::StringFormat::Literal));
-        let encrypt_id = doc.add_object(lopdf::Object::Dictionary(d));
-        doc.trailer.set("Encrypt", lopdf::Object::Reference(encrypt_id));
-        doc.save(output)?;
-        Ok(())
+        Err(PdfError::UnsupportedFeature(
+            "standards-compliant PDF encryption is not enabled".to_string(),
+        ))
     }
 
     // --- Sign (F13) ---
 
-    /// Add a placeholder digital signature field to a PDF.
+    /// Request a digital signature for a PDF.
     ///
-    /// Note: Full PKCS#7/RSA digital signatures require the `crypto` feature
-    /// and are not yet implemented. This method adds the signature dictionary
-    /// structure without an actual cryptographic signature.
+    /// Signing is intentionally unavailable until a real PKCS#7 implementation
+    /// is integrated; this method never emits a placeholder that appears signed.
     ///
     /// # Errors
     ///
     /// Returns an error if the input file cannot be read or the output cannot be written.
     pub fn sign(
-        input: impl AsRef<Path>,
-        output: impl AsRef<Path>,
-        reason: &str,
+        _input: impl AsRef<Path>,
+        _output: impl AsRef<Path>,
+        _reason: &str,
     ) -> crate::Result<()> {
-        let mut doc = lopdf::Document::load(input).map_err(|e| PdfError::Parse(e.to_string()))?;
-        // Create a signature field (placeholder)
-        let mut sig_dict = lopdf::Dictionary::new();
-        sig_dict.set("Type", lopdf::Object::Name(b"Sig".to_vec()));
-        sig_dict.set("Filter", lopdf::Object::Name(b"Adobe.PPKLite".to_vec()));
-        sig_dict.set("SubFilter", lopdf::Object::Name(b"adbe.pkcs7.detached".to_vec()));
-        sig_dict.set("Reason", lopdf::Object::String(reason.as_bytes().to_vec(), lopdf::StringFormat::Literal));
-        sig_dict.set("ByteRange", lopdf::Object::Array(vec![0.into(), 0.into(), 0.into(), 0.into()]));
-        sig_dict.set("Contents", lopdf::Object::String(vec![0u8; 8192], lopdf::StringFormat::Literal));
-        let sig_id = doc.add_object(lopdf::Object::Dictionary(sig_dict));
-        if let Ok(catalog) = doc.catalog_mut() {
-            let mut perm = lopdf::Dictionary::new();
-            perm.set("DocMDP", lopdf::Object::Reference(sig_id));
-            catalog.set("Perms", lopdf::Object::Dictionary(perm));
-        }
-        doc.save(output)?;
-        Ok(())
+        Err(PdfError::UnsupportedFeature(
+            "PKCS#7 PDF signing is not enabled".to_string(),
+        ))
     }
 }
 
@@ -543,17 +542,26 @@ impl PdfReadBuilder {
         self
     }
 
+    /// Open a reusable, single-parse reader session.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the PDF cannot be read or parsed.
+    pub fn open(self) -> Result<PdfReader> {
+        let mut reader = PdfReader::open(&self.path)?;
+        if let Some(range) = self.pages {
+            reader = reader.try_pages(range)?;
+        }
+        Ok(reader)
+    }
+
     /// Extract all text from the PDF.
     ///
     /// # Errors
     ///
     /// Returns `PdfError::Parse` if the PDF cannot be read.
     pub fn extract_text(self) -> Result<String> {
-        let mut reader = easypdf_reader::PdfReader::open(&self.path)?;
-        if let Some(range) = self.pages {
-            reader = reader.pages(range);
-        }
-        reader.extract_text()
+        self.open()?.extract_text()
     }
 
     /// Extract PDF metadata.
@@ -562,7 +570,7 @@ impl PdfReadBuilder {
     ///
     /// Returns `PdfError::Parse` if the PDF cannot be read.
     pub fn metadata(self) -> Result<PdfMetadata> {
-        easypdf_reader::PdfReader::open(&self.path)?.extract_metadata()
+        self.open()?.extract_metadata()
     }
 
     /// Get the number of pages.
@@ -571,7 +579,7 @@ impl PdfReadBuilder {
     ///
     /// Returns `PdfError::Parse` if the PDF cannot be read.
     pub fn page_count(self) -> Result<usize> {
-        easypdf_reader::PdfReader::open(&self.path)?.page_count()
+        self.open()?.page_count()
     }
 }
 
@@ -758,6 +766,8 @@ impl PdfFillBuilder {
 /// Convenience re-exports in a `prelude` module.
 pub mod prelude {
     pub use super::EasyPdf;
+    #[cfg(feature = "markdown")]
+    pub use super::{ImagePolicy, MarkdownProfile, OcrPolicy, TablePolicy};
     pub use easypdf_core::*;
     pub use easypdf_derive::PdfModel;
 }
@@ -1081,8 +1091,8 @@ mod tests {
 
         let out = dir.join("easypdf_encrypted.pdf");
         let result = EasyPdf::encrypt(&path, &out, "password123");
-        assert!(result.is_ok());
-        assert!(out.exists());
+        assert!(matches!(result, Err(PdfError::UnsupportedFeature(_))));
+        assert!(!out.exists());
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&out);
     }
@@ -1107,7 +1117,11 @@ mod tests {
         w.write_text(&PdfText::new("sig"), 100.0, 700.0).unwrap();
         w.finish(&path).unwrap();
         let out = dir.join("easypdf_signed.pdf");
-        assert!(EasyPdf::sign(&path, &out, "Approved").is_ok());
+        assert!(matches!(
+            EasyPdf::sign(&path, &out, "Approved"),
+            Err(PdfError::UnsupportedFeature(_))
+        ));
+        assert!(!out.exists());
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&out);
     }
