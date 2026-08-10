@@ -6,6 +6,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
+#![allow(clippy::uninlined_format_args, clippy::manual_string_new)]
 
 use std::ops::Range;
 use std::path::Path;

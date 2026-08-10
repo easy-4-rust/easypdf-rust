@@ -177,18 +177,18 @@ impl PdfWriter {
 
     /// Write text at (x, y) in PDF points.
     pub fn write_text(&mut self, text: &PdfText, x_pt: f64, y_pt: f64) -> Result<()> {
-        if let FontFamily::Custom(ref path) = text.font.family {
-            if let Some(font_id) = self.custom_fonts.get(path.as_ref()) {
-                let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
-                let ops = vec![
-                    Op::StartTextSection, Op::SetTextCursor { pos },
-                    Op::SetFont { font: PdfFontHandle::External(font_id.clone()), size: Pt(text.font.size as f32) },
-                    Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
-                    Op::EndTextSection,
-                ];
-                self.current_page_ops.extend(ops);
-                return Ok(());
-            }
+        if let FontFamily::Custom(ref path) = text.font.family
+            && let Some(font_id) = self.custom_fonts.get(path.as_ref())
+        {
+            let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
+            let ops = vec![
+                Op::StartTextSection, Op::SetTextCursor { pos },
+                Op::SetFont { font: PdfFontHandle::External(font_id.clone()), size: Pt(text.font.size as f32) },
+                Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
+                Op::EndTextSection,
+            ];
+            self.current_page_ops.extend(ops);
+            return Ok(());
         }
         let bf = map_builtin_font(&text.font);
         let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
@@ -244,6 +244,7 @@ impl PdfWriter {
     }
 
     /// Flush to the pre-configured output stream (hutool pattern).
+    #[allow(clippy::similar_names)]
     pub fn flush(&mut self) -> Result<()> {
         let mut pages = std::mem::take(&mut self.pages);
         let ops = std::mem::take(&mut self.current_page_ops);

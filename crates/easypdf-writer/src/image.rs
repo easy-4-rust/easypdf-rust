@@ -8,6 +8,10 @@ use printpdf::{Op, Pt, RawImage, XObjectTransform};
 impl PdfWriter {
     /// Write an image at (x, y) with dimensions (w, h) in points.
     /// If w=h=0, uses natural pixel size at 72 DPI.
+    ///
+    /// # Errors
+    ///
+    /// Returns `PdfError::Io` if the image cannot be written.
     pub fn write_image(&mut self, image: &PdfImage, x_pt: f64, y_pt: f64, w_pt: f64, h_pt: f64) -> Result<()> {
         let mut warnings = Vec::new();
         let raw = RawImage::decode_from_bytes(&image.data, &mut warnings)

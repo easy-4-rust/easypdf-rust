@@ -4,6 +4,7 @@ use easypdf_core::{BuiltInFont, FontFamily, PdfFont};
 use printpdf::BuiltinFont;
 
 /// Map easypdf-core's FontFamily to printpdf's BuiltinFont.
+#[must_use]
 pub fn map_builtin_font(font: &PdfFont) -> BuiltinFont {
     match &font.family {
         FontFamily::BuiltIn(builtin) => match builtin {

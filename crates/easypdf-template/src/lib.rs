@@ -5,6 +5,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
+#![allow(clippy::similar_names, clippy::doc_markdown)]
 
 use easypdf_core::error::{PdfError, Result};
 use easypdf_io::AtomicFileOutput;
@@ -40,11 +41,11 @@ impl PdfTemplateFiller {
         let object_ids: Vec<lopdf::ObjectId> = self.doc.objects.keys().copied().collect();
 
         for id in object_ids {
-            if let Ok(obj) = self.doc.get_object_mut(id) {
-                if let Ok(dict) = obj.as_dict_mut() {
-                    // Check if this is the field we're looking for by /T (field name)
-                    if let Ok(lopdf::Object::String(name_bytes, _)) = dict.get(b"T") {
-                        if name_bytes == field_name.as_bytes() {
+            if let Ok(obj) = self.doc.get_object_mut(id)
+                && let Ok(dict) = obj.as_dict_mut()
+                && let Ok(lopdf::Object::String(name_bytes, _)) = dict.get(b"T")
+                && name_bytes == field_name.as_bytes()
+            {
                             dict.set(
                                 "V",
                                 lopdf::Object::String(
@@ -53,9 +54,6 @@ impl PdfTemplateFiller {
                                 ),
                             );
                             found = true;
-                        }
-                    }
-                }
             }
         }
 

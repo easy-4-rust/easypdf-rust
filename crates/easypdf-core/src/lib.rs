@@ -31,6 +31,11 @@ pub use traits::*;
 mod tests {
     use super::*;
 
+    /// Approximate equality for f64 in tests.
+    fn assert_f64_eq(actual: f64, expected: f64) {
+        assert!((actual - expected).abs() < f64::EPSILON, "expected {expected}, got {actual}");
+    }
+
     // --- Enums ---
 
     #[test]
@@ -66,7 +71,7 @@ mod tests {
     #[test]
     fn test_pdf_error_display() {
         let err = PdfError::InvalidPage(5);
-        assert!(format!("{err}").contains("5"));
+        assert!(format!("{err}").contains('5'));
         let err = PdfError::Parse("bad data".into());
         assert!(format!("{err}").contains("bad data"));
         let err = PdfError::UnsupportedFeature("tables".into());
@@ -127,20 +132,20 @@ mod tests {
     #[test]
     fn test_pdf_font_constructors() {
         let f = PdfFont::helvetica(12.0);
-        assert_eq!(f.size, 12.0);
+        assert_f64_eq(f.size, 12.0);
         assert!(matches!(f.family, FontFamily::BuiltIn(BuiltInFont::Helvetica)));
 
         let f = PdfFont::times_roman(14.0);
-        assert_eq!(f.size, 14.0);
+        assert_f64_eq(f.size, 14.0);
 
         let f = PdfFont::courier(10.0);
-        assert_eq!(f.size, 10.0);
+        assert_f64_eq(f.size, 10.0);
     }
 
     #[test]
     fn test_pdf_font_builder() {
         let f = PdfFont::helvetica(12.0).bold().italic().with_size(16.0);
-        assert_eq!(f.size, 16.0);
+        assert_f64_eq(f.size, 16.0);
         assert!(f.style.bold);
         assert!(f.style.italic);
     }
@@ -148,7 +153,7 @@ mod tests {
     #[test]
     fn test_pdf_font_default() {
         let f = PdfFont::default();
-        assert_eq!(f.size, 12.0);
+        assert_f64_eq(f.size, 12.0);
         assert!(!f.style.bold);
         assert!(!f.style.italic);
     }
@@ -178,7 +183,7 @@ mod tests {
     #[test]
     fn test_table_border_default() {
         let b = TableBorder::default();
-        assert_eq!(b.width, 0.5);
+        assert_f64_eq(b.width, 0.5);
         assert_eq!(b.color, PdfColor::black());
     }
 
@@ -210,7 +215,7 @@ mod tests {
             .width(500.0);
         assert_eq!(t.headers.len(), 2);
         assert_eq!(t.rows.len(), 2);
-        assert_eq!(t.width, 500.0);
+        assert_f64_eq(t.width, 500.0);
     }
 
     #[test]
@@ -225,8 +230,8 @@ mod tests {
     fn test_pdf_image_from_bytes() {
         let img = PdfImage::from_bytes(vec![1, 2, 3]);
         assert_eq!(img.data, vec![1, 2, 3]);
-        assert_eq!(img.width, 0.0);
-        assert_eq!(img.height, 0.0);
+        assert_f64_eq(img.width, 0.0);
+        assert_f64_eq(img.height, 0.0);
     }
 
     #[test]
@@ -295,7 +300,7 @@ mod tests {
         let m = PdfModelMetadata::default();
         assert_eq!(m.page_size, PageSize::A4);
         assert_eq!(m.orientation, Orientation::Portrait);
-        assert_eq!(m.margins, 72.0);
+        assert_f64_eq(m.margins, 72.0);
     }
 
     struct TestListener {

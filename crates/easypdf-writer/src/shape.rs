@@ -37,6 +37,7 @@ impl PdfWriter {
     pub fn draw_circle(&mut self, cx: f64, cy: f64, radius: f64, line_width: f64) {
         const K: f64 = 0.552_284_749_8;
         let (r, k) = (radius, K * radius);
+        #[allow(clippy::type_complexity)]
         let segments: [(f64,f64,f64,f64,f64,f64,f64,f64); 4] = [
             (r, 0.0, r, k, k, r, 0.0, r),
             (0.0, r, -k, r, -r, k, -r, 0.0),

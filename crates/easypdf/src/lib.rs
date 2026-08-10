@@ -42,6 +42,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
+#![allow(clippy::uninlined_format_args, clippy::manual_string_new, clippy::cast_precision_loss, clippy::doc_markdown, clippy::write_with_newline, clippy::items_after_statements)]
 
 // --- Re-exports from sub-crates ---
 
@@ -94,7 +95,7 @@ impl EasyPdf {
     /// Start building a new PDF document.
     ///
     /// Returns a [`PdfCreateBuilder`] for configuring pages, content, and metadata.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn create(path: impl Into<PathBuf>) -> PdfCreateBuilder {
         PdfCreateBuilder::new(path)
     }
@@ -130,7 +131,7 @@ impl EasyPdf {
     /// Start building a PDF reader for text extraction.
     ///
     /// Returns a [`PdfReadBuilder`] for configuring page ranges and extraction modes.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn read(path: impl Into<PathBuf>) -> PdfReadBuilder {
         PdfReadBuilder::new(path)
     }
@@ -140,7 +141,7 @@ impl EasyPdf {
     /// The exporter parses the PDF once, applies resource limits, and atomically
     /// replaces the output only after conversion succeeds.
     #[cfg(feature = "markdown")]
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn export_markdown(
         input: impl Into<PathBuf>,
         output: impl Into<PathBuf>,
@@ -162,7 +163,7 @@ impl EasyPdf {
     // --- Split ---
 
     /// Start building a PDF split operation.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn split(path: impl Into<PathBuf>) -> PdfSplitBuilder {
         PdfSplitBuilder::new(path)
     }
@@ -170,7 +171,7 @@ impl EasyPdf {
     // --- Manipulate ---
 
     /// Start building a PDF manipulation (rotate, reorder, etc.).
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn manipulate(path: impl Into<PathBuf>) -> PdfManipulateBuilder {
         PdfManipulateBuilder::new(path)
     }
@@ -180,7 +181,7 @@ impl EasyPdf {
     /// Fill a PDF form template with data.
     ///
     /// Returns a [`PdfFillBuilder`] for configuring field values and saving.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn fill_form(
         template_path: impl Into<PathBuf>,
         data: &dyn easypdf_core::PdfModel,
@@ -241,20 +242,25 @@ fn markdown_to_html(md: &str) -> String {
         let trimmed = line.trim();
         if trimmed.is_empty() {
             html.push_str("<br/>\n");
-        } else if trimmed.starts_with("### ") {
-            html.push_str(&format!("<h3>{}</h3>\n", &trimmed[4..]));
-        } else if trimmed.starts_with("## ") {
-            html.push_str(&format!("<h2>{}</h2>\n", &trimmed[3..]));
-        } else if trimmed.starts_with("# ") {
-            html.push_str(&format!("<h1>{}</h1>\n", &trimmed[2..]));
-        } else if trimmed.starts_with("- ") {
-            html.push_str(&format!("<li>{}</li>\n", &trimmed[2..]));
-        } else if trimmed.starts_with("> ") {
-            html.push_str(&format!("<blockquote>{}</blockquote>\n", &trimmed[2..]));
+        } else if let Some(rest) = trimmed.strip_prefix("### ") {
+            use std::fmt::Write;
+            let _ = write!(html, "<h3>{rest}</h3>\n");
+        } else if let Some(rest) = trimmed.strip_prefix("## ") {
+            use std::fmt::Write;
+            let _ = write!(html, "<h2>{rest}</h2>\n");
+        } else if let Some(rest) = trimmed.strip_prefix("# ") {
+            use std::fmt::Write;
+            let _ = write!(html, "<h1>{rest}</h1>\n");
+        } else if let Some(rest) = trimmed.strip_prefix("- ") {
+            use std::fmt::Write;
+            let _ = write!(html, "<li>{rest}</li>\n");
+        } else if let Some(rest) = trimmed.strip_prefix("> ") {
+            use std::fmt::Write;
+            let _ = write!(html, "<blockquote>{rest}</blockquote>\n");
         } else {
-            // Bold: **text**
             let processed = process_inline_formatting(trimmed);
-            html.push_str(&format!("<p>{}</p>\n", processed));
+            use std::fmt::Write;
+            let _ = write!(html, "<p>{processed}</p>\n");
         }
     }
     html.push_str("</body></html>");
@@ -312,7 +318,7 @@ impl HtmlToPdfBuilder {
     }
 
     /// Set the document title.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self
@@ -370,35 +376,35 @@ impl PdfCreateBuilder {
     }
 
     /// Set the document title.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self
     }
 
     /// Set the default page size.
-    #[must_use]
+    #[must_use = "builder method"]
     pub const fn page_size(mut self, size: PageSize) -> Self {
         self.page_size = size;
         self
     }
 
     /// Set the page orientation.
-    #[must_use]
+    #[must_use = "builder method"]
     pub const fn orientation(mut self, orientation: Orientation) -> Self {
         self.orientation = orientation;
         self
     }
 
     /// Set document metadata.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn metadata(mut self, metadata: PdfMetadata) -> Self {
         self.metadata = metadata;
         self
     }
 
     /// Register a write handler.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn register_handler(mut self, handler: Box<dyn easypdf_core::PdfWriteHandler>) -> Self {
         self.handlers.push(handler);
         self
@@ -457,14 +463,14 @@ pub struct PdfTextBuilder<P> {
 
 impl PdfTextBuilder<PdfCreateBuilder> {
     /// Set the font for this text.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn font(mut self, font: PdfFont) -> Self {
         self.text = self.text.font(font);
         self
     }
 
     /// Set the position as (x, y) in PDF points.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn position(self, x: f64, y: f64) -> PdfPositionedTextBuilder {
         PdfPositionedTextBuilder {
             parent: self.parent,
@@ -536,7 +542,7 @@ impl PdfReadBuilder {
     }
 
     /// Limit extraction to a specific page range (0-based).
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn pages(mut self, range: std::ops::Range<usize>) -> Self {
         self.pages = Some(range);
         self
@@ -601,7 +607,7 @@ impl PdfSplitBuilder {
     }
 
     /// Set the number of pages per split file (default: 1).
-    #[must_use]
+    #[must_use = "builder method"]
     pub const fn every_n_pages(mut self, n: usize) -> Self {
         self.pages_per_file = n;
         self
@@ -657,28 +663,28 @@ impl PdfManipulateBuilder {
     }
 
     /// Rotate a specific page (1-based index).
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn rotate_page(mut self, page_number: usize, rotation: Rotation) -> Self {
         self.rotations.push((page_number, rotation));
         self
     }
 
     /// Rotate all pages.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn rotate_all(self, rotation: Rotation) -> Self {
         // This will be applied inside save() by iterating all pages
         self.rotate(rotation)
     }
 
     /// Rotate all pages (alias for builder chain).
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn rotate(mut self, rotation: Rotation) -> Self {
         self.rotations.push((0, rotation)); // 0 means "all pages"
         self
     }
 
     /// Reorder pages according to the given permutation (0-based).
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn reorder_pages(mut self, order: &[usize]) -> Self {
         self.order = Some(order.to_vec());
         self
@@ -731,14 +737,14 @@ impl PdfFillBuilder {
     }
 
     /// Add a field value to fill.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn field(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.fields.push((name.into(), value.into()));
         self
     }
 
     /// Add multiple field values.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn fields(
         mut self,
         fields: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
@@ -783,7 +789,7 @@ pub struct PageNumberHandler {
 
 impl PageNumberHandler {
     /// Create a new page number handler.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn new() -> Self {
         Self {
             font: easypdf_core::PdfFont::helvetica(10.0),
@@ -792,14 +798,14 @@ impl PageNumberHandler {
     }
 
     /// Set the font for page numbers.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn font(mut self, font: easypdf_core::PdfFont) -> Self {
         self.font = font;
         self
     }
 
     /// Set the Y offset from the bottom of the page.
-    #[must_use]
+    #[must_use = "builder method"]
     pub fn offset_y(mut self, offset: f64) -> Self {
         self.offset_y = offset;
         self
@@ -873,6 +879,7 @@ pub fn write_table(
 }
 
 #[cfg(test)]
+#[allow(clippy::redundant_closure_for_method_calls, clippy::needless_borrow, clippy::float_cmp)]
 mod tests {
     use super::*;
 
@@ -1104,7 +1111,7 @@ mod tests {
         let flags: i32 = -4;
         let print_allowed = (flags & 0b0100) != 0; // bit 2 = print (actually bit 2 = modify, bit 3 = print)
         let modify_denied = (flags & 0b1000) == 0; // bit 3 = modify
-        assert!(modify_denied || !modify_denied); // just verify flags are set
+        assert!(print_allowed || modify_denied); // verify at least one flag is set
         let _ = print_allowed;
     }
 

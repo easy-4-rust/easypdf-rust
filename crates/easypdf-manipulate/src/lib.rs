@@ -5,6 +5,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
+#![allow(clippy::uninlined_format_args, clippy::manual_string_new)]
 
 use easypdf_core::Rotation;
 use easypdf_core::error::{PdfError, Result};
@@ -75,7 +76,7 @@ impl PdfManipulator {
     pub fn rotate_page(&mut self, page_number: usize, rotation: Rotation) -> Result<()> {
         let pages = self.doc.get_pages();
         let page_id = pages
-            .get(&(page_number as u32))
+            .get(&u32::try_from(page_number).map_err(|_| PdfError::InvalidPage(page_number))?)
             .copied()
             .ok_or(PdfError::InvalidPage(page_number))?;
 
@@ -95,10 +96,8 @@ impl PdfManipulator {
             Rotation::Clockwise270 => (current_rotate + 270) % 360,
         };
 
-        if let Ok(obj) = self.doc.get_object_mut(page_id) {
-            if let Ok(dict) = obj.as_dict_mut() {
-                dict.set("Rotate", lopdf::Object::Integer(new_rotate));
-            }
+        if let Ok(dict) = self.doc.get_object_mut(page_id).and_then(|obj| obj.as_dict_mut()) {
+            dict.set("Rotate", lopdf::Object::Integer(new_rotate));
         }
         Ok(())
     }
@@ -122,21 +121,21 @@ impl PdfManipulator {
         }
 
         // Update the page tree: modify the catalog's /Pages -> /Kids array
-        if let Ok(catalog) = self.doc.catalog_mut() {
-            if let Ok(pages_ref) = catalog.get(b"Pages") {
-                if let Ok(pages_id) = pages_ref.as_reference() {
-                    if let Ok(pages_dict) = self.doc.get_object_mut(pages_id) {
-                        if let Ok(pages_dict) = pages_dict.as_dict_mut() {
-                            pages_dict.set("Count", lopdf::Object::Integer(new_order.len() as i64));
-                            let kids: Vec<lopdf::Object> = new_order
-                                .into_iter()
-                                .map(lopdf::Object::Reference)
-                                .collect();
-                            pages_dict.set("Kids", lopdf::Object::Array(kids));
-                        }
-                    }
-                }
-            }
+        let count = i64::try_from(new_order.len()).unwrap_or(i64::MAX);
+        if let Some(pages_dict) = self
+            .doc
+            .catalog_mut()
+            .ok()
+            .and_then(|c| c.get(b"Pages").ok()?.as_reference().ok())
+            .and_then(|id| self.doc.get_object_mut(id).ok())
+            .and_then(|obj| obj.as_dict_mut().ok())
+        {
+            pages_dict.set("Count", lopdf::Object::Integer(count));
+            let kids: Vec<lopdf::Object> = new_order
+                .into_iter()
+                .map(lopdf::Object::Reference)
+                .collect();
+            pages_dict.set("Kids", lopdf::Object::Array(kids));
         }
         Ok(())
     }
@@ -349,6 +348,7 @@ fn save_document_atomically(
 }
 
 #[cfg(test)]
+#[allow(clippy::similar_names)]
 mod tests {
     use super::*;
 
