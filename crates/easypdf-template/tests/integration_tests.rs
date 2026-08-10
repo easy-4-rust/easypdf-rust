@@ -5,25 +5,43 @@ fn make_form_pdf(dir: &std::path::Path, name: &str) -> std::path::PathBuf {
     let path = dir.join(name);
     let mut doc = lopdf::Document::new();
 
-    let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(lopdf::Dictionary::new(), b" ".to_vec())));
+    let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(
+        lopdf::Dictionary::new(),
+        b" ".to_vec(),
+    )));
     let mut f = lopdf::Dictionary::new();
     f.set("Type", lopdf::Object::Name(b"Annot".to_vec()));
     f.set("Subtype", lopdf::Object::Name(b"Widget".to_vec()));
     f.set("FT", lopdf::Object::Name(b"Tx".to_vec()));
-    f.set("T", lopdf::Object::String(b"name".to_vec(), lopdf::StringFormat::Literal));
-    f.set("V", lopdf::Object::String(b"old".to_vec(), lopdf::StringFormat::Literal));
+    f.set(
+        "T",
+        lopdf::Object::String(b"name".to_vec(), lopdf::StringFormat::Literal),
+    );
+    f.set(
+        "V",
+        lopdf::Object::String(b"old".to_vec(), lopdf::StringFormat::Literal),
+    );
     let fid = doc.add_object(lopdf::Object::Dictionary(f));
 
     let mut p = lopdf::Dictionary::new();
     p.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-    p.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
+    p.set(
+        "MediaBox",
+        lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+    );
     p.set("Contents", lopdf::Object::Reference(c));
-    p.set("Annots", lopdf::Object::Array(vec![lopdf::Object::Reference(fid)]));
+    p.set(
+        "Annots",
+        lopdf::Object::Array(vec![lopdf::Object::Reference(fid)]),
+    );
     let pid = doc.add_object(lopdf::Object::Dictionary(p));
 
     let mut pages = lopdf::Dictionary::new();
     pages.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-    pages.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(pid)]));
+    pages.set(
+        "Kids",
+        lopdf::Object::Array(vec![lopdf::Object::Reference(pid)]),
+    );
     pages.set("Count", lopdf::Object::Integer(1));
     let pages_id = doc.add_object(lopdf::Object::Dictionary(pages));
 

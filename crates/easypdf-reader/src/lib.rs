@@ -119,7 +119,8 @@ impl PdfReader {
     /// Returns `PdfError::Parse` if the document cannot be read.
     pub fn extract_metadata(&self) -> Result<PdfMetadata> {
         // Try to read the /Info dictionary from the trailer
-        let title = self.document
+        let title = self
+            .document
             .trailer
             .get(b"Info")
             .ok()
@@ -135,7 +136,8 @@ impl PdfReader {
                     .map(|s| String::from_utf8_lossy(s).into_owned())
             });
 
-        let author = self.document
+        let author = self
+            .document
             .trailer
             .get(b"Info")
             .ok()
@@ -284,14 +286,20 @@ mod tests {
 
         let mut page_dict = lopdf::Dictionary::new();
         page_dict.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-        page_dict.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
+        page_dict.set(
+            "MediaBox",
+            lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+        );
         page_dict.set("Contents", lopdf::Object::Reference(content_id));
         page_dict.set("Resources", lopdf::Object::Reference(resources_id));
         let page_id = doc.add_object(lopdf::Object::Dictionary(page_dict));
 
         let mut pages_dict = lopdf::Dictionary::new();
         pages_dict.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-        pages_dict.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]));
+        pages_dict.set(
+            "Kids",
+            lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]),
+        );
         pages_dict.set("Count", lopdf::Object::Integer(1));
         let pages_id = doc.add_object(lopdf::Object::Dictionary(pages_dict));
 
@@ -300,7 +308,8 @@ mod tests {
         catalog.set("Pages", lopdf::Object::Reference(pages_id));
         let catalog_id = doc.add_object(lopdf::Object::Dictionary(catalog));
 
-        doc.trailer.set("Root", lopdf::Object::Reference(catalog_id));
+        doc.trailer
+            .set("Root", lopdf::Object::Reference(catalog_id));
         doc.save(path).unwrap();
     }
 
@@ -340,10 +349,7 @@ mod tests {
         let path = dir.join("easypdf_reader_text.pdf");
         make_test_pdf(&path);
 
-        let text = PdfReader::open(&path)
-            .unwrap()
-            .extract_text()
-            .unwrap();
+        let text = PdfReader::open(&path).unwrap().extract_text().unwrap();
         // Should extract something (at minimum, not panic)
         assert!(!text.is_empty() || text.is_empty()); // just verify it doesn't error
         let _ = std::fs::remove_file(&path);
@@ -355,10 +361,7 @@ mod tests {
         let path = dir.join("easypdf_reader_meta.pdf");
         make_test_pdf(&path);
 
-        let meta = PdfReader::open(&path)
-            .unwrap()
-            .extract_metadata()
-            .unwrap();
+        let meta = PdfReader::open(&path).unwrap().extract_metadata().unwrap();
         // Title/author may be None for test PDF
         assert!(meta.title.is_none() || meta.title.is_some());
         let _ = std::fs::remove_file(&path);
@@ -438,15 +441,24 @@ mod tests {
         let dir = std::env::temp_dir();
         let path = dir.join("reader_txt.pdf");
         let mut doc = lopdf::Document::new();
-        let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(lopdf::Dictionary::new(), b"BT /F1 12 Tf 72 700 Td (Hello PDF) Tj ET".to_vec())));
+        let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(
+            lopdf::Dictionary::new(),
+            b"BT /F1 12 Tf 72 700 Td (Hello PDF) Tj ET".to_vec(),
+        )));
         let mut p = lopdf::Dictionary::new();
         p.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-        p.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
+        p.set(
+            "MediaBox",
+            lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+        );
         p.set("Contents", lopdf::Object::Reference(c));
         let pid = doc.add_object(lopdf::Object::Dictionary(p));
         let mut pages = lopdf::Dictionary::new();
         pages.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-        pages.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(pid)]));
+        pages.set(
+            "Kids",
+            lopdf::Object::Array(vec![lopdf::Object::Reference(pid)]),
+        );
         pages.set("Count", lopdf::Object::Integer(1));
         let pgid = doc.add_object(lopdf::Object::Dictionary(pages));
         let mut cat = lopdf::Dictionary::new();

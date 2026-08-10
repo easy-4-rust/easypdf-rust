@@ -42,7 +42,14 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
-#![allow(clippy::uninlined_format_args, clippy::manual_string_new, clippy::cast_precision_loss, clippy::doc_markdown, clippy::write_with_newline, clippy::items_after_statements)]
+#![allow(
+    clippy::uninlined_format_args,
+    clippy::manual_string_new,
+    clippy::cast_precision_loss,
+    clippy::doc_markdown,
+    clippy::write_with_newline,
+    clippy::items_after_statements
+)]
 
 // --- Re-exports from sub-crates ---
 
@@ -76,8 +83,8 @@ pub use easypdf_manipulate::PdfManipulator;
 pub use easypdf_template::PdfTemplateFiller;
 
 // Layout crate (C2)
-pub use easypdf_layout::FlowLayout;
 pub use easypdf_layout::Direction as LayoutDirection;
+pub use easypdf_layout::FlowLayout;
 
 // --- Builder entry points ---
 
@@ -282,7 +289,9 @@ fn process_inline_formatting(text: &str) -> String {
                 i += 1;
             }
             result.push_str("</b>");
-            if i + 1 < chars.len() { i += 2; }
+            if i + 1 < chars.len() {
+                i += 2;
+            }
         } else if chars[i] == '*' && i + 1 < chars.len() && chars[i + 1] != '*' {
             result.push_str("<i>");
             i += 1;
@@ -291,7 +300,9 @@ fn process_inline_formatting(text: &str) -> String {
                 i += 1;
             }
             result.push_str("</i>");
-            if i < chars.len() { i += 1; }
+            if i < chars.len() {
+                i += 1;
+            }
         } else {
             result.push(chars[i]);
             i += 1;
@@ -335,8 +346,9 @@ impl HtmlToPdfBuilder {
         let images = BTreeMap::new();
         let fonts = BTreeMap::new();
         let options = printpdf::GeneratePdfOptions::default();
-        let doc = printpdf::PdfDocument::from_html(&self.html, &images, &fonts, &options, &mut warnings)
-            .map_err(|e| PdfError::Other(format!("HTML render error: {e}")))?;
+        let doc =
+            printpdf::PdfDocument::from_html(&self.html, &images, &fonts, &options, &mut warnings)
+                .map_err(|e| PdfError::Other(format!("HTML render error: {e}")))?;
         let file = std::fs::File::create(output)?;
         let mut buf = std::io::BufWriter::new(file);
         let save_opts = printpdf::PdfSaveOptions::default();
@@ -580,7 +592,15 @@ impl PdfTableBuilder {
         let orientation = self.parent.orientation;
         let mut writer = self.parent.build()?;
         writer.add_page(page_size, orientation)?;
-        crate::write_table(&mut writer, &self.table, self.x, self.y, &self.col_widths, self.row_height, &self.font)?;
+        crate::write_table(
+            &mut writer,
+            &self.table,
+            self.x,
+            self.y,
+            &self.col_widths,
+            self.row_height,
+            &self.font,
+        )?;
         writer.finish(&path)?;
         Ok(path)
     }
@@ -988,7 +1008,7 @@ pub fn write_table(
         col_widths.to_vec()
     };
 
-        // Draw header row
+    // Draw header row
     let header_y = y;
     for (i, header) in table.headers.iter().enumerate() {
         let cell_x = x + widths.iter().take(i).sum::<f64>();
@@ -1013,7 +1033,11 @@ pub fn write_table(
 }
 
 #[cfg(test)]
-#[allow(clippy::redundant_closure_for_method_calls, clippy::needless_borrow, clippy::float_cmp)]
+#[allow(
+    clippy::redundant_closure_for_method_calls,
+    clippy::needless_borrow,
+    clippy::float_cmp
+)]
 mod tests {
     use super::*;
 
@@ -1044,18 +1068,43 @@ mod tests {
     #[test]
     fn test_write_table_empty() {
         let mut writer = PdfWriter::new("test");
-        writer.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        writer
+            .add_page(PageSize::A4, Orientation::Portrait)
+            .unwrap();
         let table = PdfTable::new(vec![]);
-        assert!(write_table(&mut writer, &table, 50.0, 700.0, &[], 20.0, &PdfFont::helvetica(10.0)).is_ok());
+        assert!(
+            write_table(
+                &mut writer,
+                &table,
+                50.0,
+                700.0,
+                &[],
+                20.0,
+                &PdfFont::helvetica(10.0)
+            )
+            .is_ok()
+        );
     }
 
     #[test]
     fn test_write_table_with_data() {
         let mut writer = PdfWriter::new("test");
-        writer.add_page(PageSize::A4, Orientation::Portrait).unwrap();
-        let table = PdfTable::new(vec!["A".into(), "B".into()])
-            .row(vec!["1".into(), "2".into()]);
-        assert!(write_table(&mut writer, &table, 50.0, 700.0, &[100.0, 100.0], 25.0, &PdfFont::helvetica(10.0)).is_ok());
+        writer
+            .add_page(PageSize::A4, Orientation::Portrait)
+            .unwrap();
+        let table = PdfTable::new(vec!["A".into(), "B".into()]).row(vec!["1".into(), "2".into()]);
+        assert!(
+            write_table(
+                &mut writer,
+                &table,
+                50.0,
+                700.0,
+                &[100.0, 100.0],
+                25.0,
+                &PdfFont::helvetica(10.0)
+            )
+            .is_ok()
+        );
         let dir = std::env::temp_dir();
         let path = dir.join("easypdf_table_test.pdf");
         writer.finish(&path).unwrap();
@@ -1094,8 +1143,8 @@ mod tests {
                 easypdf_core::PdfModelMetadata::default()
             }
         }
-        let result = EasyPdf::fill_form("/nonexistent/template.pdf", &DummyModel)
-            .save("/tmp/out.pdf");
+        let result =
+            EasyPdf::fill_form("/nonexistent/template.pdf", &DummyModel).save("/tmp/out.pdf");
         assert!(result.is_err());
     }
 
@@ -1154,8 +1203,7 @@ mod tests {
 
     #[test]
     fn test_create_builder_do_write_error() {
-        let result = EasyPdf::create("/invalid/path/out.pdf")
-            .do_write();
+        let result = EasyPdf::create("/invalid/path/out.pdf").do_write();
         assert!(result.is_err());
     }
 
@@ -1165,7 +1213,7 @@ mod tests {
         let path = dir.join("easypdf_facade_text.pdf");
         let result = EasyPdf::create(&path)
             .add_text("Hi")
-                .font(PdfFont::helvetica(12.0))
+            .font(PdfFont::helvetica(12.0))
             .do_write();
         assert!(result.is_ok());
         let _ = std::fs::remove_file(&path);
@@ -1177,8 +1225,8 @@ mod tests {
         let path = dir.join("easypdf_facade_pos.pdf");
         let result = EasyPdf::create(&path)
             .add_text("Hi")
-                .font(PdfFont::helvetica(12.0))
-                .position(200.0, 500.0)
+            .font(PdfFont::helvetica(12.0))
+            .position(200.0, 500.0)
             .do_write();
         assert!(result.is_ok());
         let _ = std::fs::remove_file(&path);
@@ -1186,9 +1234,7 @@ mod tests {
 
     #[test]
     fn test_read_builder_pages() {
-        let result = EasyPdf::read("/nonexistent.pdf")
-            .pages(0..5)
-            .extract_text();
+        let result = EasyPdf::read("/nonexistent.pdf").pages(0..5).extract_text();
         assert!(result.is_err());
     }
 
@@ -1226,8 +1272,12 @@ mod tests {
         let path = dir.join("easypdf_encrypt_test.pdf");
         // Create a minimal PDF via writer
         let mut writer = PdfWriter::new("test");
-        writer.add_page(PageSize::A4, Orientation::Portrait).unwrap();
-        writer.write_text(&PdfText::new("secret"), 100.0, 700.0).unwrap();
+        writer
+            .add_page(PageSize::A4, Orientation::Portrait)
+            .unwrap();
+        writer
+            .write_text(&PdfText::new("secret"), 100.0, 700.0)
+            .unwrap();
         writer.finish(&path).unwrap();
 
         let out = dir.join("easypdf_encrypted.pdf");
@@ -1281,8 +1331,8 @@ mod tests {
             .row(vec!["Bob".into(), "25".into()]);
         let result = EasyPdf::create(&path)
             .add_table(&table)
-                .position(72.0, 700.0)
-                .row_height(24.0)
+            .position(72.0, 700.0)
+            .row_height(24.0)
             .do_write();
         assert!(result.is_ok(), "table builder do_write should succeed");
         let out = result.unwrap();
@@ -1296,18 +1346,21 @@ mod tests {
         let path = dir.join("easypdf_image_builder.pdf");
         // Create a minimal 1x1 white PNG
         let png_data = vec![
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-            0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-            0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
-            0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F,
-            0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0xCC, 0x59, 0xE7, 0x00, 0x00, 0x00,
-            0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48,
+            0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00,
+            0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, 0x54, 0x08,
+            0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F, 0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0xCC, 0x59,
+            0xE7, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
         ];
-        let image = PdfImage { data: png_data, width: 1.0, height: 1.0 };
+        let image = PdfImage {
+            data: png_data,
+            width: 1.0,
+            height: 1.0,
+        };
         let result = EasyPdf::create(&path)
             .add_image(&image)
-                .position(100.0, 600.0)
-                .size(50.0, 50.0)
+            .position(100.0, 600.0)
+            .size(50.0, 50.0)
             .do_write();
         assert!(result.is_ok(), "image builder do_write should succeed");
         let out = result.unwrap();
@@ -1319,12 +1372,9 @@ mod tests {
     fn test_table_builder_default_position() {
         let dir = std::env::temp_dir();
         let path = dir.join("easypdf_table_default.pdf");
-        let table = PdfTable::new(vec!["Col1".into()])
-            .row(vec!["val".into()]);
+        let table = PdfTable::new(vec!["Col1".into()]).row(vec!["val".into()]);
         // Use default position (no .position() call)
-        let result = EasyPdf::create(&path)
-            .add_table(&table)
-            .do_write();
+        let result = EasyPdf::create(&path).add_table(&table).do_write();
         assert!(result.is_ok());
         let _ = std::fs::remove_file(result.unwrap());
     }
@@ -1334,18 +1384,21 @@ mod tests {
         let dir = std::env::temp_dir();
         let path = dir.join("easypdf_image_default.pdf");
         let png_data = vec![
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-            0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-            0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
-            0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F,
-            0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0xCC, 0x59, 0xE7, 0x00, 0x00, 0x00,
-            0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48,
+            0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00,
+            0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, 0x54, 0x08,
+            0xD7, 0x63, 0xF8, 0xFF, 0xFF, 0x3F, 0x00, 0x05, 0xFE, 0x02, 0xFE, 0xDC, 0xCC, 0x59,
+            0xE7, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
         ];
-        let image = PdfImage { data: png_data, width: 1.0, height: 1.0 };
+        let image = PdfImage {
+            data: png_data,
+            width: 1.0,
+            height: 1.0,
+        };
         // Use default size (0.0, 0.0 = natural size)
         let result = EasyPdf::create(&path)
             .add_image(&image)
-                .position(100.0, 600.0)
+            .position(100.0, 600.0)
             .do_write();
         assert!(result.is_ok());
         let _ = std::fs::remove_file(result.unwrap());

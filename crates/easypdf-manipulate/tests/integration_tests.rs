@@ -1,23 +1,35 @@
 //! Integration tests for easypdf-manipulate using real PDF fixtures.
-use easypdf_manipulate::PdfManipulator;
 use easypdf_core::Rotation;
+use easypdf_manipulate::PdfManipulator;
 
 fn make_fixture_pdf(dir: &std::path::Path, name: &str) -> std::path::PathBuf {
     // Reuse the same fixture creation logic
     let path = dir.join(name);
     let mut doc = lopdf::Document::new();
 
-    let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(lopdf::Dictionary::new(), b"BT /F1 12 Tf 72 700 Td (Hello) Tj ET".to_vec())));
+    let c = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(
+        lopdf::Dictionary::new(),
+        b"BT /F1 12 Tf 72 700 Td (Hello) Tj ET".to_vec(),
+    )));
     let mut p = lopdf::Dictionary::new();
     p.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-    p.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
+    p.set(
+        "MediaBox",
+        lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+    );
     p.set("Contents", lopdf::Object::Reference(c));
     let p1 = doc.add_object(lopdf::Object::Dictionary(p.clone()));
     let p2 = doc.add_object(lopdf::Object::Dictionary(p));
 
     let mut pages = lopdf::Dictionary::new();
     pages.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-    pages.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(p1), lopdf::Object::Reference(p2)]));
+    pages.set(
+        "Kids",
+        lopdf::Object::Array(vec![
+            lopdf::Object::Reference(p1),
+            lopdf::Object::Reference(p2),
+        ]),
+    );
     pages.set("Count", lopdf::Object::Integer(2));
     let pages_id = doc.add_object(lopdf::Object::Dictionary(pages));
 

@@ -96,7 +96,11 @@ impl PdfManipulator {
             Rotation::Clockwise270 => (current_rotate + 270) % 360,
         };
 
-        if let Ok(dict) = self.doc.get_object_mut(page_id).and_then(|obj| obj.as_dict_mut()) {
+        if let Ok(dict) = self
+            .doc
+            .get_object_mut(page_id)
+            .and_then(|obj| obj.as_dict_mut())
+        {
             dict.set("Rotate", lopdf::Object::Integer(new_rotate));
         }
         Ok(())
@@ -228,16 +232,28 @@ impl PdfManipulator {
         // Create OCG dictionary
         let mut ocg = lopdf::Dictionary::new();
         ocg.set("Type", lopdf::Object::Name(b"OCG".to_vec()));
-        ocg.set("Name", lopdf::Object::String(name.as_bytes().to_vec(), lopdf::StringFormat::Literal));
+        ocg.set(
+            "Name",
+            lopdf::Object::String(name.as_bytes().to_vec(), lopdf::StringFormat::Literal),
+        );
         let ocg_id = self.doc.add_object(lopdf::Object::Dictionary(ocg));
 
         // Add to /OCProperties in catalog
         if let Ok(catalog) = self.doc.catalog_mut() {
             let mut ocprops = lopdf::Dictionary::new();
-            ocprops.set("OCGs", lopdf::Object::Array(vec![lopdf::Object::Reference(ocg_id)]));
+            ocprops.set(
+                "OCGs",
+                lopdf::Object::Array(vec![lopdf::Object::Reference(ocg_id)]),
+            );
             let mut d_dict = lopdf::Dictionary::new();
-            d_dict.set("Name", lopdf::Object::String(name.as_bytes().to_vec(), lopdf::StringFormat::Literal));
-            d_dict.set("OCGs", lopdf::Object::Array(vec![lopdf::Object::Reference(ocg_id)]));
+            d_dict.set(
+                "Name",
+                lopdf::Object::String(name.as_bytes().to_vec(), lopdf::StringFormat::Literal),
+            );
+            d_dict.set(
+                "OCGs",
+                lopdf::Object::Array(vec![lopdf::Object::Reference(ocg_id)]),
+            );
             ocprops.set("D", lopdf::Object::Dictionary(d_dict));
             catalog.set("OCProperties", lopdf::Object::Dictionary(ocprops));
         }
@@ -251,8 +267,12 @@ impl PdfManipulator {
         if self.doc.is_encrypted() {
             issues.push("Document is encrypted (PDF/A forbids encryption)".into());
         }
-        let has_meta = self.doc.catalog().ok()
-            .and_then(|c| c.get(b"Metadata").ok()).is_some();
+        let has_meta = self
+            .doc
+            .catalog()
+            .ok()
+            .and_then(|c| c.get(b"Metadata").ok())
+            .is_some();
         if !has_meta {
             issues.push("Missing XMP metadata stream (required for PDF/A)".into());
         }
@@ -308,7 +328,10 @@ fn append_page_tree(
         .and_then(lopdf::Object::as_array_mut)
         .map_err(|error| PdfError::Parse(error.to_string()))?;
     kids.push(lopdf::Object::Reference(source_pages_id));
-    destination_pages.set("Count", lopdf::Object::Integer(current_count + source_count));
+    destination_pages.set(
+        "Count",
+        lopdf::Object::Integer(current_count + source_count),
+    );
     Ok(())
 }
 
@@ -338,10 +361,7 @@ fn replace_page_tree_kids(
     Ok(())
 }
 
-fn save_document_atomically(
-    mut document: lopdf::Document,
-    path: impl AsRef<Path>,
-) -> Result<()> {
+fn save_document_atomically(mut document: lopdf::Document, path: impl AsRef<Path>) -> Result<()> {
     let mut bytes = Vec::new();
     document.save_to(&mut bytes)?;
     AtomicFileOutput::new(path.as_ref()).write(&bytes)
@@ -356,12 +376,18 @@ mod tests {
         let mut doc = lopdf::Document::new();
         let mut page_dict = lopdf::Dictionary::new();
         page_dict.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-        page_dict.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
+        page_dict.set(
+            "MediaBox",
+            lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+        );
         let page_id = doc.add_object(lopdf::Object::Dictionary(page_dict));
 
         let mut pages_dict = lopdf::Dictionary::new();
         pages_dict.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-        pages_dict.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]));
+        pages_dict.set(
+            "Kids",
+            lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]),
+        );
         pages_dict.set("Count", lopdf::Object::Integer(1));
         let pages_id = doc.add_object(lopdf::Object::Dictionary(pages_dict));
 
@@ -369,7 +395,8 @@ mod tests {
         catalog.set("Type", lopdf::Object::Name(b"Catalog".to_vec()));
         catalog.set("Pages", lopdf::Object::Reference(pages_id));
         let catalog_id = doc.add_object(lopdf::Object::Dictionary(catalog));
-        doc.trailer.set("Root", lopdf::Object::Reference(catalog_id));
+        doc.trailer
+            .set("Root", lopdf::Object::Reference(catalog_id));
         doc.save(path).unwrap();
     }
 
@@ -476,5 +503,4 @@ mod tests {
         assert!(!issues.is_empty() || issues.is_empty()); // just verify no panic
         let _ = std::fs::remove_file(&path);
     }
-
 }

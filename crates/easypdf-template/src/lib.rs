@@ -46,14 +46,11 @@ impl PdfTemplateFiller {
                 && let Ok(lopdf::Object::String(name_bytes, _)) = dict.get(b"T")
                 && name_bytes == field_name.as_bytes()
             {
-                            dict.set(
-                                "V",
-                                lopdf::Object::String(
-                                    value.as_bytes().to_vec(),
-                                    lopdf::StringFormat::Literal,
-                                ),
-                            );
-                            found = true;
+                dict.set(
+                    "V",
+                    lopdf::Object::String(value.as_bytes().to_vec(), lopdf::StringFormat::Literal),
+                );
+                found = true;
             }
         }
 
@@ -116,19 +113,34 @@ mod tests {
         field_dict.set("Type", lopdf::Object::Name(b"Annot".to_vec()));
         field_dict.set("Subtype", lopdf::Object::Name(b"Widget".to_vec()));
         field_dict.set("FT", lopdf::Object::Name(b"Tx".to_vec()));
-        field_dict.set("T", lopdf::Object::String(b"test_field".to_vec(), lopdf::StringFormat::Literal));
-        field_dict.set("V", lopdf::Object::String(b"old_value".to_vec(), lopdf::StringFormat::Literal));
+        field_dict.set(
+            "T",
+            lopdf::Object::String(b"test_field".to_vec(), lopdf::StringFormat::Literal),
+        );
+        field_dict.set(
+            "V",
+            lopdf::Object::String(b"old_value".to_vec(), lopdf::StringFormat::Literal),
+        );
         let field_id = doc.add_object(lopdf::Object::Dictionary(field_dict));
 
         let mut page_dict = lopdf::Dictionary::new();
         page_dict.set("Type", lopdf::Object::Name(b"Page".to_vec()));
-        page_dict.set("MediaBox", lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]));
-        page_dict.set("Annots", lopdf::Object::Array(vec![lopdf::Object::Reference(field_id)]));
+        page_dict.set(
+            "MediaBox",
+            lopdf::Object::Array(vec![0.into(), 0.into(), 595.into(), 842.into()]),
+        );
+        page_dict.set(
+            "Annots",
+            lopdf::Object::Array(vec![lopdf::Object::Reference(field_id)]),
+        );
         let page_id = doc.add_object(lopdf::Object::Dictionary(page_dict));
 
         let mut pages_dict = lopdf::Dictionary::new();
         pages_dict.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-        pages_dict.set("Kids", lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]));
+        pages_dict.set(
+            "Kids",
+            lopdf::Object::Array(vec![lopdf::Object::Reference(page_id)]),
+        );
         pages_dict.set("Count", lopdf::Object::Integer(1));
         let pages_id = doc.add_object(lopdf::Object::Dictionary(pages_dict));
 
@@ -136,7 +148,8 @@ mod tests {
         catalog.set("Type", lopdf::Object::Name(b"Catalog".to_vec()));
         catalog.set("Pages", lopdf::Object::Reference(pages_id));
         let catalog_id = doc.add_object(lopdf::Object::Dictionary(catalog));
-        doc.trailer.set("Root", lopdf::Object::Reference(catalog_id));
+        doc.trailer
+            .set("Root", lopdf::Object::Reference(catalog_id));
         doc.save(path).unwrap();
     }
 

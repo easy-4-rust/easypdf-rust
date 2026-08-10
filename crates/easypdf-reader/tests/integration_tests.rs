@@ -44,7 +44,10 @@ fn test_listener_with_real_pdf() {
         }
     }
     let mut c = Collect(vec![]);
-    PdfReader::open(&path).unwrap().read_with_listener(&mut c).unwrap();
+    PdfReader::open(&path)
+        .unwrap()
+        .read_with_listener(&mut c)
+        .unwrap();
     assert!(!c.0.is_empty());
     let _ = std::fs::remove_file(&path);
 }

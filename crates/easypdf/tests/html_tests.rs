@@ -8,7 +8,10 @@ fn test_from_html_with_chrome() {
     let dir = std::env::temp_dir();
     let out = dir.join("easypdf_html_test.pdf");
     let html = "<html><body><h1>Test</h1><p>Hello from HTML</p></body></html>";
-    let result = EasyPdf::from_html(html).unwrap().title("HTML Test").save(&out);
+    let result = EasyPdf::from_html(html)
+        .unwrap()
+        .title("HTML Test")
+        .save(&out);
     if let Err(ref e) = result {
         eprintln!("HTML test note: {e:?} (may need Chromium installed)");
     }

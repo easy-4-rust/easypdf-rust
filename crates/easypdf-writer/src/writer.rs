@@ -111,16 +111,30 @@ impl PdfWriter {
 
     /// Write text using a custom (non-builtin) font.
     pub fn write_text_with_custom_font(
-        &mut self, text: &str, font_key: &str, font_size: f64, x_pt: f64, y_pt: f64,
+        &mut self,
+        text: &str,
+        font_key: &str,
+        font_size: f64,
+        x_pt: f64,
+        y_pt: f64,
     ) -> Result<()> {
         let font_id = self.custom_fonts.get(font_key).cloned().ok_or_else(|| {
             PdfError::UnsupportedFeature(format!("Custom font '{font_key}' not registered."))
         })?;
-        let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
+        let pos = Point {
+            x: Pt(x_pt as f32),
+            y: Pt(y_pt as f32),
+        };
         let ops = vec![
-            Op::StartTextSection, Op::SetTextCursor { pos },
-            Op::SetFont { font: PdfFontHandle::External(font_id), size: Pt(font_size as f32) },
-            Op::ShowText { items: vec![TextItem::Text(text.to_string())] },
+            Op::StartTextSection,
+            Op::SetTextCursor { pos },
+            Op::SetFont {
+                font: PdfFontHandle::External(font_id),
+                size: Pt(font_size as f32),
+            },
+            Op::ShowText {
+                items: vec![TextItem::Text(text.to_string())],
+            },
             Op::EndTextSection,
         ];
         self.current_page_ops.extend(ops);
@@ -154,7 +168,11 @@ impl PdfWriter {
         }
         let ops = std::mem::take(&mut self.current_page_ops);
         let (w, h) = self.current_page_size;
-        self.pages.push(PdfPage::new(Mm(w as f32 * PT_TO_MM as f32), Mm(h as f32 * PT_TO_MM as f32), ops));
+        self.pages.push(PdfPage::new(
+            Mm(w as f32 * PT_TO_MM as f32),
+            Mm(h as f32 * PT_TO_MM as f32),
+            ops,
+        ));
         self.current_page_open = false;
         Ok(())
     }
@@ -171,31 +189,55 @@ impl PdfWriter {
     }
 
     /// Get current page number (1-based).
-    #[must_use] pub const fn current_page_number(&self) -> usize { self.current_page_number }
+    #[must_use]
+    pub const fn current_page_number(&self) -> usize {
+        self.current_page_number
+    }
     /// Get total finalized pages.
-    #[must_use] pub fn page_count(&self) -> usize { self.pages.len() }
+    #[must_use]
+    pub fn page_count(&self) -> usize {
+        self.pages.len()
+    }
 
     /// Write text at (x, y) in PDF points.
     pub fn write_text(&mut self, text: &PdfText, x_pt: f64, y_pt: f64) -> Result<()> {
         if let FontFamily::Custom(ref path) = text.font.family
             && let Some(font_id) = self.custom_fonts.get(path.as_ref())
         {
-            let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
+            let pos = Point {
+                x: Pt(x_pt as f32),
+                y: Pt(y_pt as f32),
+            };
             let ops = vec![
-                Op::StartTextSection, Op::SetTextCursor { pos },
-                Op::SetFont { font: PdfFontHandle::External(font_id.clone()), size: Pt(text.font.size as f32) },
-                Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
+                Op::StartTextSection,
+                Op::SetTextCursor { pos },
+                Op::SetFont {
+                    font: PdfFontHandle::External(font_id.clone()),
+                    size: Pt(text.font.size as f32),
+                },
+                Op::ShowText {
+                    items: vec![TextItem::Text(text.content.clone())],
+                },
                 Op::EndTextSection,
             ];
             self.current_page_ops.extend(ops);
             return Ok(());
         }
         let bf = map_builtin_font(&text.font);
-        let pos = Point { x: Pt(x_pt as f32), y: Pt(y_pt as f32) };
+        let pos = Point {
+            x: Pt(x_pt as f32),
+            y: Pt(y_pt as f32),
+        };
         let ops = vec![
-            Op::StartTextSection, Op::SetTextCursor { pos },
-            Op::SetFont { font: PdfFontHandle::Builtin(bf), size: Pt(text.font.size as f32) },
-            Op::ShowText { items: vec![TextItem::Text(text.content.clone())] },
+            Op::StartTextSection,
+            Op::SetTextCursor { pos },
+            Op::SetFont {
+                font: PdfFontHandle::Builtin(bf),
+                size: Pt(text.font.size as f32),
+            },
+            Op::ShowText {
+                items: vec![TextItem::Text(text.content.clone())],
+            },
             Op::EndTextSection,
         ];
         self.current_page_ops.extend(ops);
@@ -211,7 +253,12 @@ impl PdfWriter {
     }
 
     /// Add auto-positioned text with explicit color.
-    pub fn add_text_colored(&mut self, font: &PdfFont, color: &PdfColor, text: &str) -> Result<&mut Self> {
+    pub fn add_text_colored(
+        &mut self,
+        font: &PdfFont,
+        color: &PdfColor,
+        text: &str,
+    ) -> Result<&mut Self> {
         let (x, y) = self.text_cursor;
         self.write_text(&PdfText::new(text).font(font.clone()).color(*color), x, y)?;
         self.text_cursor.1 -= font.size + 4.0;
@@ -219,7 +266,12 @@ impl PdfWriter {
     }
 
     /// Add image from file path (hutool addPicture pattern).
-    pub fn add_image_from_path(&mut self, path: impl AsRef<Path>, w_pt: f64, h_pt: f64) -> Result<&mut Self> {
+    pub fn add_image_from_path(
+        &mut self,
+        path: impl AsRef<Path>,
+        w_pt: f64,
+        h_pt: f64,
+    ) -> Result<&mut Self> {
         let img = PdfImage::from_path(path)?;
         let (x, y) = self.text_cursor;
         self.write_image(&img, x, y - h_pt, w_pt, h_pt)?;
@@ -250,16 +302,26 @@ impl PdfWriter {
         let ops = std::mem::take(&mut self.current_page_ops);
         if !ops.is_empty() {
             let (w, h) = self.current_page_size;
-            pages.push(PdfPage::new(Mm(w as f32 * PT_TO_MM as f32), Mm(h as f32 * PT_TO_MM as f32), ops));
+            pages.push(PdfPage::new(
+                Mm(w as f32 * PT_TO_MM as f32),
+                Mm(h as f32 * PT_TO_MM as f32),
+                ops,
+            ));
         }
         if pages.is_empty() {
             let (w, h) = self.current_page_size;
-            pages.push(PdfPage::new(Mm(w as f32 * PT_TO_MM as f32), Mm(h as f32 * PT_TO_MM as f32), Vec::new()));
+            pages.push(PdfPage::new(
+                Mm(w as f32 * PT_TO_MM as f32),
+                Mm(h as f32 * PT_TO_MM as f32),
+                Vec::new(),
+            ));
         }
         self.doc.with_pages(pages);
         let opts = PdfSaveOptions::default();
         let mut warnings = Vec::new();
-        if let Some(ref mut w) = self.output { self.doc.save_writer(w, &opts, &mut warnings); }
+        if let Some(ref mut w) = self.output {
+            self.doc.save_writer(w, &opts, &mut warnings);
+        }
         Ok(())
     }
 }
