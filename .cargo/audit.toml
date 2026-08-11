@@ -1,0 +1,19 @@
+[advisories]
+# RUSTSEC-2023-0071: rsa 0.9.x Marvin Attack (potential key recovery through timing sidechannels)
+#
+# Reason for ignoring:
+#   rsa 0.9.10 is ONLY a dev-dependency in:
+#     - crates/easypdf-core/Cargo.toml  [dev-dependencies]
+#     - easypdf-test/Cargo.toml         [dev-dependencies]
+#   Usage: test RSA key generation only (ring 0.17 has no keygen API).
+#   Production signing/verification uses ring 0.17 (constant-time RSA).
+#   Production path has ZERO dependency on rsa.
+#
+# When to re-evaluate:
+#   - ring gains a keygen API -> remove rsa dev-dep entirely
+#   - Or: switch test certificates to pre-generated .pem fixtures (no runtime keygen)
+#
+# See: https://rustsec.org/advisories/RUSTSEC-2023-0071
+ignore = [
+    "RUSTSEC-2023-0071",
+]

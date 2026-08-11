@@ -50,3 +50,54 @@ impl MarkdownExportReport {
         &self.warnings
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+    use crate::MarkdownWarning;
+
+    #[test]
+    fn default_is_empty() {
+        let report = MarkdownExportReport::default();
+        assert_eq!(report.pages_read(), 0);
+        assert_eq!(report.blocks_written(), 0);
+        assert_eq!(report.bytes_written(), 0);
+        assert!(report.warnings().is_empty());
+    }
+
+    #[test]
+    fn new_sets_all_fields() {
+        let warnings = vec![MarkdownWarning::ProcessorFailed {
+            message: "test failure".to_string(),
+        }];
+        let report = MarkdownExportReport::new(5, 100, 4096, warnings);
+        assert_eq!(report.pages_read(), 5);
+        assert_eq!(report.blocks_written(), 100);
+        assert_eq!(report.bytes_written(), 4096);
+        assert_eq!(report.warnings().len(), 1);
+    }
+
+    #[test]
+    fn clone_preserves_values() {
+        let report = MarkdownExportReport::new(1, 2, 3, vec![]);
+        let cloned = report.clone();
+        assert_eq!(report, cloned);
+    }
+
+    #[test]
+    fn partial_eq_works() {
+        let a = MarkdownExportReport::new(1, 2, 3, vec![]);
+        let b = MarkdownExportReport::new(1, 2, 3, vec![]);
+        let c = MarkdownExportReport::new(1, 2, 4, vec![]);
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+    }
+
+    #[test]
+    fn debug_format() {
+        let report = MarkdownExportReport::new(1, 2, 3, vec![]);
+        let dbg = format!("{:?}", report);
+        assert!(dbg.contains("MarkdownExportReport"));
+    }
+}

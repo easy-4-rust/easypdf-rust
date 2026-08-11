@@ -2,6 +2,32 @@
 //!
 //! Provides `PdfWriter` for creating new PDF documents with text, tables,
 //! images, shapes, and custom fonts. Backed by the `printpdf` crate.
+//!
+//! # Write backends
+//!
+//! The [`WriteBackend`] enum controls how finalized pages are stored:
+//!
+//! - [`InMemory`](WriteBackend::InMemory) -- default, suitable for small documents.
+//! - [`Spill`](WriteBackend::Spill) -- page-level spill to temp files for large documents.
+//!
+//! Use [`PdfWriterBuilder`] to configure the backend, handler priorities,
+//! and constant-memory mode.
+//!
+//! # Examples
+//!
+//! ```
+//! use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
+//! use easypdf_core::*;
+//!
+//! // Simple (backward-compatible).
+//! let mut w = PdfWriter::new("title");
+//!
+//! // Builder with spill backend.
+//! let w = PdfWriterBuilder::new("Big Report")
+//!     .backend(WriteBackend::auto(500))
+//!     .build()
+//!     .unwrap();
+//! ```
 
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
@@ -18,12 +44,18 @@
     clippy::needless_pass_by_value
 )]
 
+mod backend;
+mod builder;
 mod font;
 mod image;
 mod shape;
+mod template;
 mod writer;
 
+pub use backend::WriteBackend;
+pub use builder::PdfWriterBuilder;
 pub use font::map_builtin_font;
+pub use template::PdfTemplateFiller;
 pub use writer::PdfWriter;
 
 #[cfg(test)]
@@ -569,5 +601,157 @@ mod tests {
         let height = media_box[3].as_float().unwrap();
         assert!(width > height);
         let _ = std::fs::remove_file(output);
+    }
+
+    // --- New tests for builder, backend, and spill ---
+
+    #[test]
+    fn test_builder_basic() {
+        let w = PdfWriterBuilder::new("test").build().unwrap();
+        assert_eq!(w.current_page_number(), 0);
+        assert!(!w.is_constant_memory());
+    }
+
+    #[test]
+    fn test_builder_with_metadata() {
+        let w = PdfWriterBuilder::new("test")
+            .metadata(PdfMetadata::new().title("T"))
+            .build()
+            .unwrap();
+        assert_eq!(w.metadata_title(), Some("T"));
+    }
+
+    #[test]
+    fn test_builder_constant_memory() {
+        let w = PdfWriterBuilder::new("test")
+            .constant_memory(true)
+            .build()
+            .unwrap();
+        assert!(w.is_constant_memory());
+    }
+
+    #[test]
+    fn test_builder_register_handler_with_priority() {
+        struct NoopHandler;
+        impl PdfWriteHandler for NoopHandler {}
+        let w = PdfWriterBuilder::new("test")
+            .register_handler_with_priority(Box::new(NoopHandler), 5.0)
+            .build()
+            .unwrap();
+        assert_eq!(w.handler_count(), 1);
+    }
+
+    #[test]
+    fn test_set_constant_memory() {
+        let mut w = PdfWriter::new("t");
+        assert!(!w.is_constant_memory());
+        w.set_constant_memory(true);
+        assert!(w.is_constant_memory());
+        w.set_constant_memory(false);
+        assert!(!w.is_constant_memory());
+    }
+
+    #[test]
+    fn test_handler_count() {
+        struct H;
+        impl PdfWriteHandler for H {}
+        let w = PdfWriter::new("t")
+            .register_handler(Box::new(H))
+            .register_handler(Box::new(H));
+        assert_eq!(w.handler_count(), 2);
+    }
+
+    #[test]
+    fn test_register_handler_with_priority_api() {
+        struct H;
+        impl PdfWriteHandler for H {}
+        let w = PdfWriter::new("t").register_handler_with_priority(Box::new(H), 0.5);
+        assert_eq!(w.handler_count(), 1);
+    }
+
+    #[test]
+    fn test_write_backend_auto() {
+        assert_eq!(WriteBackend::auto(10), WriteBackend::InMemory);
+        assert!(WriteBackend::auto(200).is_constant_memory());
+    }
+
+    #[test]
+    fn test_spill_finish_produces_valid_pdf() {
+        let d = std::env::temp_dir();
+        let p = d.join("ew_spill.pdf");
+        let mut w = PdfWriterBuilder::new("spill-test")
+            .constant_memory(true)
+            .build()
+            .unwrap();
+        w.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        w.write_text(
+            &PdfText::new("Spilled!").font(PdfFont::helvetica(14.0)),
+            100.0,
+            700.0,
+        )
+        .unwrap();
+        w.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        w.write_text(
+            &PdfText::new("Page 2").font(PdfFont::helvetica(14.0)),
+            100.0,
+            700.0,
+        )
+        .unwrap();
+        w.finish(&p).unwrap();
+        assert!(p.exists());
+        // Verify the PDF is valid by loading it.
+        let doc = lopdf::Document::load(&p).unwrap();
+        assert_eq!(doc.get_pages().len(), 2);
+        let _ = std::fs::remove_file(&p);
+    }
+
+    #[test]
+    fn test_spill_finish_with_handler_lifecycle() {
+        use std::sync::{Arc, Mutex};
+
+        struct RecordingHandler(Arc<Mutex<Vec<String>>>);
+        impl PdfWriteHandler for RecordingHandler {
+            fn before_document(&mut self) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push("before_document".into());
+                Ok(())
+            }
+            fn before_page(&mut self, n: usize) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push(format!("before_page:{n}"));
+                Ok(())
+            }
+            fn after_page(&mut self, n: usize) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push(format!("after_page:{n}"));
+                Ok(())
+            }
+            fn after_document(&mut self) -> easypdf_core::Result<()> {
+                self.0.lock().unwrap().push("after_document".into());
+                Ok(())
+            }
+        }
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let mut w = PdfWriterBuilder::new("spill-lifecycle")
+            .constant_memory(true)
+            .register_handler(Box::new(RecordingHandler(Arc::clone(&events))))
+            .build()
+            .unwrap();
+        w.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        w.add_page(PageSize::A4, Orientation::Portrait).unwrap();
+        let p = std::env::temp_dir().join("ew_spill_lifecycle.pdf");
+        w.finish(&p).unwrap();
+
+        let actual = events.lock().unwrap().clone();
+        assert_eq!(
+            actual,
+            [
+                "before_document",
+                "before_page:1",
+                "after_page:1",
+                "before_page:2",
+                "after_page:2",
+                "after_document",
+            ]
+        );
+        let _ = std::fs::remove_file(&p);
     }
 }

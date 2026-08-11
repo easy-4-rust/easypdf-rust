@@ -1,0 +1,37 @@
+[package]
+name = "easypdf-test"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "generate_samples"
+path = "src/bin/generate_samples.rs"
+
+[[bin]]
+name = "generate_golden"
+path = "src/bin/generate_golden.rs"
+
+[[bin]]
+name = "generate_special_pdfs"
+path = "src/bin/generate_special_pdfs.rs"
+
+[dependencies]
+easypdf = { path = "../crates/easypdf", features = ["markdown"] }
+lopdf = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile.workspace = true
+easypdf-core = { path = "../crates/easypdf-core" }
+easypdf-ocr = { path = "../crates/easypdf-ocr" }
+rsa = { version = "0.9", features = ["sha2"] }
+rand = "0.8"
+ring.workspace = true
+x509-parser = "0.16"
+
+[lints]
+workspace = true

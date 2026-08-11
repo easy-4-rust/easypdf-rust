@@ -20,4 +20,74 @@ pub enum MarkdownWarning {
         /// 零基页索引。
         page_index: PageIndex,
     },
+    /// 管道中某个处理器执行失败（非 `fail_fast` 模式下收集）。
+    ProcessorFailed {
+        /// 错误描述。
+        message: String,
+    },
+}
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+    use easypdf_core::PageIndex;
+
+    #[test]
+    fn empty_page_variant() {
+        let w = MarkdownWarning::EmptyPage {
+            page_index: PageIndex::new(0),
+        };
+        let dbg = format!("{:?}", w);
+        assert!(dbg.contains("EmptyPage"));
+    }
+
+    #[test]
+    fn table_detection_unavailable_variant() {
+        let w = MarkdownWarning::TableDetectionUnavailable;
+        assert_eq!(format!("{:?}", w), "TableDetectionUnavailable");
+    }
+
+    #[test]
+    fn image_extraction_unavailable_variant() {
+        let w = MarkdownWarning::ImageExtractionUnavailable;
+        assert_eq!(format!("{:?}", w), "ImageExtractionUnavailable");
+    }
+
+    #[test]
+    fn ocr_unavailable_variant() {
+        let w = MarkdownWarning::OcrUnavailable {
+            page_index: PageIndex::new(2),
+        };
+        let dbg = format!("{:?}", w);
+        assert!(dbg.contains("OcrUnavailable"));
+    }
+
+    #[test]
+    fn processor_failed_variant() {
+        let w = MarkdownWarning::ProcessorFailed {
+            message: "test error".to_string(),
+        };
+        let dbg = format!("{:?}", w);
+        assert!(dbg.contains("ProcessorFailed"));
+        assert!(dbg.contains("test error"));
+    }
+
+    #[test]
+    fn clone_preserves() {
+        let w = MarkdownWarning::EmptyPage {
+            page_index: PageIndex::new(1),
+        };
+        let cloned = w.clone();
+        assert_eq!(w, cloned);
+    }
+
+    #[test]
+    fn partial_eq_works() {
+        let a = MarkdownWarning::TableDetectionUnavailable;
+        let b = MarkdownWarning::TableDetectionUnavailable;
+        let c = MarkdownWarning::ImageExtractionUnavailable;
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+    }
 }

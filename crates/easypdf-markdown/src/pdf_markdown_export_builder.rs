@@ -2,18 +2,18 @@
 
 use std::ops::Range;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use easypdf_core::Result;
-use easypdf_io::{AtomicFileOutput, PdfInput, ResourceLimits};
-use easypdf_reader::PdfReader;
+use easypdf_core::{AtomicFileOutput, PdfInput, ResourceLimits};
 
 use crate::{
-    ImagePolicy, MarkdownExportReport, MarkdownExportResult, MarkdownProfile, MarkdownRenderer,
-    MarkdownWarning, OcrPolicy, TablePolicy,
+    ImagePolicy, MarkdownExportResult, MarkdownProfile, OcrPolicy, PdfMarkdownBuilder,
+    PdfMarkdownProcessor, TablePolicy,
 };
 
 /// PDF 到 Markdown 的链式导出构建器。
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[must_use]
 pub struct PdfMarkdownExportBuilder {
     input: PdfInput,
@@ -24,6 +24,24 @@ pub struct PdfMarkdownExportBuilder {
     image_policy: ImagePolicy,
     ocr_policy: OcrPolicy,
     limits: ResourceLimits,
+    processors: Vec<Arc<dyn PdfMarkdownProcessor>>,
+}
+
+impl std::fmt::Debug for PdfMarkdownExportBuilder {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("PdfMarkdownExportBuilder")
+            .field("input", &self.input)
+            .field("output", &self.output)
+            .field("pages", &self.pages)
+            .field("profile", &self.profile)
+            .field("table_policy", &self.table_policy)
+            .field("image_policy", &self.image_policy)
+            .field("ocr_policy", &self.ocr_policy)
+            .field("limits", &self.limits)
+            .field("processor_count", &self.processors.len())
+            .finish()
+    }
 }
 
 impl PdfMarkdownExportBuilder {
@@ -38,6 +56,7 @@ impl PdfMarkdownExportBuilder {
             image_policy: ImagePolicy::default(),
             ocr_policy: OcrPolicy::default(),
             limits: ResourceLimits::default(),
+            processors: Vec::new(),
         }
     }
 
@@ -52,6 +71,7 @@ impl PdfMarkdownExportBuilder {
             image_policy: ImagePolicy::default(),
             ocr_policy: OcrPolicy::default(),
             limits: ResourceLimits::default(),
+            processors: Vec::new(),
         }
     }
 
@@ -91,62 +111,121 @@ impl PdfMarkdownExportBuilder {
         self
     }
 
+    /// 注册一个语义增强处理器。
+    pub fn processor(mut self, processor: Arc<dyn PdfMarkdownProcessor>) -> Self {
+        self.processors.push(processor);
+        self
+    }
+
     /// 执行转换并原子写入输出文件。
     ///
     /// # Errors
     ///
     /// 输入读取、PDF 解析、文本提取或输出写入失败时返回错误。
     pub fn do_export(self) -> Result<MarkdownExportResult> {
-        let image_extraction_requested = matches!(&self.image_policy, ImagePolicy::ExtractTo(_));
-        let mut reader = PdfReader::open_with_limits(&self.input, self.limits)?;
+        let mut builder = PdfMarkdownBuilder::from_input(self.input)
+            .profile(self.profile)
+            .tables(self.table_policy)
+            .images(self.image_policy)
+            .ocr(self.ocr_policy)
+            .resource_limits(self.limits);
         if let Some(pages) = self.pages {
-            reader = reader.try_pages(pages)?;
+            builder = builder.pages(pages);
         }
-        let document = reader.extract_document_model()?;
-        let renderer = MarkdownRenderer::new(self.profile)
-            .with_table_policy(self.table_policy)
-            .with_image_policy(self.image_policy);
-        let markdown = renderer.render(&document);
-        AtomicFileOutput::new(&self.output).write(markdown.as_bytes())?;
-
-        let mut warnings = Vec::new();
-        if self.table_policy == TablePolicy::Detect {
-            warnings.push(MarkdownWarning::TableDetectionUnavailable);
+        for processor in self.processors {
+            builder = builder.processor(processor);
         }
-        if image_extraction_requested {
-            warnings.push(MarkdownWarning::ImageExtractionUnavailable);
-        }
-        for page in document
-            .pages()
-            .iter()
-            .filter(|page| page.blocks().is_empty())
-        {
-            warnings.push(MarkdownWarning::EmptyPage {
-                page_index: page.index(),
-            });
-            if self.ocr_policy == OcrPolicy::Auto {
-                warnings.push(MarkdownWarning::OcrUnavailable {
-                    page_index: page.index(),
-                });
-            }
-        }
-        let blocks_written = document
-            .pages()
-            .iter()
-            .map(|page| page.blocks().len())
-            .sum();
-        let report = MarkdownExportReport::new(
-            document.page_count(),
-            blocks_written,
-            markdown.len(),
-            warnings,
-        );
-        Ok(MarkdownExportResult::new(self.output, report))
+        let conversion = builder.do_convert()?;
+        AtomicFileOutput::new(&self.output).write(conversion.markdown().as_bytes())?;
+        Ok(MarkdownExportResult::new(
+            self.output,
+            conversion.report().clone(),
+        ))
     }
 
     /// 返回输出目标路径。
     #[must_use]
     pub fn output(&self) -> &Path {
         &self.output
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_creates_builder() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/input.pdf", "/tmp/output.md");
+        assert_eq!(builder.output(), Path::new("/tmp/output.md"));
+    }
+
+    #[test]
+    fn from_bytes_creates_builder() {
+        let builder = PdfMarkdownExportBuilder::from_bytes(vec![1, 2, 3], "/tmp/out.md");
+        assert_eq!(builder.output(), Path::new("/tmp/out.md"));
+    }
+
+    #[test]
+    fn pages_sets_range() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .pages(2..5);
+        assert!(builder.pages.is_some());
+        assert_eq!(builder.pages.unwrap(), 2..5);
+    }
+
+    #[test]
+    fn profile_sets_profile() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .profile(MarkdownProfile::Llm);
+        assert_eq!(builder.profile, MarkdownProfile::Llm);
+    }
+
+    #[test]
+    fn tables_sets_policy() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .tables(TablePolicy::PlainText);
+        assert_eq!(builder.table_policy, TablePolicy::PlainText);
+    }
+
+    #[test]
+    fn images_sets_policy() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .images(ImagePolicy::Reference);
+        assert_eq!(builder.image_policy, ImagePolicy::Reference);
+    }
+
+    #[test]
+    fn ocr_sets_policy() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .ocr(OcrPolicy::Auto);
+        assert_eq!(builder.ocr_policy, OcrPolicy::Auto);
+    }
+
+    #[test]
+    fn resource_limits_sets_limits() {
+        let limits = ResourceLimits::strict();
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .resource_limits(limits);
+        assert_eq!(builder.limits.max_input_bytes(), limits.max_input_bytes());
+    }
+
+    #[test]
+    fn debug_format() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md");
+        let dbg = format!("{:?}", builder);
+        assert!(dbg.contains("PdfMarkdownExportBuilder"));
+        assert!(dbg.contains("input"));
+        assert!(dbg.contains("output"));
+    }
+
+    #[test]
+    fn clone_preserves_values() {
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
+            .profile(MarkdownProfile::Llm);
+        let cloned = builder.clone();
+        assert_eq!(builder.profile, cloned.profile);
+        assert_eq!(builder.output(), cloned.output());
     }
 }

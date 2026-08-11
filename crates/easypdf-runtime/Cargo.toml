@@ -1,0 +1,34 @@
+[package]
+name = "easypdf-runtime"
+description = "Runtime layer for easypdf: MCP server + resident daemon"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "easypdf-mcp"
+path = "src/mcp/main.rs"
+required-features = ["mcp"]
+
+[dependencies]
+easypdf-core = { path = "../easypdf-core" }
+easypdf-reader = { path = "../easypdf-reader" }
+easypdf-writer = { path = "../easypdf-writer" }
+easypdf-markdown = { path = "../easypdf-markdown" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing.workspace = true
+
+[dev-dependencies]
+lopdf = { workspace = true }
+
+[features]
+default = ["mcp", "resident"]
+mcp = []
+resident = []
+
+[lints]
+workspace = true

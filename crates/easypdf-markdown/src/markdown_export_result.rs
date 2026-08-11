@@ -28,3 +28,41 @@ impl MarkdownExportResult {
         &self.report
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+    use crate::MarkdownExportReport;
+
+    #[test]
+    fn output_returns_path() {
+        let report = MarkdownExportReport::default();
+        let result = MarkdownExportResult::new(PathBuf::from("/tmp/out.md"), report);
+        assert_eq!(result.output(), Path::new("/tmp/out.md"));
+    }
+
+    #[test]
+    fn report_returns_reference() {
+        let report = MarkdownExportReport::new(5, 10, 100, vec![]);
+        let result = MarkdownExportResult::new(PathBuf::from("/tmp/out.md"), report);
+        assert_eq!(result.report().pages_read(), 5);
+        assert_eq!(result.report().blocks_written(), 10);
+    }
+
+    #[test]
+    fn clone_preserves() {
+        let report = MarkdownExportReport::default();
+        let result = MarkdownExportResult::new(PathBuf::from("/tmp/out.md"), report);
+        let cloned = result.clone();
+        assert_eq!(result.output(), cloned.output());
+    }
+
+    #[test]
+    fn debug_format() {
+        let report = MarkdownExportReport::default();
+        let result = MarkdownExportResult::new(PathBuf::from("/tmp/out.md"), report);
+        let dbg = format!("{:?}", result);
+        assert!(dbg.contains("MarkdownExportResult"));
+    }
+}

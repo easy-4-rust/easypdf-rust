@@ -1,0 +1,276 @@
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.0
+    Checking lopdf v0.44.0
+    Checking bytemuck v1.25.2
+    Checking font-types v0.11.3
+    Checking tiny-skia-path v0.11.4
+    Checking rgb v0.8.53
+    Checking image v0.25.10
+    Checking serde v1.0.229
+    Checking read-fonts v0.39.2
+    Checking tiny-skia v0.11.4
+    Checking smallvec v1.15.2
+    Checking bincode v1.3.3
+    Checking hyphenation_commons v0.8.4
+    Checking tracing-serde v0.1.3
+    Checking kurbo v0.11.3
+    Checking kurbo v0.13.1
+    Checking rustybuzz v0.20.1
+    Checking tracing-subscriber v0.3.18
+   Compiling hyphenation v0.8.4
+    Checking svgtypes v0.15.3
+    Checking easypdf-core v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-core)
+    Checking usvg v0.45.1
+    Checking azul-layout v0.0.13
+    Checking resvg v0.45.1
+    Checking write-fonts v0.48.1
+    Checking skrifa v0.42.1
+    Checking subsetter v0.2.6
+    Checking svg2pdf v0.13.0
+    Checking printpdf v0.12.5
+ Documenting easypdf-writer v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-writer)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.51s
+pub mod easypdf_writer
+pub enum easypdf_writer::WriteBackend
+pub easypdf_writer::WriteBackend::InMemory
+pub easypdf_writer::WriteBackend::Spill
+pub easypdf_writer::WriteBackend::Spill::compress: bool
+pub easypdf_writer::WriteBackend::Spill::spill_dir: core::option::Option<std::path::PathBuf>
+pub easypdf_writer::WriteBackend::Spill::threshold_pages: usize
+impl easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::auto(usize) -> Self
+pub fn easypdf_writer::WriteBackend::constant_memory() -> Self
+pub const fn easypdf_writer::WriteBackend::is_constant_memory(&self) -> bool
+impl core::clone::Clone for easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::clone(&self) -> easypdf_writer::WriteBackend
+impl core::cmp::Eq for easypdf_writer::WriteBackend
+impl core::cmp::PartialEq for easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::eq(&self, &easypdf_writer::WriteBackend) -> bool
+impl core::default::Default for easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::default() -> easypdf_writer::WriteBackend
+impl core::fmt::Debug for easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for easypdf_writer::WriteBackend
+impl core::marker::Freeze for easypdf_writer::WriteBackend
+impl core::marker::Send for easypdf_writer::WriteBackend
+impl core::marker::Sync for easypdf_writer::WriteBackend
+impl core::marker::Unpin for easypdf_writer::WriteBackend
+impl core::marker::UnsafeUnpin for easypdf_writer::WriteBackend
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_writer::WriteBackend
+impl core::panic::unwind_safe::UnwindSafe for easypdf_writer::WriteBackend
+impl<Q, K> equivalent::Equivalent<K> for easypdf_writer::WriteBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_writer::WriteBackend::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_writer::WriteBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_writer::WriteBackend::equivalent(&self, &K) -> bool
+impl<T, U> core::convert::Into<U> for easypdf_writer::WriteBackend where U: core::convert::From<T>
+pub fn easypdf_writer::WriteBackend::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_writer::WriteBackend where U: core::convert::Into<T>
+pub type easypdf_writer::WriteBackend::Error = core::convert::Infallible
+pub fn easypdf_writer::WriteBackend::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_writer::WriteBackend where U: core::convert::TryFrom<T>
+pub type easypdf_writer::WriteBackend::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_writer::WriteBackend::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_writer::WriteBackend where T: core::clone::Clone
+pub type easypdf_writer::WriteBackend::Owned = T
+pub fn easypdf_writer::WriteBackend::clone_into(&self, &mut T)
+pub fn easypdf_writer::WriteBackend::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_writer::WriteBackend where T: 'static + ?core::marker::Sized
+pub fn easypdf_writer::WriteBackend::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_writer::WriteBackend where T: ?core::marker::Sized
+pub fn easypdf_writer::WriteBackend::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_writer::WriteBackend where T: ?core::marker::Sized
+pub fn easypdf_writer::WriteBackend::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_writer::WriteBackend where T: core::clone::Clone
+pub unsafe fn easypdf_writer::WriteBackend::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_writer::WriteBackend
+pub fn easypdf_writer::WriteBackend::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_writer::WriteBackend
+pub type easypdf_writer::WriteBackend::Init = T
+pub const easypdf_writer::WriteBackend::ALIGN: usize
+pub unsafe fn easypdf_writer::WriteBackend::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_writer::WriteBackend::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_writer::WriteBackend::drop(usize)
+pub unsafe fn easypdf_writer::WriteBackend::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_writer::WriteBackend
+impl<T> pdf_writer::object::Finish for easypdf_writer::WriteBackend
+impl<T> tracing::instrument::Instrument for easypdf_writer::WriteBackend
+impl<T> tracing::instrument::WithSubscriber for easypdf_writer::WriteBackend
+impl<T> typenum::type_operators::Same for easypdf_writer::WriteBackend
+pub type easypdf_writer::WriteBackend::Output = T
+impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf_writer::WriteBackend where U: write_fonts::from_obj::FromObjRef<T>
+pub fn easypdf_writer::WriteBackend::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
+impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf_writer::WriteBackend where U: write_fonts::from_obj::FromTableRef<T>
+pub fn easypdf_writer::WriteBackend::to_owned_table(&self) -> U
+pub struct easypdf_writer::PdfTemplateFiller
+impl easypdf_writer::PdfTemplateFiller
+pub fn easypdf_writer::PdfTemplateFiller::fill_field(&mut self, &str, &str) -> easypdf_core::error::Result<&mut Self>
+pub fn easypdf_writer::PdfTemplateFiller::fill_fields(&mut self, impl core::iter::traits::collect::IntoIterator<Item = (impl core::convert::AsRef<str>, impl core::convert::AsRef<str>)>) -> easypdf_core::error::Result<&mut Self>
+pub fn easypdf_writer::PdfTemplateFiller::into_inner(self) -> lopdf::document::Document
+pub fn easypdf_writer::PdfTemplateFiller::open(impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<Self>
+pub fn easypdf_writer::PdfTemplateFiller::page_count(&self) -> usize
+pub fn easypdf_writer::PdfTemplateFiller::save(self, impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
+impl core::marker::Freeze for easypdf_writer::PdfTemplateFiller
+impl core::marker::Send for easypdf_writer::PdfTemplateFiller
+impl core::marker::Sync for easypdf_writer::PdfTemplateFiller
+impl core::marker::Unpin for easypdf_writer::PdfTemplateFiller
+impl core::marker::UnsafeUnpin for easypdf_writer::PdfTemplateFiller
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_writer::PdfTemplateFiller
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_writer::PdfTemplateFiller
+impl<T, U> core::convert::Into<U> for easypdf_writer::PdfTemplateFiller where U: core::convert::From<T>
+pub fn easypdf_writer::PdfTemplateFiller::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_writer::PdfTemplateFiller where U: core::convert::Into<T>
+pub type easypdf_writer::PdfTemplateFiller::Error = core::convert::Infallible
+pub fn easypdf_writer::PdfTemplateFiller::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_writer::PdfTemplateFiller where U: core::convert::TryFrom<T>
+pub type easypdf_writer::PdfTemplateFiller::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_writer::PdfTemplateFiller::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_writer::PdfTemplateFiller where T: 'static + ?core::marker::Sized
+pub fn easypdf_writer::PdfTemplateFiller::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_writer::PdfTemplateFiller where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfTemplateFiller::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_writer::PdfTemplateFiller where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfTemplateFiller::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_writer::PdfTemplateFiller
+pub fn easypdf_writer::PdfTemplateFiller::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_writer::PdfTemplateFiller
+pub type easypdf_writer::PdfTemplateFiller::Init = T
+pub const easypdf_writer::PdfTemplateFiller::ALIGN: usize
+pub unsafe fn easypdf_writer::PdfTemplateFiller::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_writer::PdfTemplateFiller::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_writer::PdfTemplateFiller::drop(usize)
+pub unsafe fn easypdf_writer::PdfTemplateFiller::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_writer::PdfTemplateFiller
+impl<T> pdf_writer::object::Finish for easypdf_writer::PdfTemplateFiller
+impl<T> tracing::instrument::Instrument for easypdf_writer::PdfTemplateFiller
+impl<T> tracing::instrument::WithSubscriber for easypdf_writer::PdfTemplateFiller
+impl<T> typenum::type_operators::Same for easypdf_writer::PdfTemplateFiller
+pub type easypdf_writer::PdfTemplateFiller::Output = T
+impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf_writer::PdfTemplateFiller where U: write_fonts::from_obj::FromObjRef<T>
+pub fn easypdf_writer::PdfTemplateFiller::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
+impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf_writer::PdfTemplateFiller where U: write_fonts::from_obj::FromTableRef<T>
+pub fn easypdf_writer::PdfTemplateFiller::to_owned_table(&self) -> U
+pub struct easypdf_writer::PdfWriter
+impl easypdf_writer::PdfWriter
+pub fn easypdf_writer::PdfWriter::add_image_from_path(&mut self, impl core::convert::AsRef<std::path::Path>, f64, f64) -> easypdf_core::error::Result<&mut Self>
+pub fn easypdf_writer::PdfWriter::add_page(&mut self, easypdf_core::enums::PageSize, easypdf_core::enums::Orientation) -> easypdf_core::error::Result<usize>
+pub fn easypdf_writer::PdfWriter::add_text(&mut self, &easypdf_core::style::PdfFont, &str) -> easypdf_core::error::Result<&mut Self>
+pub fn easypdf_writer::PdfWriter::add_text_colored(&mut self, &easypdf_core::style::PdfFont, &easypdf_core::style::PdfColor, &str) -> easypdf_core::error::Result<&mut Self>
+pub const fn easypdf_writer::PdfWriter::current_page_number(&self) -> usize
+pub fn easypdf_writer::PdfWriter::finish(self, impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
+pub fn easypdf_writer::PdfWriter::flush(&mut self) -> easypdf_core::error::Result<()>
+pub fn easypdf_writer::PdfWriter::handler_count(&self) -> usize
+pub fn easypdf_writer::PdfWriter::is_constant_memory(&self) -> bool
+pub fn easypdf_writer::PdfWriter::metadata(self, easypdf_core::metadata::PdfMetadata) -> Self
+pub fn easypdf_writer::PdfWriter::metadata_title(&self) -> core::option::Option<&str>
+pub fn easypdf_writer::PdfWriter::new(&str) -> Self
+pub fn easypdf_writer::PdfWriter::new_from_writer(impl core::io::write::Write + 'static) -> Self
+pub fn easypdf_writer::PdfWriter::page_count(&self) -> usize
+pub fn easypdf_writer::PdfWriter::register_font_from_bytes(&mut self, &str, &[u8]) -> easypdf_core::error::Result<alloc::string::String>
+pub fn easypdf_writer::PdfWriter::register_font_from_path(&mut self, &str) -> easypdf_core::error::Result<alloc::string::String>
+pub fn easypdf_writer::PdfWriter::register_handler(self, alloc::boxed::Box<dyn easypdf_core::traits::PdfWriteHandler>) -> Self
+pub fn easypdf_writer::PdfWriter::register_handler_with_priority(self, alloc::boxed::Box<dyn easypdf_core::traits::PdfWriteHandler>, f64) -> Self
+pub fn easypdf_writer::PdfWriter::set_constant_memory(&mut self, bool)
+pub fn easypdf_writer::PdfWriter::write_text(&mut self, &easypdf_core::content::PdfText, f64, f64) -> easypdf_core::error::Result<()>
+pub fn easypdf_writer::PdfWriter::write_text_with_custom_font(&mut self, &str, &str, f64, f64, f64) -> easypdf_core::error::Result<()>
+impl easypdf_writer::PdfWriter
+pub fn easypdf_writer::PdfWriter::draw_circle(&mut self, f64, f64, f64, f64)
+pub fn easypdf_writer::PdfWriter::draw_line(&mut self, f64, f64, f64, f64, f64)
+pub fn easypdf_writer::PdfWriter::draw_rect_stroke(&mut self, f64, f64, f64, f64, f64)
+impl easypdf_writer::PdfWriter
+pub fn easypdf_writer::PdfWriter::write_image(&mut self, &easypdf_core::content::PdfImage, f64, f64, f64, f64) -> easypdf_core::error::Result<()>
+pub fn easypdf_writer::PdfWriter::write_svg(&mut self, &str, f64, f64, f64, f64) -> easypdf_core::error::Result<()>
+impl easypdf_core::layout::layout_sink::LayoutSink for easypdf_writer::PdfWriter
+pub fn easypdf_writer::PdfWriter::add_page(&mut self, easypdf_core::enums::PageSize, easypdf_core::enums::Orientation) -> easypdf_core::error::Result<usize>
+pub fn easypdf_writer::PdfWriter::finish(self, &std::path::Path) -> easypdf_core::error::Result<()>
+pub fn easypdf_writer::PdfWriter::write_text(&mut self, &easypdf_core::content::PdfText, f64, f64) -> easypdf_core::error::Result<()>
+impl core::marker::Freeze for easypdf_writer::PdfWriter
+impl !core::marker::Send for easypdf_writer::PdfWriter
+impl !core::marker::Sync for easypdf_writer::PdfWriter
+impl core::marker::Unpin for easypdf_writer::PdfWriter
+impl core::marker::UnsafeUnpin for easypdf_writer::PdfWriter
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_writer::PdfWriter
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_writer::PdfWriter
+impl<T, U> core::convert::Into<U> for easypdf_writer::PdfWriter where U: core::convert::From<T>
+pub fn easypdf_writer::PdfWriter::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_writer::PdfWriter where U: core::convert::Into<T>
+pub type easypdf_writer::PdfWriter::Error = core::convert::Infallible
+pub fn easypdf_writer::PdfWriter::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_writer::PdfWriter where U: core::convert::TryFrom<T>
+pub type easypdf_writer::PdfWriter::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_writer::PdfWriter::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_writer::PdfWriter where T: 'static + ?core::marker::Sized
+pub fn easypdf_writer::PdfWriter::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_writer::PdfWriter where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfWriter::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_writer::PdfWriter where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfWriter::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_writer::PdfWriter
+pub fn easypdf_writer::PdfWriter::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_writer::PdfWriter
+pub type easypdf_writer::PdfWriter::Init = T
+pub const easypdf_writer::PdfWriter::ALIGN: usize
+pub unsafe fn easypdf_writer::PdfWriter::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_writer::PdfWriter::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_writer::PdfWriter::drop(usize)
+pub unsafe fn easypdf_writer::PdfWriter::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_writer::PdfWriter
+impl<T> pdf_writer::object::Finish for easypdf_writer::PdfWriter
+impl<T> tracing::instrument::Instrument for easypdf_writer::PdfWriter
+impl<T> tracing::instrument::WithSubscriber for easypdf_writer::PdfWriter
+impl<T> typenum::type_operators::Same for easypdf_writer::PdfWriter
+pub type easypdf_writer::PdfWriter::Output = T
+impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf_writer::PdfWriter where U: write_fonts::from_obj::FromObjRef<T>
+pub fn easypdf_writer::PdfWriter::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
+impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf_writer::PdfWriter where U: write_fonts::from_obj::FromTableRef<T>
+pub fn easypdf_writer::PdfWriter::to_owned_table(&self) -> U
+pub struct easypdf_writer::PdfWriterBuilder
+impl easypdf_writer::PdfWriterBuilder
+pub fn easypdf_writer::PdfWriterBuilder::backend(self, easypdf_writer::WriteBackend) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::build(self) -> easypdf_core::error::Result<easypdf_writer::PdfWriter>
+pub fn easypdf_writer::PdfWriterBuilder::compress_temp_files(self, bool) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::constant_memory(self, bool) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::metadata(self, easypdf_core::metadata::PdfMetadata) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::new(impl core::convert::Into<alloc::string::String>) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::register_handler(self, alloc::boxed::Box<dyn easypdf_core::traits::PdfWriteHandler>) -> Self
+pub fn easypdf_writer::PdfWriterBuilder::register_handler_with_priority(self, alloc::boxed::Box<dyn easypdf_core::traits::PdfWriteHandler>, f64) -> Self
+impl core::marker::Freeze for easypdf_writer::PdfWriterBuilder
+impl core::marker::Send for easypdf_writer::PdfWriterBuilder
+impl !core::marker::Sync for easypdf_writer::PdfWriterBuilder
+impl core::marker::Unpin for easypdf_writer::PdfWriterBuilder
+impl core::marker::UnsafeUnpin for easypdf_writer::PdfWriterBuilder
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_writer::PdfWriterBuilder
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_writer::PdfWriterBuilder
+impl<T, U> core::convert::Into<U> for easypdf_writer::PdfWriterBuilder where U: core::convert::From<T>
+pub fn easypdf_writer::PdfWriterBuilder::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_writer::PdfWriterBuilder where U: core::convert::Into<T>
+pub type easypdf_writer::PdfWriterBuilder::Error = core::convert::Infallible
+pub fn easypdf_writer::PdfWriterBuilder::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_writer::PdfWriterBuilder where U: core::convert::TryFrom<T>
+pub type easypdf_writer::PdfWriterBuilder::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_writer::PdfWriterBuilder::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_writer::PdfWriterBuilder where T: 'static + ?core::marker::Sized
+pub fn easypdf_writer::PdfWriterBuilder::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_writer::PdfWriterBuilder where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfWriterBuilder::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_writer::PdfWriterBuilder where T: ?core::marker::Sized
+pub fn easypdf_writer::PdfWriterBuilder::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_writer::PdfWriterBuilder
+pub fn easypdf_writer::PdfWriterBuilder::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_writer::PdfWriterBuilder
+pub type easypdf_writer::PdfWriterBuilder::Init = T
+pub const easypdf_writer::PdfWriterBuilder::ALIGN: usize
+pub unsafe fn easypdf_writer::PdfWriterBuilder::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_writer::PdfWriterBuilder::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_writer::PdfWriterBuilder::drop(usize)
+pub unsafe fn easypdf_writer::PdfWriterBuilder::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_writer::PdfWriterBuilder
+impl<T> pdf_writer::object::Finish for easypdf_writer::PdfWriterBuilder
+impl<T> tracing::instrument::Instrument for easypdf_writer::PdfWriterBuilder
+impl<T> tracing::instrument::WithSubscriber for easypdf_writer::PdfWriterBuilder
+impl<T> typenum::type_operators::Same for easypdf_writer::PdfWriterBuilder
+pub type easypdf_writer::PdfWriterBuilder::Output = T
+impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf_writer::PdfWriterBuilder where U: write_fonts::from_obj::FromObjRef<T>
+pub fn easypdf_writer::PdfWriterBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
+impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf_writer::PdfWriterBuilder where U: write_fonts::from_obj::FromTableRef<T>
+pub fn easypdf_writer::PdfWriterBuilder::to_owned_table(&self) -> U
+pub fn easypdf_writer::map_builtin_font(&easypdf_core::style::PdfFont) -> printpdf::font::BuiltinFont

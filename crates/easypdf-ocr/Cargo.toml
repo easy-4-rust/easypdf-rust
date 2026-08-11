@@ -1,0 +1,31 @@
+[package]
+name = "easypdf-ocr"
+description = "Cloud OCR engine collection (GLM / HunyuanOCR / Baidu) for easypdf"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+easypdf-markdown = { path = "../easypdf-markdown" }
+easypdf-core = { path = "../easypdf-core" }
+
+# Synchronous HTTP client (no async runtime required)
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "multipart", "blocking"] }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+base64 = "0.22"
+hmac = "0.12"
+sha2 = "0.10"
+chrono = { workspace = true }
+hex = "0.4"
+once_cell = "1.19"
+parking_lot = "0.12"
+image = { workspace = true, default-features = false, features = ["png"] }
+urlencoding = "2.1"

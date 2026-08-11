@@ -9,25 +9,56 @@ readme.workspace = true
 description = "Easy PDF manipulation library for Rust — builder API for creating, reading, manipulating, and filling PDFs"
 
 [dependencies]
+# --- Mandatory crates ---
 easypdf-core = { path = "../easypdf-core" }
-easypdf-model = { path = "../easypdf-model" }
-easypdf-io = { path = "../easypdf-io" }
 easypdf-derive = { path = "../easypdf-derive" }
 easypdf-reader = { path = "../easypdf-reader" }
 easypdf-writer = { path = "../easypdf-writer" }
-easypdf-manipulate = { path = "../easypdf-manipulate" }
-easypdf-template = { path = "../easypdf-template" }
-easypdf-layout = { path = "../easypdf-layout" }
+
+# --- Optional crates ---
 easypdf-markdown = { path = "../easypdf-markdown", optional = true }
+easypdf-ocr = { path = "../easypdf-ocr", optional = true }
+easypdf-runtime = { path = "../easypdf-runtime", optional = true, default-features = false }
 
 [features]
 default = ["markdown"]
 html = ["printpdf/html"]
+
+# --- Markdown pipeline ---
 markdown = ["dep:easypdf-markdown"]
+markdown-table = ["markdown"]
+markdown-ocr = ["markdown"]
+
+# --- OCR engines ---
+ocr = ["dep:easypdf-ocr", "markdown"]
+
+# --- Rendering ---
+render = ["markdown"]
+
+# --- Runtime (MCP + Resident) ---
+runtime = ["dep:easypdf-runtime"]
+mcp = ["runtime", "easypdf-runtime/mcp"]
+resident = ["runtime", "easypdf-runtime/resident"]
+
+# --- Full (everything available) ---
+full = ["markdown-table", "ocr", "render", "mcp", "resident"]
+
+# --- Backward-compatible aliases ---
+markdown-ocr-http-base = ["ocr"]
 
 [dependencies.printpdf]
 workspace = true
 optional = true
+
+[[example]]
+name = "pdf_to_markdown"
+path = "examples/pdf_to_markdown.rs"
+required-features = ["markdown"]
+
+[[example]]
+name = "markdown_pipeline"
+path = "examples/markdown_pipeline.rs"
+required-features = ["markdown"]
 
 [dev-dependencies]
 tempfile.workspace = true

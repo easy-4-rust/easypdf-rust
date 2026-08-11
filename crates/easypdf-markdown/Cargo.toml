@@ -6,17 +6,50 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 readme.workspace = true
-description = "Deterministic PDF to Markdown conversion for easypdf-rust"
+description = "Deterministic PDF to Markdown conversion for easypdf-rust (includes render, table detection, and OCR)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
-easypdf-model = { path = "../easypdf-model" }
-easypdf-io = { path = "../easypdf-io" }
 easypdf-reader = { path = "../easypdf-reader" }
+lopdf.workspace = true
+image = { workspace = true, features = ["png"] }
+thiserror.workspace = true
+tempfile.workspace = true
+
+# Optional: pdfium rendering backend (from easypdf-render)
+[dependencies.pdfium-render]
+version = "0.8"
+optional = true
+
+# Optional: OCR backends (from easypdf-markdown-ocr)
+[dependencies.ocrs]
+version = "0.9"
+optional = true
+
+[dependencies.rig-core]
+version = "0.8"
+optional = true
+
+[dependencies.base64]
+version = "0.22"
+optional = true
+
+[dependencies.tokio]
+version = "1"
+optional = true
+default-features = false
+features = ["rt"]
 
 [dev-dependencies]
-lopdf.workspace = true
-tempfile.workspace = true
+
+[features]
+default = []
+## Enable the pdfium rendering backend (requires libpdfium dynamic library at runtime).
+pdfium = ["dep:pdfium-render"]
+## Enable the ocrs pure-Rust OCR engine.
+ocrs = ["dep:ocrs"]
+## Enable the LLM Vision OCR engine (OpenAI/Gemini/DeepSeek).
+llm = ["dep:rig-core", "dep:base64", "dep:tokio"]
 
 [lints]
 workspace = true

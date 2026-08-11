@@ -108,3 +108,119 @@ impl PdfBookmark {
         self
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_metadata() {
+        let meta = PdfMetadata::default();
+        assert!(meta.title.is_none());
+        assert!(meta.author.is_none());
+        assert!(meta.subject.is_none());
+        assert!(meta.keywords.is_none());
+        assert!(meta.creator.is_none());
+        assert!(meta.producer.is_none());
+    }
+
+    #[test]
+    fn new_is_default() {
+        let meta = PdfMetadata::new();
+        assert!(meta.title.is_none());
+    }
+
+    #[test]
+    fn title_builder() {
+        let meta = PdfMetadata::default().title("My Doc");
+        assert_eq!(meta.title.as_deref(), Some("My Doc"));
+    }
+
+    #[test]
+    fn author_builder() {
+        let meta = PdfMetadata::default().author("John");
+        assert_eq!(meta.author.as_deref(), Some("John"));
+    }
+
+    #[test]
+    fn subject_builder() {
+        let meta = PdfMetadata::default().subject("Test");
+        assert_eq!(meta.subject.as_deref(), Some("Test"));
+    }
+
+    #[test]
+    fn keywords_builder() {
+        let meta = PdfMetadata::default().keywords("a,b,c");
+        assert_eq!(meta.keywords.as_deref(), Some("a,b,c"));
+    }
+
+    #[test]
+    fn to_xmp_includes_fields() {
+        let meta = PdfMetadata::default()
+            .title("Title")
+            .author("Author")
+            .subject("Subject")
+            .keywords("kw");
+        let xmp = meta.to_xmp();
+        assert!(xmp.contains("Title"));
+        assert!(xmp.contains("Author"));
+        assert!(xmp.contains("Subject"));
+        assert!(xmp.contains("kw"));
+    }
+
+    #[test]
+    fn to_xmp_empty_fields() {
+        let meta = PdfMetadata::default();
+        let xmp = meta.to_xmp();
+        assert!(xmp.contains("xmpmeta"));
+    }
+
+    #[test]
+    fn debug_format() {
+        let meta = PdfMetadata::default();
+        let dbg = format!("{:?}", meta);
+        assert!(dbg.contains("PdfMetadata"));
+    }
+
+    #[test]
+    fn clone_preserves() {
+        let meta = PdfMetadata::default().title("Test");
+        let cloned = meta.clone();
+        assert_eq!(meta.title, cloned.title);
+    }
+
+    #[test]
+    fn bookmark_new() {
+        let bm = PdfBookmark::new("Chapter 1", 1);
+        assert_eq!(bm.title, "Chapter 1");
+        assert_eq!(bm.page, 1);
+        assert!(bm.children.is_empty());
+    }
+
+    #[test]
+    fn bookmark_with_child() {
+        let bm = PdfBookmark::new("Root", 1)
+            .child(PdfBookmark::new("Child", 2));
+        assert_eq!(bm.children.len(), 1);
+        assert_eq!(bm.children[0].title, "Child");
+    }
+
+    #[test]
+    fn bookmark_nested_children() {
+        let bm = PdfBookmark::new("Root", 1)
+            .child(
+                PdfBookmark::new("L1", 2)
+                    .child(PdfBookmark::new("L2", 3)),
+            );
+        assert_eq!(bm.children.len(), 1);
+        assert_eq!(bm.children[0].children.len(), 1);
+    }
+
+    #[test]
+    fn bookmark_debug() {
+        let bm = PdfBookmark::new("Test", 1);
+        let dbg = format!("{:?}", bm);
+        assert!(dbg.contains("PdfBookmark"));
+    }
+}

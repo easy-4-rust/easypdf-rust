@@ -282,3 +282,156 @@ impl TableStyle {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn color_default_is_black() {
+        let c = PdfColor::default();
+        assert_eq!(c, PdfColor::Rgb(0.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn color_rgb_u8() {
+        let c = PdfColor::rgb_u8(255, 0, 0);
+        assert_eq!(c, PdfColor::Rgb(1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn color_named() {
+        assert_eq!(PdfColor::black(), PdfColor::Rgb(0.0, 0.0, 0.0));
+        assert_eq!(PdfColor::white(), PdfColor::Rgb(1.0, 1.0, 1.0));
+        assert_eq!(PdfColor::red(), PdfColor::Rgb(1.0, 0.0, 0.0));
+        assert_eq!(PdfColor::green(), PdfColor::Rgb(0.0, 1.0, 0.0));
+        assert_eq!(PdfColor::blue(), PdfColor::Rgb(0.0, 0.0, 1.0));
+    }
+
+    #[test]
+    fn color_gray() {
+        assert_eq!(PdfColor::light_gray(), PdfColor::Gray(0.8));
+        assert_eq!(PdfColor::gray(), PdfColor::Gray(0.5));
+    }
+
+    #[test]
+    fn color_cmyk() {
+        let c = PdfColor::Cmyk(0.0, 1.0, 1.0, 0.0);
+        let _ = format!("{:?}", c);
+    }
+
+    #[test]
+    fn color_clone_copy() {
+        let c = PdfColor::red();
+        let copied = c;
+        assert_eq!(c, copied);
+    }
+
+    #[test]
+    fn font_default() {
+        let f = PdfFont::default();
+        assert_eq!(f.size, 12.0);
+    }
+
+    #[test]
+    fn font_helvetica() {
+        let f = PdfFont::helvetica(14.0);
+        assert_eq!(f.size, 14.0);
+    }
+
+    #[test]
+    fn font_times_roman() {
+        let f = PdfFont::times_roman(10.0);
+        assert_eq!(f.size, 10.0);
+    }
+
+    #[test]
+    fn font_courier() {
+        let f = PdfFont::courier(8.0);
+        assert_eq!(f.size, 8.0);
+    }
+
+    #[test]
+    fn font_with_size() {
+        let f = PdfFont::default().with_size(20.0);
+        assert_eq!(f.size, 20.0);
+    }
+
+    #[test]
+    fn font_bold() {
+        let f = PdfFont::default().bold();
+        assert!(f.style.bold);
+    }
+
+    #[test]
+    fn font_italic() {
+        let f = PdfFont::default().italic();
+        assert!(f.style.italic);
+    }
+
+    #[test]
+    fn font_debug() {
+        let f = PdfFont::default();
+        let _ = format!("{:?}", f);
+    }
+
+    #[test]
+    fn font_family_eq() {
+        assert_eq!(
+            FontFamily::BuiltIn(BuiltInFont::Helvetica),
+            FontFamily::BuiltIn(BuiltInFont::Helvetica)
+        );
+        assert_ne!(
+            FontFamily::BuiltIn(BuiltInFont::Helvetica),
+            FontFamily::BuiltIn(BuiltInFont::Courier)
+        );
+    }
+
+    #[test]
+    fn built_in_font_variants() {
+        assert_ne!(BuiltInFont::TimesRoman, BuiltInFont::TimesBold);
+    }
+
+    #[test]
+    fn font_style_default() {
+        let fs = FontStyle::default();
+        assert!(!fs.bold);
+        assert!(!fs.italic);
+    }
+
+    #[test]
+    fn table_border_default() {
+        let b = TableBorder::default();
+        assert_eq!(b.width, 0.5);
+    }
+
+    #[test]
+    fn table_style_default() {
+        let s = TableStyle::default();
+        assert!(s.header_bg.is_some());
+        assert!(!s.striped);
+    }
+
+    #[test]
+    fn table_style_simple() {
+        let s = TableStyle::simple();
+        assert!(s.header_bg.is_none());
+        assert!(!s.striped);
+    }
+
+    #[test]
+    fn table_style_striped() {
+        let s = TableStyle::striped();
+        assert!(s.header_bg.is_some());
+        assert!(s.striped);
+    }
+
+    #[test]
+    fn table_style_debug_clone() {
+        let s = TableStyle::default();
+        let cloned = s.clone();
+        assert_eq!(s.striped, cloned.striped);
+        let _ = format!("{:?}", s);
+    }
+}

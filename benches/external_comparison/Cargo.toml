@@ -1,0 +1,34 @@
+[package]
+name = "easypdf-bench-external"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+publish = false
+description = "External comparison benchmarks for easypdf vs pdftotext"
+
+# Standalone workspace: NOT a member of the parent workspace.
+# Uses easypdf-reader directly to avoid pulling in the easypdf facade,
+# which depends on easypdf-core::crypto (has pre-existing version
+# compatibility issues with rsa/pkcs8 crates).
+
+[workspace]
+
+[dependencies]
+easypdf-reader = { path = "../../crates/easypdf-reader" }
+easypdf-core = { path = "../../crates/easypdf-core" }
+lopdf = "0.44"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bin]]
+name = "text_extract"
+path = "src/bin/text_extract.rs"
+
+[[bench]]
+name = "text_extraction"
+harness = false
+
+[[bench]]
+name = "accuracy"
+harness = false

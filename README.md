@@ -24,7 +24,7 @@ Inspired by [Alibaba EasyExcel](https://github.com/alibaba/easyexcel)'s builder-
 
 ---
 
-> **Current Version**: `0.1.0`
+> **Current Version**: `0.2.0`
 > **MSRV**: Rust `1.88`
 > **Edition**: `2024`
 > **Workspace Resolver**: `3`
@@ -75,19 +75,26 @@ Inspired by [Alibaba EasyExcel](https://github.com/alibaba/easyexcel)'s builder-
 |---|:---:|---|---|---|
 | Create PDF (text, fonts, metadata) | ✅ Stable | `easypdf-writer` | Built-in fonts only by default | Tests + examples |
 | Read / extract text + metadata | ✅ Stable | `easypdf-reader` | Text extraction depends on font encoding | Tests + benchmark |
+| Streaming read strategy | ✅ Preview | `easypdf-reader` | `ReadStrategy::Streaming` for large files | Strategy tests |
 | PDF → Markdown | ✅ Preview | `easypdf-markdown` / `markdown` | Native text MVP; tables/images/OCR emit warnings | 6 profile tests |
-| Merge PDFs | ✅ Stable | `easypdf-manipulate` | Valid `/Pages` tree on output | Merge tests |
-| Split PDF | ✅ Stable | `easypdf-manipulate` | Valid `/Pages` tree per output | Split tests |
-| Rotate / reorder pages | ✅ Stable | `easypdf-manipulate` | Per-page or all-pages | Manipulate tests |
-| Fill AcroForm fields | ✅ Stable | `easypdf-template` | Field name matching | Template tests |
-| `#[derive(PdfModel)]` | ✅ Stable | `easypdf-derive` | Compile-time only | trybuild tests |
+| Merge / Split / Rotate / Reorder | ✅ Stable | `easypdf-reader::manipulate` | Valid `/Pages` tree on output | Manipulate tests |
+| Fill AcroForm fields | ✅ Stable | `easypdf-writer::template` | Field name matching | Template tests |
+| `#[derive(PdfModel)]` | ✅ Stable | `easypdf-derive` | Extended attrs: `field`/`order`/`skip`/`default`/`required`/`format`/`nested` | trybuild + integration tests |
+| Table detection | ✅ Preview | `easypdf-markdown::table` | Pipe, tab, whitespace patterns | Integration tests |
+| OCR pipeline | ✅ Preview | `easypdf-markdown::ocr` | Trait-based `OcrEngine` abstraction | Integration tests |
+| Cloud OCR (GLM/Hunyuan/Baidu) | ✅ Preview | `easypdf-ocr` | Synchronous HTTP via reqwest | Integration tests |
+| Page rendering | ✅ Preview | `easypdf-markdown::render` | Text renderer (pdfium optional) | Integration tests |
+| Resident daemon | ✅ Preview | `easypdf-runtime` / `resident` | Unix socket IPC | Integration tests |
+| MCP server | ✅ Preview | `easypdf-runtime` / `mcp` | JSON-RPC over stdio for LLMs | Unit tests |
+| Writer backend selection | ✅ Stable | `easypdf-writer` | `InMemory` / `Spill` / `Auto` | Integration tests |
 | Writer lifecycle hooks | ✅ Stable | `easypdf-writer` | `PdfWriteHandler` trait | Handler lifecycle test |
 | Event-driven read listeners | ✅ Stable | `easypdf-reader` | `PdfReadListener` trait | Listener test |
-| Atomic output | ✅ Stable | `easypdf-io` | Temp file + atomic rename | All save operations |
-| Resource limits | ✅ Stable | `easypdf-io` | File size, page count, text length | Limit exceeded tests |
-| Engine-neutral semantic model | ✅ Preview | `easypdf-model` | `PdfBlock` / `PdfPageModel` / `PdfDocumentModel` | Markdown pipeline |
-| Tables, images, shapes | 🚧 Planned | — | Not yet implemented | v0.2 roadmap |
-| Custom TTF/OTF fonts | 🚧 Planned | — | Partial: `register_font_from_path` exists | v0.2 roadmap |
+| Atomic output | ✅ Stable | `easypdf-core::io` | Temp file + atomic rename | All save operations |
+| Resource limits | ✅ Stable | `easypdf-core::io` | File size, page count, text length | Limit exceeded tests |
+| Engine-neutral semantic model | ✅ Preview | `easypdf-core::model` | `PdfBlock` / `PdfPageModel` / `PdfDocumentModel` | Markdown pipeline |
+| tracing observability | ✅ Stable | `easypdf-core::logging` | Structured spans, env-filter, JSON | All crates |
+| Tables, images, shapes | 🚧 Planned | — | Not yet implemented | v0.3 roadmap |
+| Custom TTF/OTF fonts | 🚧 Planned | — | Partial: `register_font_from_path` exists | v0.3 roadmap |
 | Encryption | ⛔ Not implemented | — | Returns `UnsupportedFeature` | Explicit error test |
 | Digital signatures | ⛔ Not implemented | — | Returns `UnsupportedFeature` | Explicit error test |
 
@@ -157,51 +164,46 @@ lopdf parse → PdfReader session (single-parse, reusable)
 ```mermaid
 flowchart TB
     facade["easypdf\nEasyPdf facade"]
-    markdown["easypdf-markdown\nPDF → Markdown pipeline"]
-    reader["easypdf-reader\nsingle-parse session"]
-    writer["easypdf-writer\nprintpdf backend"]
-    manipulate["easypdf-manipulate\nmerge/split/edit"]
-    template["easypdf-template\nAcroForm filling"]
-    layout["easypdf-layout\nbackend-neutral layout"]
-    model["easypdf-model\nsemantic IR"]
-    io["easypdf-io\nlimits + atomic output"]
-    core["easypdf-core\ntypes + errors"]
+    core["easypdf-core\ntypes + errors + model + io + layout"]
     derive["easypdf-derive\nproc-macro"]
+    reader["easypdf-reader\nread + manipulate + streaming"]
+    writer["easypdf-writer\nwrite + template + backends"]
+    markdown["easypdf-markdown\nmarkdown + table + OCR + render"]
+    ocr["easypdf-ocr\ncloud OCR engines"]
+    runtime["easypdf-runtime\nMCP + resident daemon"]
+    test["easypdf-test\nintegration tests"]
 
-    facade --> markdown & reader & writer & manipulate & template
-    markdown --> reader & model & io
-    reader --> model & io & core
-    writer --> layout & io & core
-    manipulate --> io & core
-    template --> io & core
-    layout --> core
-    model --> core
-    io --> core
+    facade --> markdown & reader & writer & ocr
+    runtime --> reader & writer & markdown
+    markdown --> reader & core
+    reader --> core
+    writer --> core
+    ocr --> markdown & core
     derive --> core
+    test --> facade
 ```
 
 ### 5.2 Crate Responsibilities
 
 | Crate | Purpose | Backend |
 |---|---|---|
-| **easypdf** | Facade + `EasyPdf` entry point + all Builder types | Depends on all sub-crates |
-| **easypdf-core** | Types, enums, traits, `PdfError` | thiserror, chrono (no engine) |
-| **easypdf-model** | Engine-neutral semantic IR (`PdfBlock`, `PdfPageModel`, `PdfDocumentModel`) | No engine dependency |
-| **easypdf-io** | `ResourceLimits`, `PdfInput`, `AtomicFileOutput` | std only |
-| **easypdf-derive** | `#[derive(PdfModel)]` proc-macro | syn, quote |
-| **easypdf-layout** | Backend-neutral layout abstractions (`LayoutSink` trait, `FlowLayout`) | No engine dependency |
-| **easypdf-reader** | PDF parsing, text extraction, metadata, session reuse | lopdf |
-| **easypdf-writer** | PDF creation with text, images, shapes, fonts | printpdf |
-| **easypdf-manipulate** | Merge, split, rotate, reorder pages | lopdf |
-| **easypdf-template** | AcroForm field filling | lopdf |
-| **easypdf-markdown** | PDF → Markdown conversion with profiles and structured warnings | lopdf + easypdf-model |
+| **easypdf** | Facade + `EasyPdf` entry point + all Builder types | Depends on core, reader, writer, markdown, ocr |
+| **easypdf-core** | Types, enums, traits, `PdfError`, semantic IR, resource limits, atomic output, layout abstractions | thiserror, chrono (no engine) |
+| **easypdf-derive** | `#[derive(PdfModel)]` proc-macro with extended field attributes | syn, quote |
+| **easypdf-reader** | PDF parsing, text extraction, metadata, session reuse, merge/split/rotate/reorder, streaming strategy | lopdf |
+| **easypdf-writer** | PDF creation with text, images, shapes, fonts, `WriteBackend` selection, AcroForm filling | printpdf |
+| **easypdf-markdown** | PDF → Markdown with profiles, processor pipeline, table detection, OCR fallback, page rendering | lopdf + easypdf-core |
+| **easypdf-ocr** | Cloud OCR engine collection (GLM, HunyuanOCR, Baidu) | reqwest (blocking) |
+| **easypdf-runtime** | MCP server (`easypdf-mcp` binary) + resident daemon for in-memory sessions | Feature-gated `mcp` / `resident` |
+| **easypdf-test** | Integration test harness with golden files and sample PDFs | Test-only |
 
 ### 5.3 Dependency Rules
 
-- `easypdf-core` has zero engine dependencies — it is the shared vocabulary.
-- `easypdf-model` and `easypdf-io` have zero engine dependencies — they are engine-neutral infrastructure.
-- `easypdf-layout` does NOT depend on `easypdf-writer` — it exposes `LayoutSink` which Writer implements.
-- Domain crates (reader, writer, manipulate, template, markdown) do NOT depend on each other.
+- `easypdf-core` has zero engine dependencies — it is the shared vocabulary (types, model, io, layout).
+- `easypdf-derive` depends only on `easypdf-core`.
+- Domain crates (reader, writer, markdown) do NOT depend on each other.
+- `easypdf-ocr` depends on `easypdf-markdown` (for the `OcrEngine` trait) and `easypdf-core`.
+- `easypdf-runtime` depends on reader, writer, and markdown for the MCP/resident daemons.
 - Only the `easypdf` facade depends on all sub-crates.
 
 ## 6. Cargo Features
@@ -210,6 +212,13 @@ flowchart TB
 |---|---|---|:---:|
 | `markdown` | `easypdf-markdown` | PDF → Markdown pipeline | ✅ |
 | `html` | `printpdf/html` | HTML → PDF (requires Chromium) | ❌ |
+| `markdown-table` | `easypdf-markdown-table` | Table detection in markdown pipeline | ❌ |
+| `markdown-ocr` | `easypdf-markdown-ocr` | OCR fallback for scanned pages | ❌ |
+| `ocr` | alias for `markdown-ocr` | OCR (alias) | ❌ |
+| `render` | `easypdf-render` | PDF page rendering to PNG | ❌ |
+| `resident` | `easypdf-resident` | Resident daemon for in-memory sessions | ❌ |
+| `mcp` | `easypdf-mcp` | MCP server for LLM agents | ❌ |
+| `full` | all optional crates | Everything enabled | ❌ |
 
 ```toml
 # Default: markdown enabled
@@ -220,6 +229,15 @@ easypdf = { version = "0.1.0", default-features = false }
 
 # Enable HTML → PDF
 easypdf = { version = "0.1.0", features = ["html"] }
+
+# Enable markdown with table detection
+easypdf = { version = "0.1.0", features = ["markdown-table"] }
+
+# Enable OCR pipeline
+easypdf = { version = "0.1.0", features = ["ocr"] }
+
+# Enable everything
+easypdf = { version = "0.1.0", features = ["full"] }
 ```
 
 ## 7. Quick Start
@@ -346,21 +364,84 @@ for warning in report.warnings() {
 # Ok::<(), easypdf::PdfError>(())
 ```
 
+### 8.4 Markdown Pipeline with Table Detection
+
+```rust
+use easypdf::prelude::*;
+
+let mut pipeline = EasyPdf::markdown_pipeline(MarkdownProfile::Gfm);
+pipeline.register(Box::new(EasyPdf::table_detector()));
+# Ok::<(), easypdf::PdfError>(())
+```
+
+### 8.5 Render PDF Page to PNG
+
+```rust,ignore
+use easypdf::EasyPdf;
+
+EasyPdf::render_page("input.pdf".as_ref(), 0, "page_0.png".as_ref(), 150)?;
+# Ok::<(), easypdf::RenderError>(())
+```
+
+### 8.6 Writer with Backend Selection
+
+```rust
+use easypdf::prelude::*;
+
+let writer = EasyPdf::writer("Big Report")
+    .backend(WriteBackend::default())
+    .build()?;
+# Ok::<(), easypdf::PdfError>(())
+```
+
+### 8.7 Resident Daemon
+
+```rust,ignore
+use easypdf::EasyPdf;
+
+// Start daemon (blocks):
+EasyPdf::serve(None)?;
+
+// Or attach from another process:
+if let Some(client) = EasyPdf::attach() {
+    // use client to interact with daemon
+}
+# Ok::<(), easypdf::PdfError>(())
+```
+
+### 8.8 MCP Server
+
+```rust,ignore
+use easypdf::EasyPdf;
+
+let server = EasyPdf::mcp_server();
+server.run()?;
+# Ok::<(), easypdf::PdfError>(())
+```
+
 ## 9. Core API Overview
 
 ### 9.1 Entry Points
 
-| Method | Returns | Purpose |
-|---|---|---|
-| `EasyPdf::create(path)` | `PdfCreateBuilder` | Build and write a new PDF |
-| `EasyPdf::read(path)` | `PdfReadBuilder` | Extract text and metadata |
-| `EasyPdf::export_markdown(input, output)` | `PdfMarkdownExportBuilder` | PDF → Markdown |
-| `EasyPdf::merge(&[paths], output)` | `Result<()>` | Merge multiple PDFs |
-| `EasyPdf::split(path)` | `PdfSplitBuilder` | Split PDF into pages |
-| `EasyPdf::manipulate(path)` | `PdfManipulateBuilder` | Rotate, reorder pages |
-| `EasyPdf::fill_form(path, data)` | `PdfFillBuilder` | Fill AcroForm fields |
-| `EasyPdf::encrypt(input, output, pwd)` | `Result<()>` | ⛔ Returns `UnsupportedFeature` |
-| `EasyPdf::sign(input, output, reason)` | `Result<()>` | ⛔ Returns `UnsupportedFeature` |
+| Method | Returns | Feature | Purpose |
+|---|---|---|---|
+| `EasyPdf::create(path)` | `PdfCreateBuilder` | — | Build and write a new PDF |
+| `EasyPdf::read(path)` | `PdfReadBuilder` | — | Extract text and metadata |
+| `EasyPdf::export_markdown(input, output)` | `PdfMarkdownExportBuilder` | `markdown` | PDF → Markdown (file) |
+| `EasyPdf::to_markdown(input)` | `PdfMarkdownBuilder` | `markdown` | PDF → Markdown (in-memory) |
+| `EasyPdf::merge(&[paths], output)` | `Result<()>` | — | Merge multiple PDFs |
+| `EasyPdf::split(path)` | `PdfSplitBuilder` | — | Split PDF into pages |
+| `EasyPdf::manipulate(path)` | `PdfManipulateBuilder` | — | Rotate, reorder pages |
+| `EasyPdf::fill_form(path, data)` | `PdfFillBuilder` | — | Fill AcroForm fields |
+| `EasyPdf::writer(title)` | `PdfWriterBuilder` | — | Create PDF Writer with backend selection |
+| `EasyPdf::markdown_pipeline(profile)` | `ProcessorPipeline` | `markdown` | Markdown conversion pipeline |
+| `EasyPdf::table_detector()` | `TableDetectorProcessor` | `markdown-table` | Table detection processor |
+| `EasyPdf::render_page(path, page, out, dpi)` | `Result<(), RenderError>` | `render` | Render PDF page to PNG |
+| `EasyPdf::mcp_server()` | `McpServer` | `mcp` | Launch MCP server |
+| `EasyPdf::serve(socket)` | `Result<()>` | `resident` | Start resident daemon |
+| `EasyPdf::attach()` | `Option<ResidentClient>` | `resident` | Attach to running daemon |
+| `EasyPdf::encrypt(input, output, pwd)` | `Result<()>` | — | ⛔ Returns `UnsupportedFeature` |
+| `EasyPdf::sign(input, output, reason)` | `Result<()>` | — | ⛔ Returns `UnsupportedFeature` |
 
 ### 9.2 Reader Session Reuse
 
@@ -384,11 +465,29 @@ Benchmark (local, 3-page PDF):
 
 | Trait | Role | Analogy from EasyExcel |
 |---|---|---|
-| `PdfModel` | Map struct fields to PDF elements (derive) | `ExcelRow` |
+| `PdfModel` | Map struct fields to PDF elements + form descriptors (derive) | `ExcelRow` |
 | `PdfReadListener` | Event-driven text extraction callbacks | `ReadListener<T>` |
 | `PdfWriteHandler` | Page lifecycle hooks (before/after page) | `WriteHandler` |
 | `PdfConverter<T>` | Bidirectional Rust ⇄ PDF string | `Converter<T>` |
 | `LayoutSink` | Backend-neutral layout consumption | — |
+| `OcrEngine` | OCR backend abstraction | — |
+| `PdfMarkdownProcessor` | Markdown pipeline processor | — |
+| `PdfRenderer` | PDF page rasterization | — |
+
+### 9.4 `#[derive(PdfModel)]` Field Attributes
+
+| Attribute | Effect |
+|---|---|
+| `#[pdf(text, position = (x, y))]` | Render as positioned text |
+| `#[pdf(table, position = (x, y))]` | Render as table |
+| `#[pdf(image, position = (x, y))]` | Render as image |
+| `#[pdf(ignore)]` / `#[pdf(skip)]` | Skip field entirely |
+| `#[pdf(field = "name")]` | Map to PDF form field name |
+| `#[pdf(order = N)]` | Display/render order |
+| `#[pdf(default = "value")]` | Default value when empty |
+| `#[pdf(required)]` | Field must be non-empty |
+| `#[pdf(format = "pattern")]` | Format pattern (e.g. `"YYYY-MM-DD"`) |
+| `#[pdf(nested)]` | Recursively render inner model |
 
 ## 10. Error Handling & Resource Limits
 
@@ -437,11 +536,12 @@ All save operations (`Writer`, `Manipulate`, `Template`, `Markdown`) use atomic 
 | Phase | Focus | Key Deliverables | Status |
 |:---:|---|---|:---:|
 | **v0.1** | Foundation | 11 crates, core types, read/write/manipulate/template/markdown, derive macro, builder API, atomic output, resource limits | ✅ |
-| **v0.2** | Rich content | Tables, images, vector shapes, custom TTF/OTF fonts, page headers/footers | 🚧 |
-| **v0.3** | Watermarks & layout | Text/image watermarks, layout engine, PDF layers (OCG) | 🗓️ |
-| **v0.4** | Security | AES-256 encryption/decryption, password protection | 🗓️ |
-| **v0.5** | Compliance | PDF/A validation, digital signatures, XMP metadata | 🗓️ |
-| **v0.6** | Converters | HTML → PDF, Markdown → PDF, SVG → PDF | 🗓️ |
+| **v0.2** | Architecture + OCR | 9-crate consolidation, streaming read, WriteBackend, cloud OCR (GLM/Hunyuan/Baidu), MCP, resident daemon, tracing | ✅ |
+| **v0.3** | Rich content | Tables, images, vector shapes, custom TTF/OTF fonts, page headers/footers | 🚧 |
+| **v0.4** | Watermarks & layout | Text/image watermarks, layout engine, PDF layers (OCG) | 🗓️ |
+| **v0.5** | Security | AES-256 encryption/decryption, password protection | 🗓️ |
+| **v0.6** | Compliance | PDF/A validation, digital signatures, XMP metadata | 🗓️ |
+| **v0.7** | Converters | HTML → PDF, Markdown → PDF, SVG → PDF | 🗓️ |
 | **v1.0** | Stable | Stable API, full test coverage, performance benchmarks | 🗓️ |
 
 ## 13. Performance & Benchmarks

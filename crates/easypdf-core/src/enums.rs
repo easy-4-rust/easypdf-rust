@@ -98,3 +98,103 @@ pub enum ImageFormat {
     /// PNG image.
     Png,
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn page_size_a4() {
+        let (w, h) = PageSize::A4.dimensions();
+        assert_eq!(w, 595.0);
+        assert_eq!(h, 842.0);
+    }
+
+    #[test]
+    fn page_size_a0() {
+        let (w, _h) = PageSize::A0.dimensions();
+        assert_eq!(w, 2384.0);
+    }
+
+    #[test]
+    fn page_size_letter() {
+        let (w, h) = PageSize::Letter.dimensions();
+        assert_eq!(w, 612.0);
+        assert_eq!(h, 792.0);
+    }
+
+    #[test]
+    fn page_size_legal() {
+        let (_, h) = PageSize::Legal.dimensions();
+        assert_eq!(h, 1008.0);
+    }
+
+    #[test]
+    fn page_size_custom() {
+        let (w, h) = PageSize::Custom(300.0, 400.0).dimensions();
+        assert_eq!(w, 300.0);
+        assert_eq!(h, 400.0);
+    }
+
+    #[test]
+    fn orientation_default_is_portrait() {
+        assert_eq!(Orientation::default(), Orientation::Portrait);
+    }
+
+    #[test]
+    fn orientation_debug() {
+        assert_eq!(format!("{:?}", Orientation::Landscape), "Landscape");
+    }
+
+    #[test]
+    fn text_alignment_default_is_left() {
+        assert_eq!(TextAlignment::default(), TextAlignment::Left);
+    }
+
+    #[test]
+    fn text_alignment_variants() {
+        assert_ne!(TextAlignment::Left, TextAlignment::Center);
+        assert_ne!(TextAlignment::Right, TextAlignment::Justify);
+    }
+
+    #[test]
+    fn vertical_alignment_default_is_top() {
+        assert_eq!(VerticalAlignment::default(), VerticalAlignment::Top);
+    }
+
+    #[test]
+    fn rotation_variants() {
+        assert_ne!(Rotation::None, Rotation::Clockwise90);
+        assert_ne!(Rotation::Clockwise180, Rotation::Clockwise270);
+    }
+
+    #[test]
+    fn image_format_variants() {
+        assert_ne!(ImageFormat::Jpeg, ImageFormat::Png);
+    }
+
+    #[test]
+    fn page_size_clone_copy() {
+        let ps = PageSize::A4;
+        let copied = ps;
+        assert_eq!(ps, copied);
+    }
+
+    #[test]
+    fn page_size_custom_eq() {
+        assert_eq!(PageSize::Custom(1.0, 2.0), PageSize::Custom(1.0, 2.0));
+        assert_ne!(PageSize::Custom(1.0, 2.0), PageSize::Custom(3.0, 4.0));
+    }
+
+    #[test]
+    fn page_size_all_sizes() {
+        let sizes = [PageSize::A0, PageSize::A1, PageSize::A2, PageSize::A3,
+                     PageSize::A4, PageSize::A5, PageSize::Letter, PageSize::Legal];
+        for s in sizes {
+            let (w, h) = s.dimensions();
+            assert!(w > 0.0);
+            assert!(h > 0.0);
+        }
+    }
+}

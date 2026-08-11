@@ -1,17 +1,23 @@
-//! Main PdfWriter struct and core PDF writing methods.
+//! Main `PdfWriter` struct and core PDF writing methods.
+//!
+//! Backed by `printpdf` for PDF construction. Supports two write backends:
+//! - **In-memory** (default): the entire document is built in memory.
+//! - **Spill**: finalized pages are serialized to temp files, bounding peak memory.
 
 use easypdf_core::error::{PdfError, Result};
+use easypdf_core::handler_chain::{WriteHandlerChain, PRIORITY_NORMAL};
 use easypdf_core::{
     FontFamily, Orientation, PageSize, PdfColor, PdfFont, PdfImage, PdfMetadata, PdfText,
     PdfWriteHandler,
 };
-use easypdf_io::AtomicFileOutput;
-use easypdf_layout::LayoutSink;
+use easypdf_core::AtomicFileOutput;
+use easypdf_core::layout::LayoutSink;
 use printpdf::{Mm, Op, PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
 use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 
+use crate::backend::{PageSpillWriter, SpilledPageData, WriteBackend};
 use crate::font::map_builtin_font;
 
 /// PDF measurement units.
@@ -24,10 +30,38 @@ const DEFAULT_MARGIN: f64 = 72.0;
 /// Builds pages from operations, then serializes the document to bytes.
 /// Supports multiple pages, images, custom fonts, and shapes.
 ///
-/// Inspired by hutool's OfdWriter and ExcelWriter patterns.
+/// # Write backends
+///
+/// Use [`WriteBackend`] to choose between in-memory and page-level spill modes.
+/// For large documents, the spill backend bounds peak memory by serializing
+/// finalized pages to temporary files.
+///
+/// # Handler chain
+///
+/// Handlers are managed by a priority-sorted [`WriteHandlerChain`]. The
+/// [`register_handler`](Self::register_handler) method uses
+/// [`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL); use
+/// [`register_handler_with_priority`](Self::register_handler_with_priority)
+/// for custom priorities.
+///
+/// # Examples
+///
+/// ```
+/// use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
+/// use easypdf_core::*;
+///
+/// // Simple construction (backward-compatible).
+/// let w = PdfWriter::new("title");
+///
+/// // Builder with spill backend.
+/// let w = PdfWriterBuilder::new("Big Report")
+///     .backend(WriteBackend::auto(500))
+///     .build()
+///     .unwrap();
+/// ```
 pub struct PdfWriter {
     pub(crate) doc: PdfDocument,
-    /// Accumulated completed pages.
+    /// Accumulated completed pages (in-memory mode only).
     pages: Vec<PdfPage>,
     /// Operations being built for the current page.
     pub(crate) current_page_ops: Vec<Op>,
@@ -43,16 +77,23 @@ pub struct PdfWriter {
     custom_fonts: HashMap<String, printpdf::FontId>,
     /// Document metadata.
     pub(crate) metadata: PdfMetadata,
-    /// Lifecycle handlers.
-    handlers: Vec<Box<dyn PdfWriteHandler>>,
+    /// Priority-sorted handler chain.
+    chain: WriteHandlerChain,
     /// Auto-cursor for add_text convenience.
     text_cursor: (f64, f64),
     /// Output stream for flush-based writing.
     output: Option<Box<dyn Write>>,
+    /// Write backend configuration.
+    backend: WriteBackend,
+    /// Page-level spill writer (active when backend is `Spill`).
+    spill_writer: Option<PageSpillWriter>,
 }
 
 impl PdfWriter {
     /// Create a new PDF document (writes to file via `finish`).
+    ///
+    /// Uses the default in-memory backend. For advanced configuration,
+    /// use [`PdfWriterBuilder`](crate::PdfWriterBuilder).
     #[must_use]
     pub fn new(title: &str) -> Self {
         Self {
@@ -65,9 +106,11 @@ impl PdfWriter {
             document_started: false,
             custom_fonts: HashMap::new(),
             metadata: PdfMetadata::default(),
-            handlers: Vec::new(),
+            chain: WriteHandlerChain::new(),
             text_cursor: (DEFAULT_MARGIN, 0.0),
             output: None,
+            backend: WriteBackend::default(),
+            spill_writer: None,
         }
     }
 
@@ -79,6 +122,48 @@ impl PdfWriter {
         s
     }
 
+    /// Internal constructor used by [`PdfWriterBuilder`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the spill backend cannot be initialized.
+    pub(crate) fn with_config(
+        title: &str,
+        metadata: PdfMetadata,
+        backend: WriteBackend,
+        chain: WriteHandlerChain,
+    ) -> Result<Self> {
+        let spill_writer = match &backend {
+            WriteBackend::Spill {
+                spill_dir,
+                compress,
+                threshold_pages,
+            } => Some(PageSpillWriter::new(
+                spill_dir.clone(),
+                *compress,
+                *threshold_pages,
+            )?),
+            WriteBackend::InMemory => None,
+        };
+
+        Ok(Self {
+            doc: PdfDocument::new(title),
+            pages: Vec::new(),
+            current_page_ops: Vec::new(),
+            current_page_size: PageSize::A4.dimensions(),
+            current_page_number: 0,
+            current_page_open: false,
+            document_started: false,
+            custom_fonts: HashMap::new(),
+            metadata,
+            chain,
+            text_cursor: (DEFAULT_MARGIN, 0.0),
+            output: None,
+            backend,
+            spill_writer,
+        })
+    }
+
     /// Set document metadata.
     #[must_use]
     pub fn metadata(mut self, metadata: PdfMetadata) -> Self {
@@ -86,10 +171,24 @@ impl PdfWriter {
         self
     }
 
-    /// Register a write handler for lifecycle callbacks.
+    /// Register a write handler with default priority
+    /// ([`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)).
     #[must_use]
     pub fn register_handler(mut self, handler: Box<dyn PdfWriteHandler>) -> Self {
-        self.handlers.push(handler);
+        self.chain.register(handler, PRIORITY_NORMAL);
+        self
+    }
+
+    /// Register a write handler with a specific execution priority.
+    ///
+    /// Lower priority values execute first.
+    #[must_use]
+    pub fn register_handler_with_priority(
+        mut self,
+        handler: Box<dyn PdfWriteHandler>,
+        priority: f64,
+    ) -> Self {
+        self.chain.register(handler, priority);
         self
     }
 
@@ -152,9 +251,7 @@ impl PdfWriter {
             Orientation::Landscape => (height, width),
         };
         self.text_cursor = (DEFAULT_MARGIN, self.current_page_size.1 - DEFAULT_MARGIN);
-        for handler in &mut self.handlers {
-            handler.before_page(self.current_page_number)?;
-        }
+        self.chain.before_page(self.current_page_number)?;
         self.current_page_open = true;
         Ok(self.current_page_number)
     }
@@ -163,11 +260,26 @@ impl PdfWriter {
         if !self.current_page_open {
             return Ok(());
         }
-        for handler in &mut self.handlers {
-            handler.after_page(self.current_page_number)?;
-        }
+        self.chain.after_page(self.current_page_number)?;
         let ops = std::mem::take(&mut self.current_page_ops);
         let (w, h) = self.current_page_size;
+
+        // If spill writer is active, attempt to spill this page.
+        if let Some(ref mut spill) = self.spill_writer {
+            let page_data = SpilledPageData {
+                page_number: self.current_page_number,
+                width_pt: w,
+                height_pt: h,
+                ops: ops.clone(),
+            };
+            if spill.maybe_spill(&page_data)?.is_some() {
+                // Page was spilled -- do not keep in memory.
+                self.current_page_open = false;
+                return Ok(());
+            }
+        }
+
+        // Keep page in memory (in-memory mode, or below spill threshold).
         self.pages.push(PdfPage::new(
             Mm(w as f32 * PT_TO_MM as f32),
             Mm(h as f32 * PT_TO_MM as f32),
@@ -181,9 +293,7 @@ impl PdfWriter {
         if self.document_started {
             return Ok(());
         }
-        for handler in &mut self.handlers {
-            handler.before_document()?;
-        }
+        self.chain.before_document()?;
         self.document_started = true;
         Ok(())
     }
@@ -193,10 +303,54 @@ impl PdfWriter {
     pub const fn current_page_number(&self) -> usize {
         self.current_page_number
     }
+
     /// Get total finalized pages.
     #[must_use]
     pub fn page_count(&self) -> usize {
-        self.pages.len()
+        // Include both in-memory pages and spilled pages.
+        let spilled = self.spill_writer.as_ref().map_or(0, |s| s.spilled_count());
+        self.pages.len() + spilled
+    }
+
+    /// Return whether this writer is in constant-memory (spill) mode.
+    #[must_use]
+    pub fn is_constant_memory(&self) -> bool {
+        self.backend.is_constant_memory()
+    }
+
+    /// Switch to or from constant-memory mode.
+    ///
+    /// When enabled, the backend is set to [`WriteBackend::constant_memory()`]
+    /// which spills every page immediately after finalization. When disabled,
+    /// the backend is set to [`WriteBackend::InMemory`].
+    ///
+    /// Note: switching mode mid-document has no effect on already-finalized pages.
+    pub fn set_constant_memory(&mut self, enabled: bool) {
+        if enabled {
+            if !self.backend.is_constant_memory() {
+                self.backend = WriteBackend::constant_memory();
+                // Initialize spill writer if not present.
+                if self.spill_writer.is_none() {
+                    self.spill_writer = PageSpillWriter::new(None, true, 1).ok();
+                }
+            }
+        } else {
+            self.backend = WriteBackend::InMemory;
+            // We do not drop the spill writer -- already-spilled pages need
+            // to be collected at finish time.
+        }
+    }
+
+    /// Return the number of registered handlers.
+    #[must_use]
+    pub fn handler_count(&self) -> usize {
+        self.chain.len()
+    }
+
+    /// Return the document title from metadata, if set.
+    #[must_use]
+    pub fn metadata_title(&self) -> Option<&str> {
+        self.metadata.title.as_deref()
     }
 
     /// Write text at (x, y) in PDF points.
@@ -279,20 +433,65 @@ impl PdfWriter {
         Ok(self)
     }
 
-    /// Write the document to a file.
+    /// Write the document to a file using atomic output with fsync.
+    ///
+    /// Finalizes the current page, fires `after_document` on all handlers,
+    /// collects any spilled pages, constructs the final PDF, and writes it
+    /// atomically (temp-file + fsync + rename).
     pub fn finish(mut self, path: impl AsRef<Path>) -> Result<()> {
         if self.current_page_number == 0 {
             self.add_page(PageSize::A4, Orientation::Portrait)?;
         }
         self.finalize_current_page()?;
-        for handler in &mut self.handlers {
-            handler.after_document()?;
+        self.chain.after_document()?;
+
+        // Apply easypdf metadata to printpdf document info before saving.
+        // This ensures PdfMetadata set via builder methods is written into
+        // the PDF's /Info dictionary, overriding the default title from
+        // PdfDocument::new().
+        self.apply_metadata();
+
+        // Collect spilled pages (if any) and merge with in-memory pages.
+        let mut all_pages = std::mem::take(&mut self.pages);
+        if let Some(ref spill) = self.spill_writer {
+            let spilled = spill.collect_all()?;
+            for data in spilled {
+                all_pages.push(PdfPage::new(
+                    Mm(data.width_pt as f32 * PT_TO_MM as f32),
+                    Mm(data.height_pt as f32 * PT_TO_MM as f32),
+                    data.ops,
+                ));
+            }
         }
-        self.doc.with_pages(self.pages);
+
+        self.doc.with_pages(all_pages);
         let opts = PdfSaveOptions::default();
         let mut warnings = Vec::new();
         let bytes = self.doc.save(&opts, &mut warnings);
-        AtomicFileOutput::new(path.as_ref()).write(&bytes)
+        AtomicFileOutput::new(path.as_ref()).write_with_fsync(&bytes)
+    }
+
+    /// Copy easypdf metadata fields into the printpdf document info.
+    fn apply_metadata(&mut self) {
+        let info = &mut self.doc.metadata.info;
+        if let Some(ref title) = self.metadata.title {
+            info.document_title.clone_from(title);
+        }
+        if let Some(ref author) = self.metadata.author {
+            info.author.clone_from(author);
+        }
+        if let Some(ref subject) = self.metadata.subject {
+            info.subject.clone_from(subject);
+        }
+        if let Some(ref keywords) = self.metadata.keywords {
+            info.keywords = keywords.split(',').map(|s| s.trim().to_string()).collect();
+        }
+        if let Some(ref creator) = self.metadata.creator {
+            info.creator.clone_from(creator);
+        }
+        if let Some(ref producer) = self.metadata.producer {
+            info.producer.clone_from(producer);
+        }
     }
 
     /// Flush to the pre-configured output stream (hutool pattern).
@@ -316,6 +515,7 @@ impl PdfWriter {
                 Vec::new(),
             ));
         }
+        self.apply_metadata();
         self.doc.with_pages(pages);
         let opts = PdfSaveOptions::default();
         let mut warnings = Vec::new();

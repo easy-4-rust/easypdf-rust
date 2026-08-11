@@ -3,15 +3,13 @@ resolver = "3"
 members = [
     "crates/easypdf",
     "crates/easypdf-core",
-    "crates/easypdf-model",
-    "crates/easypdf-io",
     "crates/easypdf-derive",
-    "crates/easypdf-layout",
     "crates/easypdf-reader",
     "crates/easypdf-writer",
-    "crates/easypdf-manipulate",
-    "crates/easypdf-template",
     "crates/easypdf-markdown",
+    "crates/easypdf-ocr",
+    "crates/easypdf-runtime",
+    "easypdf-test",
 ]
 
 [workspace.package]
@@ -41,11 +39,19 @@ quote = "1.0.47"
 proc-macro2 = "1.0.107"
 proc-macro-crate = "3.5.0"
 
+# --- Observability ---
+tracing = "0.1"
+tracing-subscriber = { version = ">=0.3.20", features = ["env-filter", "json"] }
+
+# --- Crypto (constant-time RSA via ring) ---
+ring = "0.17"
+
 # --- Testing ---
 tempfile = "3.27.0"
 trybuild = "1.0.116"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
+flate2 = "1.1.9"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -54,3 +60,15 @@ missing_docs = "warn"
 [workspace.lints.clippy]
 all = "warn"
 pedantic = "warn"
+# similar_names 在测试代码（page_dict/pages_dict 等 PDF 对象）几乎总是误报
+similar_names = { level = "allow", priority = -1 }
+
+[workspace.metadata.audit]
+# RUSTSEC-2023-0071: rsa 0.9.x Marvin Attack — dev-dependency only, not in production path.
+# See audit.toml for full rationale.
+ignore = ["RUSTSEC-2023-0071"]
+
+[patch.crates-io]
+# RUSTSEC-2026-0253: lru 0.16.4 use-after-free in LruCache::pop()
+# azul-layout 0.0.13 hard-pins lru 0.16.x; force upgrade to 0.18.2+
+lru = { git = "https://github.com/jeromefroe/lru-rs.git", tag = "0.17.0" }

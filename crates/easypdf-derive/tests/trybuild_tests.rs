@@ -4,12 +4,7 @@
 //! test cases. Currently requires the derive macro to use `proc-macro-crate`
 //! name resolution correctly — see implementation.rs for details.
 //!
-//! NOTE: Tests are `#[ignore]` because trybuild standalone compilation
-//! requires the derive macro to properly resolve `easypdf_core` crate name
-//! at compile time. This is tracked as a future improvement.
-
 #[test]
-#[ignore = "trybuild standalone compilation can't resolve proc-macro-crate dependencies"]
 fn test_derive_trybuild() {
     let t = trybuild::TestCases::new();
     t.pass("tests/trybuild/01-basic-text.rs");

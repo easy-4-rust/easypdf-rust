@@ -2,12 +2,16 @@
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
+#![cfg_attr(test, allow(clippy::similar_names))]
 
 // --- Modules ---
 pub mod content;
+pub mod converter_registry;
+pub mod logging;
 pub mod enums;
 pub mod error;
 pub mod event;
+pub mod handler_chain;
 pub mod metadata;
 pub mod page_index;
 pub mod page_number;
@@ -15,17 +19,38 @@ pub mod page_range;
 pub mod style;
 pub mod traits;
 
+// --- Crypto (encryption + signing) ---
+pub mod crypto;
+
+// --- Merged sub-crates (Wave 1) ---
+pub mod model;
+pub mod io;
+pub mod layout;
+
 // --- Convenience re-exports ---
-pub use content::*;
-pub use enums::*;
+pub use content::{PdfImage, PdfLine, PdfRect, PdfTable, PdfTableCell, PdfText};
+pub use enums::{Orientation, PageSize, Rotation, TextAlignment, VerticalAlignment};
 pub use error::{PdfError, PdfErrorCode, Result};
-pub use event::*;
-pub use metadata::*;
+pub use event::PdfReadListener;
+pub use logging::{init_logging, init_logging_json};
+pub use metadata::{PdfBookmark, PdfMetadata};
 pub use page_index::PageIndex;
 pub use page_number::PageNumber;
 pub use page_range::PageRange;
-pub use style::*;
-pub use traits::*;
+pub use style::{BuiltInFont, FontFamily, FontStyle, PdfColor, PdfFont, TableBorder, TableStyle};
+pub use traits::{
+    CapabilityLevel, DetailedEngineCapabilities, EngineCapabilities, PdfConverter, PdfEngine,
+    PdfFieldDescriptor, PdfModel, PdfModelMetadata, PdfWriteHandler, RenderedElement,
+};
+
+// --- Re-exports from merged model crate ---
+pub use model::{ImageData, ImageFormat, ListItem, PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel, SourceLocation};
+
+// --- Re-exports from merged io crate (flat types) ---
+pub use io::{AtomicFileOutput, PdfInput, ResourceLimits};
+
+// --- Re-exports from merged layout crate ---
+pub use layout::{Direction, FlowLayout, LayoutSink};
 
 #[cfg(test)]
 mod tests {

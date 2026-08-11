@@ -10,11 +10,11 @@ description = "PDF creation and writing for easypdf-rust (printpdf backend)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
-easypdf-io = { path = "../easypdf-io" }
-easypdf-layout = { path = "../easypdf-layout" }
 printpdf.workspace = true
+lopdf.workspace = true
 image.workspace = true
 chrono.workspace = true
-
-[dev-dependencies]
-lopdf.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+flate2.workspace = true
+tempfile.workspace = true

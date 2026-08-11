@@ -1,0 +1,170 @@
+    Blocking waiting for file lock on build directory
+    Checking easypdf-core v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-core)
+ Documenting easypdf-reader v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-reader)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.68s
+pub mod easypdf_reader
+#[non_exhaustive] pub enum easypdf_reader::ReadStrategy
+pub easypdf_reader::ReadStrategy::Full
+pub easypdf_reader::ReadStrategy::Lazy
+pub easypdf_reader::ReadStrategy::Streaming
+impl easypdf_reader::ReadStrategy
+pub const fn easypdf_reader::ReadStrategy::auto(u64) -> Self
+pub const fn easypdf_reader::ReadStrategy::is_full(&self) -> bool
+pub const fn easypdf_reader::ReadStrategy::is_lazy(&self) -> bool
+impl core::clone::Clone for easypdf_reader::ReadStrategy
+pub fn easypdf_reader::ReadStrategy::clone(&self) -> easypdf_reader::ReadStrategy
+impl core::cmp::Eq for easypdf_reader::ReadStrategy
+impl core::cmp::PartialEq for easypdf_reader::ReadStrategy
+pub fn easypdf_reader::ReadStrategy::eq(&self, &easypdf_reader::ReadStrategy) -> bool
+impl core::fmt::Debug for easypdf_reader::ReadStrategy
+pub fn easypdf_reader::ReadStrategy::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::hash::Hash for easypdf_reader::ReadStrategy
+pub fn easypdf_reader::ReadStrategy::hash<__H: core::hash::Hasher>(&self, &mut __H)
+impl core::marker::Copy for easypdf_reader::ReadStrategy
+impl core::marker::StructuralPartialEq for easypdf_reader::ReadStrategy
+impl core::marker::Freeze for easypdf_reader::ReadStrategy
+impl core::marker::Send for easypdf_reader::ReadStrategy
+impl core::marker::Sync for easypdf_reader::ReadStrategy
+impl core::marker::Unpin for easypdf_reader::ReadStrategy
+impl core::marker::UnsafeUnpin for easypdf_reader::ReadStrategy
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::ReadStrategy
+impl core::panic::unwind_safe::UnwindSafe for easypdf_reader::ReadStrategy
+impl<Q, K> equivalent::Equivalent<K> for easypdf_reader::ReadStrategy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_reader::ReadStrategy::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_reader::ReadStrategy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_reader::ReadStrategy::equivalent(&self, &K) -> bool
+impl<T, U> core::convert::Into<U> for easypdf_reader::ReadStrategy where U: core::convert::From<T>
+pub fn easypdf_reader::ReadStrategy::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_reader::ReadStrategy where U: core::convert::Into<T>
+pub type easypdf_reader::ReadStrategy::Error = core::convert::Infallible
+pub fn easypdf_reader::ReadStrategy::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_reader::ReadStrategy where U: core::convert::TryFrom<T>
+pub type easypdf_reader::ReadStrategy::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_reader::ReadStrategy::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_reader::ReadStrategy where T: core::clone::Clone
+pub type easypdf_reader::ReadStrategy::Owned = T
+pub fn easypdf_reader::ReadStrategy::clone_into(&self, &mut T)
+pub fn easypdf_reader::ReadStrategy::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_reader::ReadStrategy where T: 'static + ?core::marker::Sized
+pub fn easypdf_reader::ReadStrategy::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_reader::ReadStrategy where T: ?core::marker::Sized
+pub fn easypdf_reader::ReadStrategy::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_reader::ReadStrategy where T: ?core::marker::Sized
+pub fn easypdf_reader::ReadStrategy::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_reader::ReadStrategy where T: core::clone::Clone
+pub unsafe fn easypdf_reader::ReadStrategy::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_reader::ReadStrategy
+pub fn easypdf_reader::ReadStrategy::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_reader::ReadStrategy
+pub type easypdf_reader::ReadStrategy::Init = T
+pub const easypdf_reader::ReadStrategy::ALIGN: usize
+pub unsafe fn easypdf_reader::ReadStrategy::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_reader::ReadStrategy::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_reader::ReadStrategy::drop(usize)
+pub unsafe fn easypdf_reader::ReadStrategy::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_reader::ReadStrategy
+impl<T> tracing::instrument::Instrument for easypdf_reader::ReadStrategy
+impl<T> tracing::instrument::WithSubscriber for easypdf_reader::ReadStrategy
+impl<T> typenum::type_operators::Same for easypdf_reader::ReadStrategy
+pub type easypdf_reader::ReadStrategy::Output = T
+pub struct easypdf_reader::PdfManipulator
+impl easypdf_reader::PdfManipulator
+pub fn easypdf_reader::PdfManipulator::add_layer(&mut self, &str) -> easypdf_core::error::Result<lopdf::object::ObjectId>
+pub fn easypdf_reader::PdfManipulator::add_text_watermark(&mut self, &str, f32, f32) -> easypdf_core::error::Result<&mut Self>
+pub fn easypdf_reader::PdfManipulator::extract_pages(&self, core::ops::range::Range<usize>) -> easypdf_core::error::Result<lopdf::document::Document>
+pub fn easypdf_reader::PdfManipulator::into_inner(self) -> lopdf::document::Document
+pub fn easypdf_reader::PdfManipulator::merge_files(&[impl core::convert::AsRef<std::path::Path>], impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfManipulator::open(impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfManipulator::page_count(&self) -> usize
+pub fn easypdf_reader::PdfManipulator::reorder_pages(&mut self, &[usize]) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfManipulator::rotate_page(&mut self, usize, easypdf_core::enums::Rotation) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfManipulator::save(self, impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfManipulator::validate_pdfa(&self) -> alloc::vec::Vec<alloc::string::String>
+impl core::marker::Freeze for easypdf_reader::PdfManipulator
+impl core::marker::Send for easypdf_reader::PdfManipulator
+impl core::marker::Sync for easypdf_reader::PdfManipulator
+impl core::marker::Unpin for easypdf_reader::PdfManipulator
+impl core::marker::UnsafeUnpin for easypdf_reader::PdfManipulator
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::PdfManipulator
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_reader::PdfManipulator
+impl<T, U> core::convert::Into<U> for easypdf_reader::PdfManipulator where U: core::convert::From<T>
+pub fn easypdf_reader::PdfManipulator::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_reader::PdfManipulator where U: core::convert::Into<T>
+pub type easypdf_reader::PdfManipulator::Error = core::convert::Infallible
+pub fn easypdf_reader::PdfManipulator::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_reader::PdfManipulator where U: core::convert::TryFrom<T>
+pub type easypdf_reader::PdfManipulator::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_reader::PdfManipulator::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_reader::PdfManipulator where T: 'static + ?core::marker::Sized
+pub fn easypdf_reader::PdfManipulator::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_reader::PdfManipulator where T: ?core::marker::Sized
+pub fn easypdf_reader::PdfManipulator::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_reader::PdfManipulator where T: ?core::marker::Sized
+pub fn easypdf_reader::PdfManipulator::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_reader::PdfManipulator
+pub fn easypdf_reader::PdfManipulator::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_reader::PdfManipulator
+pub type easypdf_reader::PdfManipulator::Init = T
+pub const easypdf_reader::PdfManipulator::ALIGN: usize
+pub unsafe fn easypdf_reader::PdfManipulator::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_reader::PdfManipulator::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_reader::PdfManipulator::drop(usize)
+pub unsafe fn easypdf_reader::PdfManipulator::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_reader::PdfManipulator
+impl<T> tracing::instrument::Instrument for easypdf_reader::PdfManipulator
+impl<T> tracing::instrument::WithSubscriber for easypdf_reader::PdfManipulator
+impl<T> typenum::type_operators::Same for easypdf_reader::PdfManipulator
+pub type easypdf_reader::PdfManipulator::Output = T
+pub struct easypdf_reader::PdfReader
+impl easypdf_reader::PdfReader
+pub fn easypdf_reader::PdfReader::extract_document_model(&self) -> easypdf_core::error::Result<easypdf_core::model::pdf_document_model::PdfDocumentModel>
+pub fn easypdf_reader::PdfReader::extract_metadata(&self) -> easypdf_core::error::Result<easypdf_core::metadata::PdfMetadata>
+pub fn easypdf_reader::PdfReader::extract_text(&self) -> easypdf_core::error::Result<alloc::string::String>
+pub fn easypdf_reader::PdfReader::extract_text_lazy(&mut self) -> easypdf_core::error::Result<alloc::string::String>
+pub fn easypdf_reader::PdfReader::from_bytes(impl core::convert::Into<alloc::vec::Vec<u8>>) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::open(impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::open_with_limits(&easypdf_core::io::pdf_input::PdfInput, easypdf_core::io::resource_limits::ResourceLimits) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::open_with_limits_and_strategy(&easypdf_core::io::pdf_input::PdfInput, easypdf_core::io::resource_limits::ResourceLimits, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::open_with_repair(impl core::convert::AsRef<std::path::Path>, easypdf_core::io::repair::RepairOptions, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::open_with_strategy(impl core::convert::AsRef<std::path::Path>, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
+pub fn easypdf_reader::PdfReader::page_count(&self) -> easypdf_core::error::Result<usize>
+pub fn easypdf_reader::PdfReader::pages(self, core::ops::range::Range<usize>) -> Self
+pub fn easypdf_reader::PdfReader::read_with_listener(&self, &mut dyn easypdf_core::traits::PdfReadListener) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfReader::read_with_listener_typed<L: easypdf_core::traits::PdfReadListener>(&self, &mut L) -> easypdf_core::error::Result<()>
+pub const fn easypdf_reader::PdfReader::strategy(&self) -> easypdf_reader::ReadStrategy
+pub fn easypdf_reader::PdfReader::try_pages(self, core::ops::range::Range<usize>) -> easypdf_core::error::Result<Self>
+impl core::marker::Freeze for easypdf_reader::PdfReader
+impl core::marker::Send for easypdf_reader::PdfReader
+impl core::marker::Sync for easypdf_reader::PdfReader
+impl core::marker::Unpin for easypdf_reader::PdfReader
+impl core::marker::UnsafeUnpin for easypdf_reader::PdfReader
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::PdfReader
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_reader::PdfReader
+impl<T, U> core::convert::Into<U> for easypdf_reader::PdfReader where U: core::convert::From<T>
+pub fn easypdf_reader::PdfReader::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_reader::PdfReader where U: core::convert::Into<T>
+pub type easypdf_reader::PdfReader::Error = core::convert::Infallible
+pub fn easypdf_reader::PdfReader::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_reader::PdfReader where U: core::convert::TryFrom<T>
+pub type easypdf_reader::PdfReader::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_reader::PdfReader::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_reader::PdfReader where T: 'static + ?core::marker::Sized
+pub fn easypdf_reader::PdfReader::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_reader::PdfReader where T: ?core::marker::Sized
+pub fn easypdf_reader::PdfReader::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_reader::PdfReader where T: ?core::marker::Sized
+pub fn easypdf_reader::PdfReader::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_reader::PdfReader
+pub fn easypdf_reader::PdfReader::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_reader::PdfReader
+pub type easypdf_reader::PdfReader::Init = T
+pub const easypdf_reader::PdfReader::ALIGN: usize
+pub unsafe fn easypdf_reader::PdfReader::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_reader::PdfReader::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_reader::PdfReader::drop(usize)
+pub unsafe fn easypdf_reader::PdfReader::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_reader::PdfReader
+impl<T> tracing::instrument::Instrument for easypdf_reader::PdfReader
+impl<T> tracing::instrument::WithSubscriber for easypdf_reader::PdfReader
+impl<T> typenum::type_operators::Same for easypdf_reader::PdfReader
+pub type easypdf_reader::PdfReader::Output = T

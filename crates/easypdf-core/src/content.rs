@@ -190,3 +190,122 @@ pub struct PdfRect {
     /// Fill color (transparent if `None`).
     pub fill_color: Option<PdfColor>,
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pdf_text_new() {
+        let t = PdfText::new("hello");
+        assert_eq!(t.content, "hello");
+    }
+
+    #[test]
+    fn pdf_text_font() {
+        let t = PdfText::new("x").font(PdfFont::default());
+        let _ = format!("{:?}", t.font);
+    }
+
+    #[test]
+    fn pdf_text_alignment() {
+        let t = PdfText::new("x").alignment(TextAlignment::Center);
+        assert_eq!(t.alignment, TextAlignment::Center);
+    }
+
+    #[test]
+    fn pdf_text_color() {
+        let t = PdfText::new("x").color(PdfColor::default());
+        assert_eq!(t.color, PdfColor::default());
+    }
+
+    #[test]
+    fn pdf_text_debug_clone() {
+        let t = PdfText::new("test");
+        let cloned = t.clone();
+        assert_eq!(t.content, cloned.content);
+        let _ = format!("{:?}", t);
+    }
+
+    #[test]
+    fn pdf_table_new() {
+        let t = PdfTable::new(vec!["A".into(), "B".into()]);
+        assert_eq!(t.headers.len(), 2);
+        assert!(t.rows.is_empty());
+    }
+
+    #[test]
+    fn pdf_table_row() {
+        let t = PdfTable::new(vec!["A".into()])
+            .row(vec!["1".into()]);
+        assert_eq!(t.rows.len(), 1);
+    }
+
+    #[test]
+    fn pdf_table_rows() {
+        let t = PdfTable::new(vec!["A".into()])
+            .rows(vec![vec!["1".into()], vec!["2".into()]]);
+        assert_eq!(t.rows.len(), 2);
+    }
+
+    #[test]
+    fn pdf_table_width() {
+        let t = PdfTable::new(vec!["A".into()]).width(200.0);
+        assert_eq!(t.width, 200.0);
+    }
+
+    #[test]
+    fn pdf_table_debug_clone() {
+        let t = PdfTable::new(vec!["A".into()]);
+        let cloned = t.clone();
+        assert_eq!(t.headers, cloned.headers);
+        let _ = format!("{:?}", t);
+    }
+
+    #[test]
+    fn pdf_image_from_bytes() {
+        let img = PdfImage::from_bytes(vec![1, 2, 3]);
+        assert_eq!(img.data, vec![1, 2, 3]);
+        assert_eq!(img.width, 0.0);
+        assert_eq!(img.height, 0.0);
+    }
+
+    #[test]
+    fn pdf_image_debug_clone() {
+        let img = PdfImage::from_bytes(vec![1]);
+        let cloned = img.clone();
+        assert_eq!(img.data, cloned.data);
+        let _ = format!("{:?}", img);
+    }
+
+    #[test]
+    fn pdf_table_cell_default() {
+        let cell = PdfTableCell::default();
+        assert!(cell.content.is_empty());
+    }
+
+    #[test]
+    fn pdf_table_cell_debug_clone() {
+        let cell = PdfTableCell { content: "x".into(), ..Default::default() };
+        let cloned = cell.clone();
+        assert_eq!(cell.content, cloned.content);
+        let _ = format!("{:?}", cell);
+    }
+
+    #[test]
+    fn pdf_line_debug_copy() {
+        let line = PdfLine { x1: 0.0, y1: 0.0, x2: 100.0, y2: 100.0, width: 1.0, color: PdfColor::default() };
+        let copied = line;
+        assert_eq!(line.x2, copied.x2);
+        let _ = format!("{:?}", line);
+    }
+
+    #[test]
+    fn pdf_rect_debug_copy() {
+        let rect = PdfRect { x: 0.0, y: 0.0, w: 100.0, h: 50.0, border_width: 1.0, border_color: PdfColor::default(), fill_color: None };
+        let copied = rect;
+        assert_eq!(rect.w, copied.w);
+        let _ = format!("{:?}", rect);
+    }
+}

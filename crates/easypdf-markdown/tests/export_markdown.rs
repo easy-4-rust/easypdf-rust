@@ -1,6 +1,11 @@
 //! PDF 到 Markdown 的端到端集成测试。
 
-use easypdf_markdown::{MarkdownProfile, PdfMarkdownExportBuilder};
+use std::sync::Arc;
+
+use easypdf_markdown::{
+    MarkdownProcessorCapabilities, MarkdownProfile, PdfMarkdownBuilder, PdfMarkdownExportBuilder,
+    PdfMarkdownProcessor,
+};
 
 fn make_two_page_pdf(path: &std::path::Path) {
     let mut document = lopdf::Document::new();
@@ -87,7 +92,7 @@ fn rejects_input_above_resource_limit_without_replacing_output() {
     make_two_page_pdf(&input);
     std::fs::write(&output, "existing").expect("seed output");
 
-    let limits = easypdf_io::ResourceLimits::new().with_max_input_bytes(8);
+    let limits = easypdf_core::ResourceLimits::new().with_max_input_bytes(8);
     let error = PdfMarkdownExportBuilder::new(&input, &output)
         .resource_limits(limits)
         .do_export()
@@ -101,4 +106,59 @@ fn rejects_input_above_resource_limit_without_replacing_output() {
         std::fs::read_to_string(output).expect("read original output"),
         "existing"
     );
+}
+
+#[test]
+fn converts_from_bytes_without_creating_an_output_file() {
+    let directory = tempfile::tempdir().expect("temporary directory");
+    let input = directory.path().join("input.pdf");
+    make_two_page_pdf(&input);
+    let bytes = std::fs::read(input).expect("read PDF fixture");
+
+    let result = PdfMarkdownBuilder::from_bytes(bytes)
+        .pages(1..2)
+        .profile(MarkdownProfile::Llm)
+        .do_convert()
+        .expect("convert Markdown");
+
+    assert!(result.markdown().contains("## Page 2"));
+    assert!(result.markdown().contains("Second Page"));
+    assert!(!result.markdown().contains("First Page"));
+    assert_eq!(result.report().pages_read(), 1);
+}
+
+struct TableAwareProcessor;
+
+impl PdfMarkdownProcessor for TableAwareProcessor {
+    fn capabilities(&self) -> MarkdownProcessorCapabilities {
+        MarkdownProcessorCapabilities::new().with_table_detection()
+    }
+
+    fn process(
+        &self,
+        _input: &easypdf_core::PdfInput,
+        document: easypdf_core::PdfDocumentModel,
+    ) -> easypdf_core::Result<(
+        easypdf_core::PdfDocumentModel,
+        Vec<easypdf_markdown::MarkdownWarning>,
+    )> {
+        Ok((document, Vec::new()))
+    }
+}
+
+#[test]
+fn registered_processor_satisfies_only_its_declared_capability() {
+    let directory = tempfile::tempdir().expect("temporary directory");
+    let input = directory.path().join("input.pdf");
+    make_two_page_pdf(&input);
+
+    let result = PdfMarkdownBuilder::new(&input)
+        .processor(Arc::new(TableAwareProcessor))
+        .do_convert()
+        .expect("convert Markdown");
+
+    assert!(!result.report().warnings().iter().any(|warning| matches!(
+        warning,
+        easypdf_markdown::MarkdownWarning::TableDetectionUnavailable
+    )));
 }

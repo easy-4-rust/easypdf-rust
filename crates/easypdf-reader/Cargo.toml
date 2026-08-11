@@ -10,9 +10,8 @@ description = "PDF reading and text extraction for easypdf-rust (lopdf backend)"
 
 [dependencies]
 easypdf-core = { path = "../easypdf-core" }
-easypdf-model = { path = "../easypdf-model" }
-easypdf-io = { path = "../easypdf-io" }
 lopdf.workspace = true
+flate2.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

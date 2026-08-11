@@ -1,0 +1,56 @@
+[package]
+name = "easypdf-fuzz"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+# Independent workspace: does not pollute the main project's stable toolchain.
+# cargo-fuzz requires nightly; this keeps nightly deps isolated.
+
+[dependencies]
+easypdf-core = { path = "../crates/easypdf-core" }
+easypdf-reader = { path = "../crates/easypdf-reader" }
+easypdf-markdown = { path = "../crates/easypdf-markdown" }
+libfuzzer-sys = "0.4"
+tempfile = "3"
+lopdf = "0.44"
+
+[[bin]]
+name = "pdf_parse"
+path = "fuzz_targets/pdf_parse.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "streaming_scan"
+path = "fuzz_targets/streaming_scan.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "pdf_encrypt_decrypt"
+path = "fuzz_targets/pdf_encrypt_decrypt.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "pdf_sign_verify"
+path = "fuzz_targets/pdf_sign_verify.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "markdown_convert"
+path = "fuzz_targets/markdown_convert.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "ssrf_url"
+path = "fuzz_targets/ssrf_url.rs"
+test = false
+doc = false

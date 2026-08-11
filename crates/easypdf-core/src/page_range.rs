@@ -59,3 +59,109 @@ impl TryFrom<Range<usize>> for PageRange {
         Self::new(value)
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::uninlined_format_args, clippy::float_cmp, clippy::reversed_empty_ranges)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_valid_range() {
+        let pr = PageRange::new(0..10).unwrap();
+        assert_eq!(pr.start(), 0);
+        assert_eq!(pr.end(), 10);
+    }
+
+    #[test]
+    fn new_empty_range() {
+        let pr = PageRange::new(5..5).unwrap();
+        assert_eq!(pr.start(), 5);
+        assert_eq!(pr.end(), 5);
+    }
+
+    #[test]
+    fn new_reversed_range_returns_error() {
+        let result = PageRange::new(10..5);
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(matches!(err, PdfError::InvalidPage(5)));
+    }
+
+    #[test]
+    fn empty_at_creates_empty_range() {
+        let pr = PageRange::empty_at(7);
+        assert_eq!(pr.start(), 7);
+        assert_eq!(pr.end(), 7);
+        // Empty range: start == end
+        assert_eq!(pr.start(), pr.end());
+    }
+
+    #[test]
+    fn contains_within_range() {
+        let pr = PageRange::new(2..8).unwrap();
+        assert!(!pr.contains(1));
+        assert!(pr.contains(2));
+        assert!(pr.contains(5));
+        assert!(!pr.contains(8));
+    }
+
+    #[test]
+    fn contains_empty_range() {
+        let pr = PageRange::empty_at(3);
+        assert!(!pr.contains(3));
+    }
+
+    #[test]
+    fn as_range_returns_inner() {
+        let pr = PageRange::new(1..5).unwrap();
+        let range = pr.as_range();
+        assert_eq!(*range, 1..5);
+    }
+
+    #[test]
+    fn try_from_valid_range() {
+        let pr: PageRange = (0..3).try_into().unwrap();
+        assert_eq!(pr.start(), 0);
+        assert_eq!(pr.end(), 3);
+    }
+
+    #[test]
+    fn try_from_invalid_range() {
+        let result: Result<PageRange> = (5..2).try_into();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn clone_preserves_values() {
+        let pr = PageRange::new(1..10).unwrap();
+        let cloned = pr.clone();
+        assert_eq!(pr, cloned);
+    }
+
+    #[test]
+    fn partial_eq_works() {
+        let a = PageRange::new(0..5).unwrap();
+        let b = PageRange::new(0..5).unwrap();
+        let c = PageRange::new(0..6).unwrap();
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+    }
+
+    #[test]
+    fn debug_format() {
+        let pr = PageRange::new(2..8).unwrap();
+        let dbg = format!("{:?}", pr);
+        assert!(dbg.contains('2'));
+        assert!(dbg.contains('8'));
+    }
+
+    #[test]
+    fn hash_same_values() {
+        use std::collections::HashSet;
+        let mut set = HashSet::new();
+        set.insert(PageRange::new(0..5).unwrap());
+        set.insert(PageRange::new(0..5).unwrap());
+        set.insert(PageRange::new(0..6).unwrap());
+        assert_eq!(set.len(), 2);
+    }
+}

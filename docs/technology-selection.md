@@ -44,9 +44,9 @@
 | 领域 | Java 组件 | Rust 组件 | crate | 版本 | 状态 | 说明 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 运行时 | Project Reactor | **当前无** | — | — | ❌ | easypdf-rust 全部同步调用；lopdf/printpdf 非 async |
-| 并发安全 | `ConcurrentHashMap` | **dashmap** | `dashmap` | 6.x | ✅ | 内部使用；Reader 缓存 |
-| 原子引用 | `AtomicReference` | **arc-swap** | `arc-swap` | 1.x | ✅ | 无锁原子指针替换 |
-| 锁 | `synchronized` / `ReentrantLock` | **parking_lot** | `parking_lot` | 0.12 | ✅ | 更快的互斥锁实现 |
+| 并发安全 | `ConcurrentHashMap` | 当前无共享缓存 | std | — | ❌ | Reader 持有独占文档会话，不引入全局缓存与锁竞争 |
+| 原子引用 | `AtomicReference` | 当前不需要 | — | — | ❌ | 没有热切换的全局配置 |
+| 锁 | `synchronized` / `ReentrantLock` | 所有权与独占借用 | std | — | ✅ | 当前实现未依赖 `parking_lot` |
 | 异步任务 | `CompletableFuture` | 🆕 同步阻塞 | — | — | ❌ | 当前无需 async；若未来引入需 tokio |
 
 > **决策**：easypdf-rust 当前为纯同步库。lopdf 和 printpdf 均为同步 API，强行包装 async 无实际收益。若未来引入网络 OCR/LLM 后端，再引入 tokio。
@@ -58,10 +58,10 @@
 | 领域 | Java 组件 | Rust 组件 | crate | 版本 | 状态 | 说明 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | JSON | Jackson | **serde + serde_json** | `serde` / `serde_json` | 1.x | ✅ | 配置序列化、测试 fixtures |
-| YAML | SnakeYAML | **serde_yaml** | `serde_yaml` | 0.9 | ✅ | 配置文件 |
-| XML | JAXB / DOM4J | **quick-xml** | `quick-xml` | 0.37 | ✅ | PDF 内部 XML 流解析（AcroForm XFA） |
-| XML DOM | DOM4J | **roxmltree** | `roxmltree` | 0.20 | ✅ | 只读 DOM 风格 XML 解析 |
-| TOML | — | **toml** | `toml` | 0.8 | ✅ | Cargo.toml 元数据解析 |
+| YAML | SnakeYAML | 当前不需要 | — | — | ❌ | 公共 API 采用类型安全 Builder，不读取 YAML 配置 |
+| XML | JAXB / DOM4J | `quick-xml` 候选 | `quick-xml` | — | 🔧 | 仅在实现 XFA 时按 feature 引入 |
+| XML DOM | DOM4J | `roxmltree` 候选 | `roxmltree` | — | 🔧 | 当前 Cargo 依赖树未采用 |
+| TOML | — | Cargo 原生清单 | — | — | ❌ | 库运行期不解析 Cargo.toml |
 
 ---
 
@@ -112,7 +112,7 @@ pub enum PdfError {
 | Mock | Mockito | **mockall** | `mockall` | 0.13 | 🔧 | trait mock；当前未需要 |
 | HTTP Mock | WireMock | **wiremock** | `wiremock` | 0.6 | 🔧 | 若引入 HTTP 后端时使用 |
 | 编译期测试 | — | **trybuild** | `trybuild` | 1.x | ✅ | derive 宏编译错误测试 |
-| 基准测试 | JMH | **criterion** | `criterion` | 0.5 | ✅ | Reader 会话复用基准 |
+| 基准测试 | JMH | Cargo bench（自定义 harness） | std | — | ✅ | 当前没有引入 `criterion`；基准实现必须与 Cargo 清单一致 |
 | 覆盖率 | JaCoCo | **cargo-llvm-cov** | `cargo-llvm-cov` | — | ✅ | LLVM 源码覆盖率 |
 | 属性测试 | — | **proptest** | `proptest` | 1.x | 🔧 | 边界输入生成 |
 | Fuzz | — | **cargo-fuzz** | `cargo-fuzz` | — | ⏳ | 计划用于 PDF 解析器鲁棒性测试 |
@@ -226,8 +226,40 @@ pub enum PdfError {
 
 ---
 
-## 16. 版本记录
+## 16. API 与性能设计（借鉴 easyexcel）
+
+easypdf 采用“静态门面 + 专用 Builder + 终止操作”的三级 API：`EasyPdf::read(...)`、`EasyPdf::create(...)`、`EasyPdf::to_markdown(...)` 负责发现能力；Builder 只保存一次任务配置；`do_read`、`do_write`、`do_convert` 或 `save` 明确触发 I/O。复杂能力留在领域 crate，业务调用只依赖 `easypdf` 门面。
+
+性能原则不是承诺一个脱离数据集的倍数，而是保证：一次任务只解析一次 PDF；页范围尽早下推；按页释放中间数据；字节输入避免临时文件；输出使用缓冲与原子替换；资源上限在昂贵分配前检查。基准结果必须同时记录样本、机器、构建模式和提交号。
+
+## 17. MarkItDown 的吸纳边界
+
+`easypdf-markdown` 是独立模块，也是 PDF→Markdown 的唯一实现边界。推荐链路如下：
+
+```mermaid
+flowchart LR
+    A[Path / Bytes] --> B[PdfReader 单次解析]
+    B --> C[PdfDocumentModel 中间模型]
+    C --> D[PdfMarkdownProcessor 扩展链]
+    D --> E[MarkdownRenderer]
+    E --> F[MarkdownConversionResult]
+    F --> G[String]
+    F --> H[AtomicFileOutput]
+```
+
+已吸纳的设计：转换结果对象（Markdown + 报告）、内存与文件双入口、可声明能力的处理器链、按能力产生结构化警告、表格/图片/OCR 的可选扩展位。下一阶段可借鉴 MarkItDown 的逐页提取、表格优先策略、主提取器失败后的保守回退和 OCR 插件，但必须转成 Rust trait/feature，不能把 Python 运行时变成核心依赖。
+
+不吸纳的内容：Word/Excel/PPT/HTML 的总路由器、LLM 客户端、云 OCR SDK 和多格式 MIME 探测。这些属于 Office/文档转换平台，不属于 PDF 读写核心。OCR 或云服务应由独立 adapter crate 实现 `PdfMarkdownProcessor`。
+
+## 18. OfficeCLI 的吸纳边界
+
+OfficeCLI 值得借鉴的是产品化契约，而不是其进程模型：统一命令语法可映射到 `EasyPdf` 门面；结构化结果与 warning 可映射到转换报告；批处理可复用解析会话；资源预算、超时、临时文件与原子替换应成为所有入口的共同约束；插件代理思想可用于 OCR、表格识别和页面渲染后端。
+
+暂不吸纳常驻服务、MCP server、Office DOM、dump/replay 和跨格式处理器体系。若未来提供 `easypdf-cli`，它应只做参数/JSON 映射与退出码管理，所有业务语义仍由库 crate 提供，避免 CLI 与 Rust API 形成两套实现。
+
+## 19. 版本记录
 
 | 版本 | 日期 | 变更说明 |
 | :--- | :--- | :--- |
-| V1.0.0 | 2026-08-10 | 初始版本；16 个技术域；覆盖 easypdf-rust 全部依赖选型 |
+| V1.1.0 | 2026-08-10 | 校正 Cargo 依赖事实；增加 easyexcel API、MarkItDown 与 OfficeCLI 的吸纳边界 |
+| V1.0.0 | 2026-08-10 | 初始版本；16 个技术域 |
