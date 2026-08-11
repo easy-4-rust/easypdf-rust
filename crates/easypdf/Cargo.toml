@@ -7,18 +7,20 @@ license.workspace = true
 repository.workspace = true
 readme.workspace = true
 description = "Easy PDF manipulation library for Rust — builder API for creating, reading, manipulating, and filling PDFs"
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
 # --- Mandatory crates ---
-easypdf-core = { path = "../easypdf-core" }
-easypdf-derive = { path = "../easypdf-derive" }
-easypdf-reader = { path = "../easypdf-reader" }
-easypdf-writer = { path = "../easypdf-writer" }
+easypdf-core.workspace = true
+easypdf-derive.workspace = true
+easypdf-reader.workspace = true
+easypdf-writer.workspace = true
 
 # --- Optional crates ---
-easypdf-markdown = { path = "../easypdf-markdown", optional = true }
-easypdf-ocr = { path = "../easypdf-ocr", optional = true }
-easypdf-runtime = { path = "../easypdf-runtime", optional = true, default-features = false }
+easypdf-markdown = { workspace = true, optional = true }
+easypdf-ocr = { workspace = true, optional = true }
+easypdf-runtime = { workspace = true, optional = true }
 
 [features]
 default = ["markdown"]

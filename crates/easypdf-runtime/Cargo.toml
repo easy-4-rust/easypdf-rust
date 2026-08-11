@@ -6,6 +6,9 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [[bin]]
 name = "easypdf-mcp"
@@ -13,10 +16,10 @@ path = "src/mcp/main.rs"
 required-features = ["mcp"]
 
 [dependencies]
-easypdf-core = { path = "../easypdf-core" }
-easypdf-reader = { path = "../easypdf-reader" }
-easypdf-writer = { path = "../easypdf-writer" }
-easypdf-markdown = { path = "../easypdf-markdown" }
+easypdf-core.workspace = true
+easypdf-reader.workspace = true
+easypdf-writer.workspace = true
+easypdf-markdown.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

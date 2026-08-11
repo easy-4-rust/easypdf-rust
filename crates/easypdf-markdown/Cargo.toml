@@ -7,10 +7,12 @@ license.workspace = true
 repository.workspace = true
 readme.workspace = true
 description = "Deterministic PDF to Markdown conversion for easypdf-rust (includes render, table detection, and OCR)"
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
-easypdf-core = { path = "../easypdf-core" }
-easypdf-reader = { path = "../easypdf-reader" }
+easypdf-core.workspace = true
+easypdf-reader.workspace = true
 lopdf.workspace = true
 image = { workspace = true, features = ["png"] }
 thiserror.workspace = true

@@ -7,9 +7,11 @@ license.workspace = true
 repository.workspace = true
 readme.workspace = true
 description = "PDF reading and text extraction for easypdf-rust (lopdf backend)"
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
-easypdf-core = { path = "../easypdf-core" }
+easypdf-core.workspace = true
 lopdf.workspace = true
 flate2.workspace = true
 

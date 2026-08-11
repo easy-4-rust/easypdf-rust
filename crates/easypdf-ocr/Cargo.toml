@@ -6,13 +6,16 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [lints]
 workspace = true
 
 [dependencies]
-easypdf-markdown = { path = "../easypdf-markdown" }
-easypdf-core = { path = "../easypdf-core" }
+easypdf-markdown.workspace = true
+easypdf-core.workspace = true
 
 # Synchronous HTTP client (no async runtime required)
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "multipart", "blocking"] }
