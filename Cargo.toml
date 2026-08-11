@@ -66,9 +66,11 @@ similar_names = { level = "allow", priority = -1 }
 [workspace.metadata.audit]
 # RUSTSEC-2023-0071: rsa 0.9.x Marvin Attack — dev-dependency only, not in production path.
 # See audit.toml for full rationale.
-ignore = ["RUSTSEC-2023-0071"]
+# RUSTSEC-2026-0253: lru 0.16.4 unsound — cannot patch (see below).
+ignore = ["RUSTSEC-2023-0071", "RUSTSEC-2026-0253"]
 
-[patch.crates-io]
-# RUSTSEC-2026-0253: lru 0.16.4 use-after-free in LruCache::pop()
-# azul-layout 0.0.13 hard-pins lru 0.16.x; force upgrade to 0.18.2+
-lru = { git = "https://github.com/jeromefroe/lru-rs.git", tag = "0.17.0" }
+# NOTE: [patch.crates-io] CANNOT force lru 0.16.x -> 0.17+/0.18+ because
+# azul-layout 0.0.13 hard-pins `lru = "^0.16.1"` and Cargo enforces semver
+# compatibility on patches. No patched 0.16.x release exists upstream.
+# The advisory is "unsound" (warning-level), not a vulnerability (error-level).
+# Re-evaluate when azul-layout releases a version with lru >=0.17.

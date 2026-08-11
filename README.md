@@ -24,7 +24,7 @@ Inspired by [Alibaba EasyExcel](https://github.com/alibaba/easyexcel)'s builder-
 
 ---
 
-> **Current Version**: `0.2.0`
+> **Current Version**: `0.1.0`
 > **MSRV**: Rust `1.88`
 > **Edition**: `2024`
 > **Workspace Resolver**: `3`
