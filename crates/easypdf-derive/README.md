@@ -1,28 +1,32 @@
 # easypdf-derive
 
-> 过程宏 crate：提供 `#[derive(PdfModel)]` 及 10+ 个 `#[pdf(...)]` 属性宏。
+> Proc-macro crate: `#[derive(PdfModel)]` with 12+ `#[pdf(...)]` attributes for declarative PDF content mapping.
 
-## 角色
+## Role
 
-`easypdf-derive` 是 easypdf-rust 的过程宏 crate，为 Rust 结构体自动生成 `PdfModel` trait 实现。通过 `#[derive(PdfModel)]` 和丰富的 `#[pdf(...)]` 属性，开发者可以用声明式的方式将 Rust 结构体映射为 PDF 内容元素（文本、表格、图片），无需手写渲染逻辑。
+`easypdf-derive` is the proc-macro crate for easypdf-rust. It auto-generates `PdfModel` trait implementations for Rust structs via `#[derive(PdfModel)]`. With rich `#[pdf(...)]` attributes, developers can declaratively map Rust structs to PDF content elements (text, tables, images, form fields) without writing rendering logic by hand.
 
-## 核心能力
+## Core Capabilities
 
-- **`#[derive(PdfModel)]`**——自动实现 `PdfModel` trait，生成 `render()` 和 `metadata()` 方法
-- **结构体级属性**——`#[pdf(page = A4, orientation = Portrait, margins = 72)]`
-- **字段级属性**——`text`、`table`、`image`、`ignore`、`field`、`order`、`default`、`required`、`format`、`nested`、`font`、`size`
-- **字段描述符生成**——为表单填充和数据映射生成 `PdfFieldDescriptor`
+- **`#[derive(PdfModel)]`** -- auto-implements `PdfModel` trait, generating `render()`, `metadata()`, and `field_descriptors()` methods (`crates/easypdf-derive/src/lib.rs:54`)
+- **Struct-level attributes** -- `#[pdf(page = A4, orientation = Portrait)]` for page configuration (`crates/easypdf-derive/src/lib.rs:44`)
+- **Field-level attributes** -- `text`, `table`, `image`, `ignore`/`skip`, `field`, `order`, `default`, `required`, `format`, `nested`, `font`, `size` (`crates/easypdf-derive/src/lib.rs:46-55`)
+- **Field descriptor generation** -- produces `PdfFieldDescriptor` for form filling and data mapping (`crates/easypdf-core/src/traits.rs:40`)
+- **Compile-time validation** -- `trybuild` tests ensure invalid attributes produce clear errors (`crates/easypdf-derive/Cargo.toml:dev-dependencies`)
 
-## 依赖
+## Dependencies
 
-- `syn`: Rust 语法解析
-- `quote`: 代码生成
-- `proc-macro2`: 过程宏基础设施
-- `proc-macro-crate`: crate 名称解析
+| Crate | Version | Purpose |
+|-------|---------|---------|
+| `syn` | 3.0.3 | Rust source parsing (features = ["full"]) |
+| `quote` | 1.0.47 | Code generation |
+| `proc-macro2` | 1.0.107 | Proc-macro 2.0 primitives |
+| `proc-macro-crate` | 3.5.0 | Crate name resolution |
 
-## 主要 API
+## Main API
 
 ### `#[derive(PdfModel)]`
+
 ```rust
 use easypdf_derive::PdfModel;
 
@@ -41,27 +45,71 @@ struct Invoice {
     #[pdf(field = "invoice_number", required)]
     number: String,
 
+    #[pdf(order = 1)]
+    date: String,
+
+    #[pdf(nested)]
+    address: Address,
+
     #[pdf(ignore)]
     internal_note: String,
 }
 ```
 
-### 属性一览
+### Attribute Reference
 
-| 属性 | 说明 |
-|------|------|
-| `#[pdf(text, position = (x, y))]` | 字段渲染为定位文本 |
-| `#[pdf(table, position = (x, y))]` | 字段渲染为表格 |
-| `#[pdf(image, position = (x, y))]` | 字段渲染为图片 |
-| `#[pdf(ignore)]` / `#[pdf(skip)]` | 跳过该字段 |
-| `#[pdf(field = "name")]` | 映射到 PDF 表单字段名 |
-| `#[pdf(order = N)]` | 显示/渲染顺序 |
-| `#[pdf(default = "value")]` | 空值时的默认值 |
-| `#[pdf(required)]` | 字段必须非空 |
-| `#[pdf(format = "pattern")]` | 格式化模式（如 `"YYYY-MM-DD"`） |
-| `#[pdf(nested)]` | 递归包含内部模型的元素 |
-| `#[pdf(font = ...)]` | 设置文本渲染字体 |
-| `#[pdf(size = N)]` | 设置文本渲染字号 |
+| Attribute | Description |
+|-----------|-------------|
+| `#[pdf(page = A4, orientation = Portrait)]` | Struct-level page configuration |
+| `#[pdf(text, position = (x, y))]` | Render field as positioned text |
+| `#[pdf(table, position = (x, y))]` | Render field as table |
+| `#[pdf(image, position = (x, y))]` | Render field as image |
+| `#[pdf(ignore)]` / `#[pdf(skip)]` | Skip this field |
+| `#[pdf(field = "name")]` | Map to PDF form field name |
+| `#[pdf(order = N)]` | Display/render order |
+| `#[pdf(default = "value")]` | Default value when empty |
+| `#[pdf(required)]` | Field must be non-empty |
+| `#[pdf(format = "pattern")]` | Format pattern (e.g. `"YYYY-MM-DD"`) |
+| `#[pdf(nested)]` | Recursively include inner model elements |
+| `#[pdf(font = ...)]` | Set text rendering font |
+| `#[pdf(size = N)]` | Set text rendering font size |
+
+## Generated Code
+
+The derive macro generates:
+
+```rust
+// For each struct with #[derive(PdfModel)]
+impl PdfModel for MyStruct {
+    fn render(&self) -> Result<Vec<RenderedElement>> {
+        // Generated rendering logic based on field attributes
+        // text -> positioned text, table -> table, image -> image
+    }
+
+    fn metadata(&self) -> PdfModelMetadata {
+        // Page size, orientation from struct-level #[pdf(...)]
+    }
+
+    fn field_descriptors(&self) -> Vec<PdfFieldDescriptor> {
+        // Generated from #[pdf(field = "...", required, default = "...")]
+    }
+}
+```
+
+## Compile-Time Validation
+
+Invalid attributes produce clear compiler errors:
+
+```rust
+#[derive(PdfModel)]
+struct Bad {
+    #[pdf(text)]  // Error: missing position for text field
+    name: String,
+
+    #[pdf(field = "x", default = "val", required)]  // Error: default and required are mutually exclusive
+    value: String,
+}
+```
 
 ## License
 
@@ -69,5 +117,6 @@ Apache-2.0
 
 ---
 
-**项目主页**：https://github.com/easy-4-rust/easypdf-rust
-**crates.io**：https://crates.io/crates/easypdf-derive
+**Project**: https://github.com/easy-4-rust/easypdf-rust
+**crates.io**: https://crates.io/crates/easypdf-derive
+**docs.rs**: https://docs.rs/easypdf-derive

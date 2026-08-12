@@ -1,33 +1,44 @@
 # easypdf-ocr
 
-> 云 OCR 引擎层：集成 GLM、混元 OCR、百度 OCR 三大云端引擎，统一 HTTP 基类。
+> Cloud OCR engine layer: unified HTTP base class with 4 engine integrations (GLM, HunyuanOCR, Baidu OCR) and 5 authentication methods.
 
-## 角色
+## Role
 
-`easypdf-ocr` 为 easypdf-rust 提供云端 OCR 引擎集成。它封装了三个主流中文 OCR 云服务（智谱 GLM、腾讯混元 OCR、百度 OCR），并提供通用的 HTTP 基类 `HttpOcrEngine`，统一处理认证、重试、限流、图片编码等基础设施，使各引擎只需关注请求构建与响应解析。
+`easypdf-ocr` provides cloud OCR engine integration for the easypdf-rust workspace. It wraps three major Chinese OCR cloud services (Zhipu GLM, Tencent HunyuanOCR, Baidu OCR) behind a shared `HttpOcrEngine` base class that handles authentication, retries, rate limiting, and image encoding. Each engine only needs to implement request building and response parsing.
 
-## 核心能力
+## Core Capabilities
 
-- **GLM OCR**（智谱 AI）——支持通用文字识别，Bearer Token 认证
-- **混元 OCR**（腾讯）——支持通用/表格/手写等多种模式，HMAC-SHA256 签名认证
-- **百度 OCR**——支持通用文字识别，AK/SK 认证 + Token 管理
-- **HTTP 基类**（`HttpOcrEngine`）——通用的 HTTP OCR 引擎框架，实现 `OcrEngine` trait
-- **认证抽象**（`AuthMethod`）——Bearer / AK-SK / HMAC / 无认证
-- **重试与限流**（`BackoffStrategy`、`RateLimitConfig`）——指数退避 + 令牌桶限流
-- **图片编码**（`EncodedImage`）——Base64 内联 / multipart 上传
+- **GLM OCR** (Zhipu AI) -- general text recognition with Bearer Token authentication (`crates/easypdf-ocr/src/glm/`)
+- **HunyuanOCR** (Tencent) -- general/table/handwriting modes with HMAC-SHA256 signature authentication (`crates/easypdf-ocr/src/hunyuan/`)
+- **Baidu OCR** -- general text recognition with AK/SK + token management (`crates/easypdf-ocr/src/baidu/`)
+- **HTTP base class** (`HttpOcrEngine`) -- generic HTTP OCR engine framework implementing `OcrEngine` trait (`crates/easypdf-ocr/src/http/client/`)
+- **Authentication abstraction** (`AuthMethod`) -- Bearer / AK-SK / HMAC-SHA256 / NoAuth / Custom header (`crates/easypdf-ocr/src/http/auth.rs`)
+- **Retry & rate limiting** (`BackoffStrategy`, `RateLimitConfig`) -- exponential backoff + token bucket (`crates/easypdf-ocr/src/http/retry.rs`, `crates/easypdf-ocr/src/http/rate_limit.rs`)
+- **Image encoding** (`EncodedImage`, `ImageEncoding`) -- Base64 inline or multipart upload (`crates/easypdf-ocr/src/http/image.rs`)
+- **Response parsing** (`OcrResponseParser`) -- pluggable response parser trait (`crates/easypdf-ocr/src/http/response.rs`)
 
-## 依赖
+## Dependencies
 
-- `easypdf-core`: 核心类型（`CapabilityLevel`）
-- `easypdf-markdown`: OCR 抽象 trait（`OcrEngine`、`OcrImage`、`OcrResult`）
-- `reqwest`（同步，rustls）: HTTP 客户端
-- `serde` / `serde_json`: 序列化
-- `hmac` / `sha2`: 签名算法
-- `base64`: 图片编码
+### Internal
 
-## 主要 API
+| Crate | Purpose |
+|-------|---------|
+| `easypdf-core` | Core types (`CapabilityLevel`) |
+| `easypdf-markdown` | OCR abstraction traits (`OcrEngine`, `OcrImage`, `OcrResult`) |
 
-### 创建 OCR 引擎
+### External
+
+| Crate | Version | Purpose |
+|-------|---------|---------|
+| `reqwest` | 0.12 | Synchronous HTTP client (features: json, rustls-tls, multipart, blocking) |
+| `serde` / `serde_json` | 1.x | Serialization |
+| `hmac` / `sha2` | -- | API signature algorithms |
+| `base64` | -- | Image encoding |
+
+## Main API
+
+### Creating OCR Engines
+
 ```rust
 use easypdf_ocr::{
     create_glm_ocr_engine, GlmConfig,
@@ -41,14 +52,14 @@ let glm = create_glm_ocr_engine(GlmConfig {
     ..Default::default()
 })?;
 
-// 混元 OCR
+// HunyuanOCR
 let hunyuan = create_hunyuan_ocr_engine(HunyuanConfig {
     secret_id: "id".into(),
     secret_key: "key".into(),
     ..Default::default()
 })?;
 
-// 百度 OCR
+// Baidu OCR
 let baidu = BaiduOcrEngine::new(BaiduConfig {
     api_key: "ak".into(),
     secret_key: "sk".into(),
@@ -56,26 +67,30 @@ let baidu = BaiduOcrEngine::new(BaiduConfig {
 })?;
 ```
 
-### `HttpOcrEngine`（通用基类）
-```rust
-use easypdf_ocr::{build_http_engine, HttpClientConfig};
+### HttpOcrEngine (Generic Base Class)
 
+```rust
+use easypdf_ocr::{build_http_engine, HttpClientConfig, build_http_engine_with_config};
+
+// Simple construction
 let engine = build_http_engine(request, parser)?;
-// 或带自定义配置
+
+// With custom config
 let engine = build_http_engine_with_config(request, parser, HttpClientConfig {
     max_retries: 3,
     ..Default::default()
 })?;
 ```
 
-### 使用 OCR 引擎
+### Using an OCR Engine
+
 ```rust
 use easypdf_markdown::{OcrEngine, OcrImage};
 
 let image = OcrImage::from_path("scan.png")?;
 let result = engine.recognize(&image)?;
-println!("识别文本: {}", result.text);
-println!("置信度: {:?}", result.confidence);
+println!("Text: {}", result.text);
+println!("Confidence: {:?}", result.confidence);
 ```
 
 ## License
@@ -84,5 +99,6 @@ Apache-2.0
 
 ---
 
-**项目主页**：https://github.com/easy-4-rust/easypdf-rust
-**crates.io**：https://crates.io/crates/easypdf-ocr
+**Project**: https://github.com/easy-4-rust/easypdf-rust
+**crates.io**: https://crates.io/crates/easypdf-ocr
+**docs.rs**: https://docs.rs/easypdf-ocr

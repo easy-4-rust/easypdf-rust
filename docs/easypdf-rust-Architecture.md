@@ -1,224 +1,33 @@
-# easypdf-rust Architecture Design Document
+# easypdf-rust Architecture Document
 
-> **Purpose**: Define easypdf-rust's architecture goals, boundaries, component responsibilities, data flows, security constraints, and evolution roadmap — providing a single verifiable architecture contract for design, development, testing, and release.
+> **Purpose**: Define easypdf-rust's architecture, crate responsibilities, data flows, trait system, security model, and testing strategy -- a single verifiable architecture contract for the v0.1.0 release.
 >
-> **Architecture Version**: 0.1.0
-> **Document Status**: Approved
+> **Version**: 0.1.0
 > **License**: Apache-2.0
-> **Last Updated**: 2026-08-09
-> **Fact-verification Date**: 2026-08-09
+> **Last Updated**: 2026-08-12
+> **Source of Truth**: `docs/PROJECT_FACTS.md`
 
 ---
 
-## 1. Document Control
+## 1. Overview
 
-### 1.1 Document Info
+**easypdf-rust is a pure Rust PDF operations workspace that unifies PDF creation, reading, manipulation, template filling, Markdown conversion, OCR, and runtime services into a type-safe, resource-controlled, atomic-output operation sequence through an `EasyPdf` facade + builder chain API.**
 
-| Field | Content |
-|---|---|
-| System/Project | easypdf-rust |
-| Architecture Version | 0.1.0 |
-| Applicable Code Version | v0.1.0 (workspace, no tag yet) |
-| Deployment Form | Local library |
-| License | Apache-2.0 |
-| MSRV | 1.88 |
+| Metric | Value |
+|--------|-------|
+| Total crates | 9 (8 publishable + 1 integration test) |
+| Total tests | 1,522 |
+| Code coverage | 91.61% |
+| Fuzz targets | 6 |
+| Lines of Rust | ~52,626 |
+| MSRV | Rust 1.88 |
 | Edition | 2024 |
-| Resolver | 3 |
-
-### 1.2 Reader Guide
-
-| Reader | Priority Sections | Expected Outcome |
-|---|---|---|
-| Users | 2, 5, 7, 10 | Quick start, API entry, format support, examples |
-| Developers | 3, 4, 6, 8, 9 | Module boundaries, dependency direction, core model, design constraints |
-| Security | 4, 8 | Resource limits, atomic output, failure safety |
-| Architecture Review | All | Target vs current gap, evolution roadmap |
-
-### 1.3 Implementation Status Labels
-
-| Label | Definition | Required Evidence |
-|---|---|---|
-| `[Implemented]` | Current code exists, verifiable via tests | Source code, tests |
-| `[Partially Implemented]` | Skeleton or partial loop exists | Completed vs missing list |
-| `[Design Goal]` | Target architecture, not yet landed | ADR, plan |
-| `[Not a Goal]` | Explicitly not in scope | Alternative or ownership |
+| License | Apache-2.0 |
+| `unsafe_code` | `forbid` (workspace-wide) |
 
 ---
 
-## 2. Executive Summary
-
-### 2.1 One-line Architecture
-
-**easypdf-rust is a pure Rust PDF operations workspace that unifies PDF creation, reading, manipulation, template filling, and Markdown conversion into a type-safe, resource-controlled, atomic-output operation sequence through `EasyPdf` facade + builder chain API + engine-neutral semantic model.**
-
-### 2.2 At a Glance
-
-```text
-User Code
-    │
-    ▼
-EasyPdf Facade (easypdf crate)
-    │
-    ├──► PdfCreateBuilder ──► easypdf-writer (printpdf) ──► PDF file
-    ├──► PdfReadBuilder ────► easypdf-reader (lopdf) ────► text/metadata
-    ├──► PdfMarkdownExportBuilder ──► easypdf-markdown ──► .md file
-    ├──► PdfSplitBuilder ──► easypdf-manipulate (lopdf) ──► multiple PDFs
-    ├──► PdfManipulateBuilder ──► easypdf-manipulate ──► modified PDF
-    └──► PdfFillBuilder ───► easypdf-template (lopdf) ──► filled PDF
-                                   │
-                                   ▼
-                          easypdf-io (limits + atomic output)
-```
-
-### 2.3 Key Architecture Decisions
-
-| Decision | Choice | Rationale |
-|---|---|---|
-| Multi-engine backend | lopdf for read/manipulate, printpdf for write | Each engine's strengths; replaceable |
-| Single-parse session | Reader holds `lopdf::Document` | ~129x performance improvement |
-| Engine-neutral IR | `easypdf-model` as separate crate | Markdown and other transforms not bound to engine |
-| Backend-neutral layout | `LayoutSink` trait | Writer implements consumption; layout does not depend on writer |
-| Atomic output | temp file + rename | Prevent corruption on write failure |
-| Structured warnings | `MarkdownWarning` enum | Unimplemented capabilities do not fake success |
-| `#![forbid(unsafe_code)]` | All crates | Consistent with easyexcel-rs safety policy |
-
-## 3. Architecture Drivers & Constraints
-
-### 3.1 Business Drivers
-
-| Driver | Priority | Description |
-|---|:---:|---|
-| Simple API | P0 | Builder pattern chain calls, one-line operations |
-| Type safety | P0 | Compile-time checks, no runtime reflection |
-| Pure Rust | P0 | Zero FFI, zero unsafe |
-| Engine replaceable | P1 | lopdf/printpdf can be swapped for other engines |
-| Align with easyexcel-rs | P1 | Same Builder/Listener/Handler/Converter patterns |
-| Resource controlled | P1 | Prevent malicious or oversized input from causing OOM |
-
-### 3.2 Hard Constraints
-
-| Constraint | Description |
-|---|---|
-| Rust 1.88+ | MSRV, workspace-level unified |
-| Edition 2024 | Uses latest language features |
-| `unsafe_code = "forbid"` | All crates enforce |
-| `missing_docs = "warn"` | Public API must have docs |
-| Apache-2.0 | License |
-
-## 4. Scope, Boundaries & Non-Goals
-
-### 4.1 System Boundary
-
-```mermaid
-flowchart LR
-    User["User Code"] --> Facade["easypdf\nEasyPdf"]
-    Facade --> Reader["easypdf-reader"]
-    Facade --> Writer["easypdf-writer"]
-    Facade --> Manip["easypdf-manipulate"]
-    Facade --> Tmpl["easypdf-template"]
-    Facade --> MD["easypdf-markdown"]
-
-    Reader --> lopdf["lopdf"]
-    Manip --> lopdf
-    Tmpl --> lopdf
-    MD --> lopdf
-
-    Writer --> printpdf["printpdf"]
-
-    Reader --> IO["easypdf-io"]
-    Writer --> IO
-    Manip --> IO
-    Tmpl --> IO
-    MD --> IO
-
-    Reader --> Model["easypdf-model"]
-    MD --> Model
-
-    Writer --> Layout["easypdf-layout"]
-```
-
-### 4.2 Non-Goals
-
-| Non-Goal | Rationale | Alternative |
-|---|---|---|
-| Encryption / decryption | Not implemented, returns `UnsupportedFeature` | Planned v0.4 |
-| Digital signatures | Not implemented, returns `UnsupportedFeature` | Planned v0.5 |
-| OCR | Not implemented, Markdown emits `OcrUnavailable` warning | Planned OCR backend |
-| Table detection | Not implemented, Markdown emits `TableDetectionUnavailable` warning | Planned table detection backend |
-| Image extraction | Not implemented, Markdown emits `ImageExtractionUnavailable` warning | Planned image extraction |
-| HTML → PDF | Requires Chromium, feature-gated | `html` feature |
-| PDF → Image | Out of scope | External renderer |
-| 1:1 Java EasyExcel compatibility | PDF and Excel are different paradigms | API style alignment, not functional clone |
-
-## 5. Current State vs Target State
-
-### 5.1 Capability Status Overview
-
-| Capability | Current State | Target State | Gap |
-|---|---|---|---|
-| Create PDF | `[Implemented]` Text, built-in fonts, metadata | Tables, images, vectors, custom fonts | v0.2 |
-| Read PDF | `[Implemented]` Text extraction, metadata, session reuse | Streaming read, structured content extraction | v0.2+ |
-| PDF → Markdown | `[Implemented]` Native text, GFM/LLM/Plain profiles | Table detection, image extraction, OCR | v0.2+ |
-| Merge | `[Implemented]` Valid `/Pages` tree | — | Complete |
-| Split | `[Implemented]` Valid `/Pages` tree | — | Complete |
-| Rotate/Reorder | `[Implemented]` Per-page or all-page | — | Complete |
-| Template Fill | `[Implemented]` AcroForm fields | — | Complete |
-| Atomic Output | `[Implemented]` Temp file + rename | — | Complete |
-| Resource Limits | `[Implemented]` File size, page count, text length | Configurable limits | v0.2 |
-| Reader Session Reuse | `[Implemented]` ~129x speedup | — | Complete |
-| Encryption | `[Not a Goal]` Returns `UnsupportedFeature` | AES-256 | v0.4 |
-| Signatures | `[Not a Goal]` Returns `UnsupportedFeature` | Digital signatures | v0.5 |
-| Layout Engine | `[Partially Implemented]` `FlowLayout` skeleton | Auto-positioning elements | v0.3 |
-
-### 5.2 Architecture Issues Fixed
-
-| Issue | Fix |
-|---|---|
-| Reader re-opens file on every operation | Single-parse session; `lopdf::Document` held in `PdfReader` |
-| 0-based page ranges mixed with PDF 1-based page numbers | Unified to 0-based; Reader maps internally |
-| Writer lifecycle incomplete | Full `before_document` / `before_page` / `after_page` / `after_document` |
-| Merge/Split generate invalid `/Pages` tree | Correctly build Pages hierarchy |
-| `easypdf-layout` reverse-depends on Writer | Introduced `LayoutSink` trait; Writer implements consumption |
-| Encryption/signatures fake success | Removed fake implementation; returns `UnsupportedFeature` |
-| Output without atomic protection | All save operations use `AtomicFileOutput` |
-
-## 6. Architecture Principles & Key Decisions
-
-### 6.1 Principles
-
-| # | Principle | Practice |
-|---|---|---|
-| P1 | Pure Rust, zero unsafe | `#![forbid(unsafe_code)]` in every crate |
-| P2 | Type-safe Builder | `mut self → Self`, `#[must_use]` |
-| P3 | Multi-engine backend | lopdf for read/manipulate, printpdf for write, replaceable |
-| P4 | Engine-neutral IR | `easypdf-model` has no engine dependency |
-| P5 | Compile-time reflection | `#[derive(PdfModel)]` replaces runtime annotation scanning |
-| P6 | Single error type | `PdfError` enum + `thiserror` |
-| P7 | Separation of concerns | Core ≠ engine implementation ≠ facade |
-| P8 | Atomic output | Temp file + rename; failure does not affect original file |
-| P9 | Structured warnings | Unimplemented capabilities do not fake success |
-
-### 6.2 ADR-001: Reader Single-Parse Session
-
-- **Context**: Original Reader re-opened file on every `extract_text()` call
-- **Decision**: `PdfReader::open()` parses once, holds `lopdf::Document`
-- **Consequence**: ~129x performance improvement; Reader lifetime bound to Document
-
-### 6.3 ADR-002: LayoutSink Decouples Layout from Write
-
-- **Context**: `easypdf-layout` depended on `easypdf-writer`, risking circular dependency
-- **Decision**: Define `LayoutSink` trait; Writer implements this trait
-- **Consequence**: layout and writer decoupled; can evolve independently
-
-### 6.4 ADR-003: Structured Warnings Replace Fake Success
-
-- **Context**: Original implementation returned empty success for unimplemented features
-- **Decision**: `MarkdownWarning` enum + `MarkdownExportReport`
-- **Consequence**: Callers know exactly which capabilities are missing
-
-## 7. Overall Architecture & Layering
-
-### 7.1 Layer Diagram
+## 2. Architecture Diagram
 
 ```mermaid
 flowchart TB
@@ -227,530 +36,625 @@ flowchart TB
     end
 
     subgraph Domain["Domain Layer"]
-        R["easypdf-reader"]
-        W["easypdf-writer"]
-        M["easypdf-manipulate"]
-        T["easypdf-template"]
-        MD["easypdf-markdown"]
+        R["easypdf-reader\nlopdf backend"]
+        W["easypdf-writer\nprintpdf backend"]
+        MD["easypdf-markdown\nPDF to Markdown"]
+        OCR["easypdf-ocr\nCloud OCR engines"]
+        RT["easypdf-runtime\nMCP + Resident daemon"]
     end
 
-    subgraph Abstract["Abstraction Layer"]
-        L["easypdf-layout\nLayoutSink + FlowLayout"]
-        MO["easypdf-model\nPdfBlock/Page/Document"]
-    end
-
-    subgraph Infra["Infrastructure Layer"]
-        IO["easypdf-io\nLimits + Atomic"]
-        C["easypdf-core\nTypes + Errors"]
-        D["easypdf-derive\nproc-macro"]
+    subgraph Core["Core Layer"]
+        C["easypdf-core\nTypes, Traits, Errors\nCrypto, Model, IO, Layout"]
+        D["easypdf-derive\n#[derive(PdfModel)]"]
     end
 
     subgraph Engine["Engine Layer"]
-        LPDF["lopdf"]
-        PPPDF["printpdf"]
+        LPDF["lopdf 0.44"]
+        PPPDF["printpdf 0.12.4"]
+        RING["ring 0.17"]
     end
 
-    E --> R & W & M & T & MD
-    R --> MO & IO & C & LPDF
-    W --> L & IO & C & PPPDF
-    M --> IO & C & LPDF
-    T --> IO & C & LPDF
-    MD --> R & MO & IO & LPDF
-    L --> C
-    MO --> C
-    IO --> C
-    D --> C
+    E --> C & D & R & W & MD & OCR & RT
+    R --> C & LPDF
+    W --> C & PPPDF
+    MD --> C & R
+    OCR --> C & MD
+    RT --> C & R & W & MD
+    C --> LPDF & RING
+    D -.->|"compile-time"| C
 ```
 
-### 7.2 Layer Responsibilities
+**Dependency direction**: Facade -> Domain -> Core -> Engine. No reverse dependencies. `easypdf-derive` is a compile-time-only proc-macro.
 
-| Layer | Responsibilities | Not Responsible For |
-|---|---|---|
-| Facade | Unified entry, Builder routing, prelude | Engine details, IO details |
-| Domain | PDF read/write/manipulate/template/markdown concrete logic | Shared types, IO infrastructure |
-| Abstraction | Engine-neutral model and layout | Concrete engine calls |
-| Infrastructure | Types, errors, IO limits, atomic output, derive | PDF business logic |
-| Engine | lopdf / printpdf | This project does not modify engines |
+---
 
-## 8. Crate Dependencies & Responsibilities
+## 3. Nine Crates -- Detailed Responsibilities
 
-### 8.1 Dependency Graph
+### 3.1 `easypdf` (Facade)
 
-```text
-easypdf (facade)
-├── easypdf-core          (types, errors)
-├── easypdf-model         (IR, depends on core)
-├── easypdf-io            (limits, depends on core)
-├── easypdf-derive        (proc-macro, depends on core)
-├── easypdf-layout        (layout, depends on core)
-├── easypdf-reader        (lopdf, depends on core + model + io)
-├── easypdf-writer        (printpdf, depends on core + layout + io)
-├── easypdf-manipulate    (lopdf, depends on core + io)
-├── easypdf-template      (lopdf, depends on core + io)
-└── easypdf-markdown      (optional, depends on reader + model + io)
+**Path**: `crates/easypdf/`
+**Role**: Unified entry point. Provides `EasyPdf` struct with static factory methods and builder pattern API.
+
+**Public API**:
+- `EasyPdf::create(path)` -- create a new PDF
+- `EasyPdf::read(path)` -- read an existing PDF
+- `EasyPdf::merge(inputs, output)` -- merge multiple PDFs
+- `EasyPdf::split(path)` -- split a PDF
+- `EasyPdf::manipulate(path)` -- rotate/reorder/extract pages
+- `EasyPdf::fill_form(path, data)` -- fill AcroForm fields
+- `EasyPdf::to_markdown(input)` -- PDF to Markdown (in-memory)
+- `EasyPdf::export_markdown(input, output)` -- PDF to Markdown (file)
+- `EasyPdf::from_html(html)` -- HTML to PDF (feature-gated)
+- `EasyPdf::from_markdown(md)` -- Markdown to PDF (feature-gated)
+
+**Builders**: `PdfCreateBuilder`, `PdfReadBuilder`, `PdfManipulateBuilder`, `PdfSplitBuilder`, `PdfFillBuilder`, `PdfMarkdownBuilder`, `PdfMarkdownExportBuilder`, `HtmlToPdfBuilder`, `PdfTextBuilder`, `PdfImageBuilder`, `PdfTableBuilder`, `PdfPositionedTextBuilder`
+
+**Key files**: `lib.rs`, `builders.rs`, `pdf_fill_builder.rs`, `writer_helpers.rs`, `html.rs`
+
+**Feature flags**: `default` (markdown), `markdown`, `markdown-table`, `markdown-ocr`, `ocr`, `render`, `html`, `runtime`, `mcp`, `resident`, `full`
+
+---
+
+### 3.2 `easypdf-core` (Core)
+
+**Path**: `crates/easypdf-core/`
+**Role**: Central hub. Types, traits, error definitions, encryption/signing, semantic model, IO primitives, layout engine. Zero engine dependency.
+
+**Submodules**:
+- `enums.rs` -- `PageSize`, `Orientation`, `Rotation`, `TextAlignment`, `VerticalAlignment`, `ImageFormat`
+- `error.rs` -- `PdfError` (9 variants), `PdfErrorCode`
+- `content.rs` -- `PdfText`, `PdfTable`, `PdfTableCell`, `PdfImage`, `PdfLine`, `PdfRect`
+- `style.rs` -- `PdfFont`, `FontFamily`, `BuiltInFont` (14 fonts), `PdfColor`, `TableStyle`, `TableBorder`
+- `metadata.rs` -- `PdfMetadata`, `PdfBookmark`
+- `traits.rs` -- `PdfModel`, `PdfReadListener`, `PdfWriteHandler`, `PdfConverter<T>`, `PdfEngine`, `EngineCapabilities`
+- `model/` -- `PdfDocumentModel`, `PdfPageModel`, `PdfBlock` (14 variants), `SourceLocation`, `ImageData`, `ListItem`
+- `io/` -- `ResourceLimits`, `PdfInput`, `AtomicFileOutput`, `guards.rs` (decompression bomb + element explosion), `ssrf_guard.rs`, `repair.rs`
+- `crypto/` -- `encrypt.rs` (AES-128/256), `sign.rs` / `sign_pdf.rs` / `sign_cms.rs` / `sign_der.rs` (PKCS#7 RSA-SHA256)
+- `layout/` -- `FlowLayout`, `LayoutSink` trait, `Direction`
+- `logging.rs` -- `init_logging()` / `init_logging_json()`
+
+**Key files**: `lib.rs`, `traits.rs`, `model/pdf_block.rs`, `model/pdf_document_model.rs`, `crypto/encrypt.rs`, `crypto/sign_pdf.rs`, `io/guards.rs`, `io/ssrf_guard.rs`
+
+---
+
+### 3.3 `easypdf-derive` (Proc-Macro)
+
+**Path**: `crates/easypdf-derive/`
+**Role**: `#[derive(PdfModel)]` proc-macro. Compile-time code generation.
+
+**Supported attributes**:
+- `#[pdf(page = A4, orientation = Portrait)]` -- page config
+- `#[pdf(text, position = (x, y))]` -- positioned text
+- `#[pdf(table, position = (x, y))]` -- table
+- `#[pdf(image, position = (x, y))]` -- image
+- `#[pdf(field = "name")]` -- form field mapping
+- `#[pdf(order = N)]`, `#[pdf(ignore)]`, `#[pdf(required)]`, `#[pdf(nested)]`
+
+**Dependencies**: `syn 3.0`, `quote 1.0`, `proc-macro2 1.0`, `proc-macro-crate 3.5`
+
+---
+
+### 3.4 `easypdf-reader` (PDF Reading)
+
+**Path**: `crates/easypdf-reader/`
+**Role**: PDF reading, text extraction, page manipulation (merge/split/rotate/reorder/watermark). lopdf backend.
+
+**Public API**:
+- `PdfReader::open(path)` -- auto-strategy selection
+- `PdfReader::from_bytes(bytes)` -- in-memory
+- `PdfReader::open_with_strategy(path, strategy)` -- explicit strategy
+- `PdfReader::open_with_repair(path, repair, strategy)` -- self-repairing
+- `PdfReader::open_with_limits(input, limits)` -- resource-limited
+- `reader.extract_text()`, `reader.extract_metadata()`, `reader.page_count()`, `reader.pages(range)`
+
+**ReadStrategy auto-selection**:
+| File Size | Strategy |
+|-----------|----------|
+| 0 -- 5 MB | `Full` (lopdf Document in memory) |
+| 5 -- 100 MB | `Lazy` (on-demand page loading) |
+| > 100 MB | `Streaming` (byte-stream scanning, no Document) |
+
+**PdfManipulator**: `merge_files()`, `rotate_page()`, `reorder_pages()`, `extract_pages()`, `add_text_watermark()`, `add_layer()`, `validate_pdfa()`
+
+**Streaming module**: `StreamScanner`, CMap/ToUnicode support. Precision lower than Full/Lazy.
+
+**Key files**: `reader/mod.rs`, `reader/extract.rs`, `strategy.rs`, `manipulate.rs`, `streaming/scanner.rs`, `streaming/cmap.rs`
+
+---
+
+### 3.5 `easypdf-writer` (PDF Writing)
+
+**Path**: `crates/easypdf-writer/`
+**Role**: PDF creation and writing. printpdf backend.
+
+**Public API**:
+- `PdfWriter::new(title)`, `PdfWriter::new_from_writer(writer)`
+- `writer.add_page()`, `writer.write_text()`, `writer.write_image()`, `writer.write_svg()`
+- `writer.draw_line()`, `writer.draw_rect_stroke()`, `writer.draw_circle()`
+- `writer.register_font_from_path()`, `writer.register_font_from_bytes()`
+- `writer.register_handler(handler)` -- lifecycle hooks
+- `writer.finish(path)` -- atomic save
+
+**WriteBackend**:
+- `InMemory` -- default, suitable for small documents
+- `Spill` -- page-level temp files, constant memory
+- `Auto(threshold)` -- automatic selection
+
+**PdfTemplateFiller**: AcroForm field filling via lopdf.
+
+**Key files**: `writer.rs`, `builder.rs`, `backend.rs`, `template.rs`, `font.rs`, `image.rs`, `shape.rs`
+
+---
+
+### 3.6 `easypdf-markdown` (PDF to Markdown)
+
+**Path**: `crates/easypdf-markdown/`
+**Role**: Deterministic PDF-to-Markdown conversion pipeline with table detection, page rendering, and OCR fallback.
+
+**Pipeline**: `PdfInput -> PdfReader -> PdfDocumentModel -> ProcessorPipeline -> MarkdownRenderer -> String`
+
+**Core components**:
+- `ProcessorPipeline` -- priority-ordered processor chain
+- `MarkdownRenderer` -- model-to-Markdown renderer
+- `PdfMarkdownBuilder` / `PdfMarkdownExportBuilder` -- conversion builders
+
+**Built-in processors**:
+- `ReadingOrderProcessor` -- reading order detection
+- `HeadingDetectorProcessor` -- heading detection
+- `LinkExtractorProcessor` -- link extraction
+- `TableDetectorProcessor` -- table detection (feature-gated)
+- `OcrProcessor` -- OCR fallback (feature-gated)
+
+**Profiles**: `MarkdownProfile` presets (GFM, LLM, Plain)
+
+**Rendering**: `PdfRenderer` trait with `TextRenderer` (default) and `PdfiumRenderer` (feature = "pdfium")
+
+**OCR**: `OcrEngine` trait with `MockOcrEngine`, `ocrs` backend (feature = "ocrs"), `llm` backend (feature = "llm")
+
+**Key files**: `pdf_markdown_processor.rs`, `processor_pipeline.rs`, `markdown_renderer.rs`, `table/detector.rs`, `render/traits.rs`, `ocr/engine.rs`
+
+---
+
+### 3.7 `easypdf-ocr` (Cloud OCR)
+
+**Path**: `crates/easypdf-ocr/`
+**Role**: Cloud OCR engine collection. Synchronous HTTP clients.
+
+**Engines**:
+- **GLM** -- `create_glm_ocr_engine()`, `GlmConfig`, `GlmOcrParser`
+- **HunyuanOCR** -- `create_hunyuan_ocr_engine()`, `HunyuanConfig`, `HunyuanOcrParser`
+- **Baidu** -- `BaiduOcrEngine`, `BaiduConfig`, `BaiduOcrParser`, `TokenManager`
+
+**Common HTTP layer**: `HttpOcrEngine`, `HttpClientConfig`, `AuthMethod`, `RateLimitConfig`, `BackoffStrategy`, `OcrRequest`, `OcrResponseParser`
+
+**Dependencies**: `reqwest 0.12` (blocking, rustls-tls), `hmac/sha2`, `base64`
+
+---
+
+### 3.8 `easypdf-runtime` (Runtime)
+
+**Path**: `crates/easypdf-runtime/`
+**Role**: Runtime layer providing MCP server (LLM agent interface) and Resident daemon (in-memory PDF sessions).
+
+**MCP module** (feature = "mcp"):
+- `McpServer`, `ToolDefinition`, `ToolResult`, `ContentBlock`
+- 7 tools: `pdf_read_text`, `pdf_to_markdown`, `pdf_create_text`, `pdf_merge`, `pdf_split`, `pdf_metadata`, `pdf_page_count`
+- Binary: `easypdf-mcp`
+
+**Resident module** (feature = "resident"):
+- `ResidentServer`, `ResidentClient`, `ResidentConfig`
+- `DocumentSession`, `Request`/`Response` protocol
+- `AutosaveMode`: Disabled / Fixed / Adaptive
+- Transport: `TcpTransport`, `UnixTransport` (cfg(unix))
+- `serve()`, `try_attach()`, `default_socket_path()`, `socket_path_for_file()`
+
+---
+
+### 3.9 `easypdf-test` (Integration Tests)
+
+**Path**: `easypdf-test/`
+**Role**: End-to-end integration tests and golden samples. Not published.
+
+**Structure**: `src/lib.rs`, `src/bin/`, `tests/`, `golden/`, `samples/`
+
+---
+
+## 4. Key Data Flows
+
+### 4.1 PDF Read Flow
+
+```
+User calls EasyPdf::read(path)
+  -> PdfReadBuilder (easypdf)
+    -> PdfReader::open(path) (easypdf-reader)
+      -> ReadStrategy::auto(file_size) selects strategy
+        -> Full: lopdf::Document::load_mem()
+        -> Lazy: lopdf::Document::load_mem() + LazyPageLoader
+        -> Streaming: StreamScanner (byte-stream, no Document)
+      -> guard_element_explosion() (easypdf-core::io::guards)
+      -> reader.extract_text()
+        -> lopdf::Document::extract_text() or StreamScanner
+    -> PdfReadListener callback (easypdf-core::traits)
 ```
 
-### 8.2 Crate Detail
+### 4.2 PDF Write Flow
 
-#### easypdf-core
-
-```text
-src/
-├── lib.rs          # flat re-exports
-├── enums.rs        # PageSize, Orientation, Rotation, TextAlignment
-├── error.rs        # PdfError enum, Result<T> alias
-├── content.rs      # PdfText, PdfTable, PdfImage, PdfLine, PdfRect
-├── style.rs        # PdfColor, PdfFont, FontFamily, BuiltInFont, TableStyle
-├── metadata.rs     # PdfMetadata, PdfBookmark
-├── traits.rs       # PdfModel, PdfReadListener, PdfWriteHandler, PdfConverter
-└── event.rs        # re-exports PdfReadListener
+```
+User calls EasyPdf::create(path)
+  -> PdfCreateBuilder (easypdf)
+    -> PdfWriter::new(title) (easypdf-writer)
+      -> WriteBackend selection (InMemory/Spill/Auto)
+      -> writer.add_page(size, orientation)
+        -> printpdf backend creates page
+      -> writer.write_text(text, x, y)
+        -> PdfWriteHandler.before_page() hook
+        -> printpdf writes text
+        -> PdfWriteHandler.after_page() hook
+      -> writer.finish(path)
+        -> AtomicFileOutput (easypdf-core::io) atomic write
 ```
 
-Zero engine dependency. Shared vocabulary for all other crates.
+### 4.3 Markdown Conversion Flow
 
-#### easypdf-model
-
-```text
-src/
-├── lib.rs
-├── pdf_block.rs          # PdfBlock: Text / Table / Image / Vector / ...
-├── pdf_page_model.rs     # PdfPageModel: blocks + page metadata
-├── pdf_document_model.rs # PdfDocumentModel: pages + doc metadata
-└── source_location.rs    # SourceLocation: page + position
+```
+User calls EasyPdf::to_markdown(input)
+  -> PdfMarkdownBuilder (easypdf)
+    -> PdfReader::open() (easypdf-reader) parses PDF
+    -> PdfDocumentModel built (easypdf-core::model)
+    -> ProcessorPipeline executes (easypdf-markdown)
+      -> ReadingOrderProcessor
+      -> HeadingDetectorProcessor
+      -> LinkExtractorProcessor
+      -> TableDetectorProcessor (optional)
+      -> OcrProcessor (optional, OCR fallback)
+    -> MarkdownRenderer renders to Markdown string
+    -> MarkdownConversionResult returned
 ```
 
-Engine-neutral semantic IR. Markdown pipeline consumes this model without directly depending on lopdf objects.
+### 4.4 Signature / Verification Flow
 
-#### easypdf-io
-
-```text
-src/
-├── lib.rs
-├── resource_limits.rs    # ResourceLimits: max_file_size, max_pages, max_text
-├── pdf_input.rs          # PdfInput: from_path / from_bytes, read + limit check
-└── atomic_file_output.rs # AtomicFileOutput: temp file + rename
+```
+User calls sign_pdf(pdf_bytes, signer) (easypdf-core::crypto::sign)
+  -> PdfSigner config (certificate + private key + metadata)
+  -> sign_pdf.rs:
+    1. Parse PDF, locate signature placeholder
+    2. Compute /ByteRange
+    3. Build CMS SignedData (sign_cms.rs)
+       -> RSA-PKCS#1v1.5 + SHA-256 (via ring)
+       -> DER encoding (sign_der.rs)
+    4. Embed signature into PDF
+  -> verify_pdf_signature(pdf_bytes)
+    1. Parse signature field
+    2. Extract /ByteRange and /Contents
+    3. Verify CMS signature
+    4. Parse X.509 certificate (via x509-parser)
+    5. Return SignatureInfo
 ```
 
-Shared IO infrastructure for all domain crates.
+### 4.5 Encryption / Decryption Flow
 
-#### easypdf-reader
+```
+User calls encrypt_pdf(pdf_bytes, encryption) (easypdf-core::crypto::encrypt)
+  -> PdfEncryption config (password + algorithm + permissions)
+  -> encrypt_pdf():
+    1. lopdf::Document::load_mem() parse
+    2. generate_file_encryption_key() generate key
+    3. build_encryption_version() build V4/V5 config
+    4. lopdf::EncryptionState::try_from() derive state
+    5. doc.encrypt() transparently encrypt all objects
+    6. doc.save_to() serialize
 
-Single-parse session. `open()` parses once, holds `lopdf::Document`. Supports 0-based page ranges, event listeners, resource limits.
+User calls decrypt_pdf(encrypted_bytes, password)
+  -> lopdf::Document::load_mem() parse
+  -> doc.decrypt(password) decrypt
+  -> doc.save_to() serialize
+```
 
-#### easypdf-writer
+---
 
-printpdf backend. Supports text, images, vector shapes, built-in fonts, custom font registration, metadata, lifecycle hooks. Implements `LayoutSink` trait.
+## 5. Trait System
 
-#### easypdf-manipulate
+### 5.1 Trait Overview
 
-lopdf backend. Merge, split, rotate, reorder. Outputs valid `/Pages` tree. Atomic output.
+| Trait | Crate | Purpose | Implementor |
+|-------|-------|---------|-------------|
+| `PdfModel` | easypdf-core | Struct to PDF element mapping | `#[derive(PdfModel)]` |
+| `PdfReadListener` | easypdf-core | Event-driven text extraction (Send) | User-defined |
+| `PdfWriteHandler` | easypdf-core | Page lifecycle hooks (Send) | User-defined; `PageNumberHandler` |
+| `PdfConverter<T>` | easypdf-core | Bidirectional type conversion (Send) | User-defined |
+| `PdfEngine` | easypdf-core | Abstract engine interface (Send+Sync) | Reserved (no impl yet) |
+| `PdfMarkdownProcessor` | easypdf-markdown | Semantic enhancement processor | `ReadingOrderProcessor`, `HeadingDetectorProcessor`, `LinkExtractorProcessor`, `TableDetectorProcessor`, `OcrProcessor` |
+| `OcrEngine` | easypdf-markdown | OCR recognition | `MockOcrEngine`, `ocrs` backend, `llm` backend |
+| `PdfRenderer` | easypdf-markdown | PDF page rendering | `TextRenderer`, `PdfiumRenderer` |
+| `LayoutSink` | easypdf-core | Backend-neutral layout output | Layout consumers |
+| `Transport` | easypdf-runtime | Network transport abstraction | `TcpTransport`, `UnixTransport` |
+| `Connection` | easypdf-runtime | Connection abstraction | TCP/Unix connections |
 
-#### easypdf-template
-
-lopdf backend. AcroForm field filling. Atomic output.
-
-#### easypdf-markdown
-
-PDF → Markdown conversion. Consumes `PdfDocumentModel` (from easypdf-model). Supports GFM/LLM/Plain profiles. Structured warnings.
-
-#### easypdf-layout
-
-Backend-neutral layout abstractions. `LayoutSink` trait (Writer implements), `FlowLayout` (direction, margin, spacing). Does not depend on Writer.
-
-#### easypdf-derive
-
-`#[derive(PdfModel)]` proc-macro. Parses `#[pdf(...)]` attributes, generates impl blocks.
-
-## 9. Runtime Model & Concurrency
-
-### 9.1 Threading Model
-
-- All operations are synchronous blocking calls (no async).
-- `PdfReader` / `PdfWriter` are not `Send`/`Sync` (lopdf/printpdf limitations).
-- Users operate on a single Reader/Writer instance in a single thread.
-- `PdfError` and `Result<T>` are `Send`; errors can be passed across threads.
-
-### 9.2 Memory Model
-
-| Pattern | Memory Complexity | Scenario |
-|---|---|---|
-| Reader session reuse | `O(document)` | Multiple text/metadata extractions |
-| Writer incremental build | `O(pages)` | PDF creation |
-| Manipulate load | `O(input)` | Merge/split/rotate |
-| Markdown pipeline | `O(document)` | PDF → Markdown |
-
-## 10. Core Data Flows
-
-### 10.1 Create PDF
+### 5.2 Mermaid Class Diagram
 
 ```mermaid
-sequenceDiagram
-    participant U as User
-    participant F as EasyPdf
-    participant B as PdfCreateBuilder
-    participant W as PdfWriter
-    participant IO as AtomicFileOutput
-    participant FS as Filesystem
+classDiagram
+    class PdfModel {
+        +render() Result~Vec~RenderedElement~~
+        +metadata() PdfModelMetadata
+        +field_descriptors() Vec~PdfFieldDescriptor~
+    }
+    class PdfReadListener {
+        <<trait Send>>
+        +on_page_start(page_number) Result
+        +on_text(page_number, text) Result
+        +on_page_end(page_number) Result
+        +on_document_end() Result
+    }
+    class PdfWriteHandler {
+        <<trait Send>>
+        +before_document() Result
+        +before_page(page_number) Result
+        +after_page(page_number) Result
+        +after_document() Result
+    }
+    class PdfConverter~T~ {
+        <<trait Send>>
+        +to_pdf_string(value) Result~String~
+        +from_pdf_string(s) Result~T~
+    }
+    class PdfEngine {
+        <<trait Send+Sync>>
+        +name() &str
+        +capabilities() EngineCapabilities
+    }
+    class PdfMarkdownProcessor {
+        <<trait>>
+        +name() &str
+        +capabilities() ProcessorCapability
+        +process(blocks) Result
+    }
+    class OcrEngine {
+        <<trait>>
+        +recognize(image) Result~OcrResult~
+    }
+    class PdfRenderer {
+        <<trait>>
+        +render_page(index, config) Result~RenderedImage~
+        +render_page_to_path(index, config, path) Result
+    }
+    class LayoutSink {
+        <<trait>>
+        +push_text(text, x, y)
+        +push_image(image, x, y)
+    }
+    class Transport {
+        <<trait>>
+        +bind() Result
+        +accept() Result~Connection~
+    }
 
-    U->>F: create("out.pdf")
-    F->>B: new(path)
-    U->>B: page(A4).add_text("Hi").font(...)
-    B->>W: new("title")
-    B->>W: add_page(A4)
-    B->>W: write_text(...)
-    U->>B: do_write()
-    B->>IO: new(target_path)
-    IO->>FS: write to temp file
-    B->>W: finish(temp_path)
-    W->>FS: printpdf save
-    IO->>FS: atomic rename
+    PdfModel <|.. PdfModel_Derive : #[derive(PdfModel)]
+    PdfReadListener <|.. UserListener : custom impl
+    PdfWriteHandler <|.. PageNumberHandler : page number handler
+    PdfMarkdownProcessor <|.. ReadingOrderProcessor
+    PdfMarkdownProcessor <|.. HeadingDetectorProcessor
+    PdfMarkdownProcessor <|.. TableDetectorProcessor
+    PdfMarkdownProcessor <|.. OcrProcessor
+    OcrEngine <|.. MockOcrEngine
+    OcrEngine <|.. OcrsBackend : feature="ocrs"
+    PdfRenderer <|.. TextRenderer : default
+    PdfRenderer <|.. PdfiumRenderer : feature="pdfium"
+    Transport <|.. TcpTransport
+    Transport <|.. UnixTransport : cfg(unix)
 ```
 
-### 10.2 Read PDF
+---
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant F as EasyPdf
-    participant B as PdfReadBuilder
-    participant R as PdfReader
-    participant LP as lopdf
+## 6. Data Model (IR)
 
-    U->>F: read("input.pdf")
-    F->>B: new(path)
-    U->>B: pages(0..10)
-    U->>B: extract_text()
-    B->>R: open(path)
-    R->>LP: Document::load_mem
-    R-->>R: hold Document
-    B->>R: extract_text()
-    R->>LP: iterate pages for text
-    R-->>U: String
+### 6.1 PdfDocumentModel Structure
+
 ```
-
-### 10.3 PDF → Markdown
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant B as PdfMarkdownExportBuilder
-    participant R as PdfReader
-    participant M as PdfDocumentModel
-    participant MR as MarkdownRenderer
-    participant IO as AtomicFileOutput
-
-    U->>B: export_markdown("in.pdf", "out.md")
-    U->>B: pages(0..20).profile(Llm)
-    U->>B: do_export()
-    B->>R: open_with_limits(input, limits)
-    R->>R: single parse
-    B->>R: build_document_model()
-    R->>M: build PdfDocumentModel
-    B->>MR: render(model, profile)
-    MR->>MR: iterate pages → blocks → Markdown
-    MR-->>B: MarkdownExportReport + warnings
-    B->>IO: write output.md (atomic)
-```
-
-### 10.4 Merge / Split
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant M as PdfManipulator
-    participant LP as lopdf
-    participant IO as AtomicFileOutput
-
-    U->>M: merge_files(&["a.pdf","b.pdf"], "out.pdf")
-    M->>LP: load all input PDFs
-    M->>LP: merge object tables
-    M->>LP: build valid /Pages tree
-    M->>IO: atomic write output
-```
-
-## 11. State Machine & Lifecycle
-
-### 11.1 PdfWriter Lifecycle
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created: PdfWriter::new()
-    Created --> PageAdded: add_page()
-    PageAdded --> PageAdded: write_text / draw_line / ...
-    PageAdded --> PageAdded: add_page() (new page)
-    PageAdded --> Finished: finish(path)
-    Finished --> [*]
-
-    Created --> Finished: finish(path) (empty document)
-```
-
-### 11.2 PdfReader Session
-
-```mermaid
-stateDiagram-v2
-    [*] --> Parsed: open(path)
-    Parsed --> Filtered: pages(range)
-    Filtered --> Parsed: extract_text()
-    Parsed --> Parsed: extract_text() / extract_metadata()
-    Parsed --> [*]: drop
-```
-
-### 11.3 WriteHandler Callback Order
-
-```text
-before_document()
-  ├─ before_page(0)
-  │   └─ after_page(0)
-  ├─ before_page(1)
-  │   └─ after_page(1)
-  └─ ...
-after_document()
-```
-
-## 12. Semantic Model (IR)
-
-### 12.1 Model Hierarchy
-
-```text
 PdfDocumentModel
-├── metadata: PdfMetadata
-├── pages: Vec<PdfPageModel>
-│   ├── page_number: usize
-│   ├── blocks: Vec<PdfBlock>
-│   │   ├── Text { content, font_info, location }
-│   │   ├── Table { rows, location }
-│   │   ├── Image { data, location }
-│   │   └── Vector { ... }
-│   └── source: SourceLocation
-└── warnings: Vec<MarkdownWarning>
++-- metadata: PdfMetadata
+|   +-- title: Option<String>
+|   +-- author: Option<String>
+|   +-- subject: Option<String>
+|   +-- keywords: Option<String>
+|   +-- creator: Option<String>
+|   +-- producer: Option<String>
++-- pages: Vec<PdfPageModel>
+    +-- index: PageIndex (zero-based)
+    +-- blocks: Vec<PdfBlock> (14 variants)
+    +-- width_pt: Option<f64>
+    +-- height_pt: Option<f64>
+    +-- rotation: u16 (0/90/180/270)
 ```
 
-### 12.2 Design Decisions
+### 6.2 PdfBlock -- 14 Variants
 
-- `PdfBlock` is an enum (not trait object) — easy to pattern match and serialize.
-- `SourceLocation` records original page number and position — useful for debugging and warning localization.
-- Model is immutable — read-only after construction.
+All variants carry `SourceLocation` (page_index + confidence f32). Marked `#[non_exhaustive]` for future extension.
 
-## 13. Error Handling & Resource Limits
+| Variant | Fields | Purpose |
+|---------|--------|---------|
+| `Heading` | level(u8), text, source | Leveled heading (1-6) |
+| `Paragraph` | text, source | Plain paragraph |
+| `List` | ordered(bool), items(Vec<ListItem>), source | Ordered/unordered list |
+| `Table` | headers(Vec<String>), rows(Vec<Vec<String>>), source | Table |
+| `Image` | data(ImageData), source | Image |
+| `Code` | language(Option<String>), text, source | Code block |
+| `Formula` | latex, source | LaTeX formula |
+| `PageBreak` | source | Page break |
+| `Footnote` | reference_id, text, source | Footnote |
+| `TableCell` | row_span(u32), col_span(u32), text, source | Fine-grained table cell |
+| `BlockQuote` | text, source | Block quote |
+| `HorizontalRule` | source | Horizontal rule |
+| `Link` | url, text, source | Hyperlink |
+| `Unknown` | raw, source | Unrecognizable content |
 
-### 13.1 Error Enum
+### 6.3 SourceLocation
 
-```rust
-pub enum PdfError {
-    Io(std::io::Error),
-    Parse(String),
-    InvalidPage(usize),
-    UnsupportedFeature(String),
-    ResourceLimitExceeded { resource: &'static str, limit: u64, actual: u64 },
-    Encryption(String),
-    Other(String),
-}
+```
+SourceLocation
++-- page_index: PageIndex (zero-based)
++-- confidence: f32 (0.0-1.0, extraction confidence)
 ```
 
-### 13.2 Resource Limits
+---
 
-| Resource | Default | Check Point |
-|---|---|---|
-| File size | 100 MB | `PdfInput::read()` |
-| Page count | 10,000 | `PdfReader::open_with_limits()` |
-| Text length | 10 MB | `PdfReader::extract_text()` |
+## 7. Performance Characteristics
 
-Exceeding limits returns `ResourceLimitExceeded` error; does not panic.
+### 7.1 Streaming Memory Strategy
 
-## 14. Atomic Output Strategy
+The reader uses a three-tier strategy to balance memory and fidelity:
 
-### 14.1 Flow
+| Strategy | File Size | Memory | Fidelity |
+|----------|-----------|--------|----------|
+| `Full` | 0 -- 5 MB | O(document) | Highest -- full object tree |
+| `Lazy` | 5 -- 100 MB | O(page) | High -- on-demand page loading |
+| `Streaming` | > 100 MB | O(1) | Lower -- byte-stream scan, no CMap |
 
-```mermaid
-flowchart LR
-    Op["Save Operation"] --> Temp["Write to temp file"]
-    Temp --> Success{"Success?"}
-    Success -->|Yes| Rename["Atomic rename"]
-    Success -->|No| Cleanup["Delete temp file"]
-    Rename --> Done["Output file ready"]
-    Cleanup --> Error["Return error, original file unaffected"]
-```
+### 7.2 WriteBackend Strategy
 
-### 14.2 Application Scope
+| Backend | Memory | Use Case |
+|---------|--------|----------|
+| `InMemory` | O(pages) | Small documents (default) |
+| `Spill` | O(1) per page | Large documents, constant memory |
+| `Auto(threshold)` | Automatic | Switches at threshold |
 
-| Operation | Backend | Atomic Output |
-|---|---|:---:|
-| PdfWriter::finish() | printpdf | ✅ |
-| PdfManipulator::merge/split/rotate/reorder | lopdf | ✅ |
-| PdfTemplateFiller::fill | lopdf | ✅ |
-| PdfMarkdownExportBuilder::do_export | lopdf | ✅ |
+### 7.3 Benchmark Data
 
-## 15. Markdown Conversion Pipeline
-
-### 15.1 Architecture
-
-```mermaid
-flowchart TB
-    Input["PDF Input"] --> Reader["PdfReader\nSingle parse"]
-    Reader --> Model["PdfDocumentModel\nEngine-neutral IR"]
-    Model --> Renderer["MarkdownRenderer\nProfile-driven"]
-    Renderer --> Output["Output .md file\nAtomic write"]
-    Renderer --> Report["MarkdownExportReport\n+ Structured warnings"]
-```
-
-### 15.2 Profile Comparison
-
-| Profile | Target | Output Style | Token Efficiency |
-|---|---|---|---|
-| Gfm | GitHub/GitLab | Standard GFM tables + fenced blocks | Medium |
-| Llm | LLM context | Minimal markup | High |
-| Plain | Human reading | Minimal formatting | Highest |
-
-### 15.3 Structured Warnings
-
-| Warning | Trigger | Behavior |
-|---|---|---|
-| `TableDetectionUnavailable` | Suspected table but no detection backend | Output raw text, warning in report |
-| `ImageExtractionUnavailable` | Image found but no extraction backend | Skip image, warning in report |
-| `OcrUnavailable` | Scanned page but no OCR backend | Skip page text, warning in report |
-
-## 16. Interface & Trait Design
-
-### 16.1 Trait Overview
-
-| Trait | Defined In | Implemented By | Purpose |
-|---|---|---|---|
-| `PdfModel` | easypdf-core | User derive | Struct → PDF element mapping |
-| `PdfReadListener` | easypdf-core | User implementation | Event-driven text extraction |
-| `PdfWriteHandler` | easypdf-core | User implementation | Page lifecycle hooks |
-| `PdfConverter<T>` | easypdf-core | User implementation | Rust ⇄ PDF string |
-| `LayoutSink` | easypdf-layout | easypdf-writer | Backend-neutral layout consumption |
-
-### 16.2 LayoutSink Interface
-
-```rust
-pub trait LayoutSink {
-    fn write_text_at(&mut self, text: &str, x: f64, y: f64) -> Result<()>;
-    fn write_image_at(&mut self, data: &[u8], x: f64, y: f64, w: f64, h: f64) -> Result<()>;
-    fn draw_line(&mut self, x1: f64, y1: f64, x2: f64, y2: f64) -> Result<()>;
-    fn new_page(&mut self, size: PageSize) -> Result<usize>;
-}
-```
-
-`easypdf-writer` implements this trait; `easypdf-layout` consumes layout results through it without directly depending on Writer.
-
-## 17. Safety & Trust Boundaries
-
-### 17.1 unsafe Policy
-
-All crates use `#![forbid(unsafe_code)]`. lopdf and printpdf may use unsafe internally, but this project introduces no additional unsafe.
-
-### 17.2 Input Safety
-
-| Threat | Protection |
-|---|---|
-| Oversized file | `ResourceLimits.max_file_size` |
-| Too many pages | `ResourceLimits.max_pages` |
-| Excessive text | `ResourceLimits.max_text_length` |
-| Corrupt PDF | lopdf parse error → `PdfError::Parse` |
-| Malicious path | Atomic output uses temp file; does not modify input |
-
-### 17.3 Unimplemented Feature Safety
-
-No fake success. `UnsupportedFeature` errors are explicit and do not produce seemingly valid but actually insecure output.
-
-## 18. Performance & Resource Budget
-
-### 18.1 Reader Session Reuse Benchmark
+**Reader session reuse** (vs re-open per operation):
 
 | Operation | Latency | Speedup |
-|---|---:|---:|
+|-----------|---------|---------|
 | Session reuse | ~1,047 ns/iter | 1x |
 | Re-open | ~135,011 ns/iter | ~129x |
 
-### 18.2 Resource Budget
+**Text extraction throughput** (100-page PDF, Criterion):
+- Wall time: 2.4 ms
+- Throughput: 28.7 MiB/s
 
-| Resource | Budget | Source |
-|---|---|---|
-| Max file size | 100 MB | `ResourceLimits` default |
-| Max pages | 10,000 | `ResourceLimits` default |
-| Max text length | 10 MB | `ResourceLimits` default |
-| Stack depth | Rust default | No recursion |
+**Peak memory** (vs pdftotext/Poppler):
+- Small files: easypdf uses ~70-73% of pdftotext RSS
+- 100-page file: easypdf uses ~83% of pdftotext RSS
 
-## 19. Testing, Verification & Architecture Acceptance
+---
 
-### 19.1 Verification Matrix
+## 8. Security Characteristics
 
-| Verification Type | Scope | Command | Status |
-|---|---|---|:---:|
-| Build check | Full workspace | `cargo check -p easypdf --all-features` | ✅ |
-| No default features | Facade | `cargo check -p easypdf --no-default-features` | ✅ |
-| Unit tests | Full workspace | `cargo test --workspace --quiet` | ✅ (136 pass) |
-| Clippy | New crates | `clippy -D warnings` on model/io/markdown | ✅ |
-| Doc build | Full workspace | `cargo doc --workspace --no-deps` | ✅ |
-| Benchmark | reader | `cargo bench -p easypdf-reader --bench reader_session` | ✅ |
-| Compile tests | derive | trybuild (1 ignored legacy) | ✅ |
+### 8.1 Security Guards
 
-### 19.2 Architecture Acceptance
+| Guard | Location | Purpose |
+|-------|----------|---------|
+| `guard_decompression_bomb()` | `easypdf-core::io::guards` | Prevents zip bombs (ratio + absolute size checks) |
+| `guard_element_explosion()` | `easypdf-core::io::guards` | Limits PDF element count (default: 5M) |
+| `validate_url()` | `easypdf-core::io::ssrf_guard` | SSRF protection (IPv4/IPv6 private ranges) |
+| `AtomicFileOutput` | `easypdf-core::io` | Prevents file corruption on write failure |
+| `ResourceLimits` | `easypdf-core::io` | File size (100MB), pages (10K), text (10MB) limits |
 
-| Architecture Claim | Acceptance Condition | Evidence |
-|---|---|---|
-| Engine-neutral IR has no engine dependency | `easypdf-model` has no lopdf/printpdf dependency | Cargo.toml |
-| Reader single-parse | `open()` reuses Document | Source + benchmark |
-| LayoutSink decoupled | `easypdf-layout` does not depend on `easypdf-writer` | Cargo.toml |
-| Atomic output | All save/finish use AtomicFileOutput | Source |
-| Structured warnings | Markdown returns `MarkdownExportReport` | Tests |
-| Zero unsafe | All crates `#![forbid(unsafe_code)]` | lib.rs |
+### 8.2 Encryption & Signing
 
-## 20. Risk, Technical Debt & Roadmap
+| Feature | Algorithm | Status |
+|---------|-----------|--------|
+| Encryption | AES-128 (V4/R4), AES-256 (V5/R6) | Implemented |
+| Decryption | lopdf transparent decrypt | Implemented |
+| Digital signature | RSA-PKCS#1v1.5 + SHA-256 (via ring) | Implemented |
+| Signature verification | CMS + X.509 (via x509-parser) | Implemented |
+| Timestamp (RFC 3161) | -- | Fields reserved, not yet implemented |
+| Permissions | PRINT/MODIFY/COPY/FILL_FORMS + 4 more | Implemented |
 
-### 20.1 Risks
+### 8.3 API Key Protection
 
-| ID | Risk | Probability | Impact | Mitigation |
-|---|---|:---:|:---:|---|
-| R-001 | lopdf text extraction quality insufficient | High | Medium | Integrate OCR backend |
-| R-002 | printpdf doesn't support custom font formats | Medium | Medium | Font registration abstraction |
-| R-003 | Large file OOM | Low | High | ResourceLimits enforcement |
+All OCR config types (`GlmConfig`, `HunyuanConfig`, `BaiduConfig`, `AuthMethod`) implement custom `Debug` that redacts secrets.
 
-### 20.2 Technical Debt
+### 8.4 Audit Status
 
-| Debt | Current Cost | Target | Repayment Phase |
-|---|---|---|---|
-| Table detection not implemented | Markdown tables output as plain text | Integrate table detection backend | v0.2 |
-| Image extraction not implemented | Markdown skips images | Integrate image extraction | v0.2 |
-| OCR not implemented | Scanned pages cannot extract text | Integrate OCR | v0.2+ |
-| Layout engine skeleton only | Manual positioning for all elements | Auto layout | v0.3 |
+4 findings in the security audit (all FIXED):
+1. Small compressed payload bypasses ratio check (MEDIUM) -- fixed with absolute safe threshold
+2. IPv6 loopback SSRF bypass (HIGH) -- fixed with `std::net::IpAddr` parsing
+3. GlmConfig leaks API key in Debug (HIGH) -- fixed with manual Debug redaction
+4. BaiduConfig leaks API key in Debug (HIGH) -- fixed with manual Debug redaction
 
-### 20.3 Implementation Roadmap
+27 security regression tests cover all finding areas.
 
-| Phase | Architecture Deliverables | Exit Conditions |
-|---|---|---|
-| v0.1 ✅ | 11 crates, core types, Builder API, IR, IO, Markdown | 136 tests pass |
-| v0.2 | Tables/images/vectors/custom fonts | Feature tests + integration tests |
-| v0.3 | Layout engine + watermarks | Auto-positioning tests |
-| v0.4 | Encryption | Encrypt/decrypt round-trip tests |
-| v0.5 | Signatures + PDF/A | Compliance verification |
-| v1.0 | Stable API | Full test coverage + benchmarks |
+---
+
+## 9. Testing System
+
+### 9.1 Coverage
+
+| Metric | Value |
+|--------|-------|
+| Total tests | 1,522 |
+| Code coverage | 91.61% |
+| Fuzz targets | 6 |
+| Security regression tests | 27 |
+
+### 9.2 Test Types
+
+| Type | Scope | Location |
+|------|-------|----------|
+| Unit tests | Per-crate inline | `#[cfg(test)]` in each crate |
+| Integration tests | Cross-crate | `easypdf-test/tests/` |
+| Security audit | Guards + API key leakage | `easypdf-test/tests/security_audit.rs` |
+| Fuzz tests | Input parsing | 6 fuzz targets |
+| Benchmark | Reader performance | `easypdf-reader/benches/reader_session.rs` |
+| Compile tests | Derive macro | `easypdf-derive` trybuild |
+| Golden samples | PDF comparison | `easypdf-test/golden/` |
+
+### 9.3 CI Verification
+
+```bash
+# Full workspace build
+cargo check --workspace
+
+# All tests
+cargo test --workspace
+
+# Clippy (strict)
+cargo clippy --workspace --all-targets -D warnings
+
+# Benchmarks
+cargo bench -p easypdf-reader --bench reader_session
+
+# Security audit
+cargo audit
+```
+
+---
 
 ## Appendix A: Glossary
 
 | Term | Definition |
-|---|---|
+|------|------------|
 | Facade | User-visible unified entry struct `EasyPdf` |
 | Builder | Chain configurator; calls terminal method like `do_write()` / `do_export()` |
 | IR | Engine-neutral intermediate representation (`PdfDocumentModel`) |
-| LayoutSink | Backend-neutral layout consumption trait |
 | Session Reuse | Reader parses PDF once; subsequent operations reuse parsed object |
 | Atomic Output | Write to temp file; rename on success to replace target |
+| Streaming | Byte-stream scanning without building full object tree |
+| Spill | Page-level temp file backend for constant-memory writing |
+| ProcessorPipeline | Priority-ordered chain of semantic enhancement processors |
 
-## Appendix B: Quality Gates Summary
+## Appendix B: Dependency Graph (Text)
 
-| Gate | Command | Status |
-|---|---|:---:|
-| No default features build | `cargo check -p easypdf --no-default-features` | ✅ |
-| All features build | `cargo check -p easypdf --all-features` | ✅ |
-| Tests | `cargo test --workspace --quiet` | ✅ |
-| Docs | `cargo doc --workspace --no-deps` | ✅ |
-| Clippy (new crates) | `clippy -D warnings` on model/io/markdown | ✅ |
-| Benchmark | `cargo bench -p easypdf-reader --bench reader_session` | ✅ |
+```
+easypdf (facade)
++-- easypdf-core (mandatory)
++-- easypdf-derive (mandatory)
++-- easypdf-reader (mandatory)
++-- easypdf-writer (mandatory)
++-- easypdf-markdown (optional, feature = "markdown")
++-- easypdf-ocr (optional, feature = "ocr")
++-- easypdf-runtime (optional, feature = "runtime")
+
+easypdf-reader     -> easypdf-core, lopdf
+easypdf-writer     -> easypdf-core, printpdf, lopdf (template)
+easypdf-markdown   -> easypdf-core, easypdf-reader
+easypdf-ocr        -> easypdf-core, easypdf-markdown, reqwest
+easypdf-runtime    -> easypdf-core, easypdf-reader, easypdf-writer, easypdf-markdown
+easypdf-derive     -> syn, quote (compile-time only)
+easypdf-core       -> lopdf, ring, aes, x509-parser, bitflags
+```
 
 ---
 
 **Document Version**: 0.1.0
-**Last Updated**: 2026-08-09
-**Document Status**: Approved
+**Last Updated**: 2026-08-12

@@ -1,212 +1,33 @@
 # easypdf-rust 架构设计文档
 
-> **文档版本**：0.1.0
-> **适用代码版本**：v0.1.0 (workspace)
-> **文档状态**：已批准
+> **目的**：定义 easypdf-rust 的架构、crate 职责、数据流、trait 体系、安全模型和测试策略 -- v0.1.0 发布的单一可验证架构契约。
+>
+> **版本**：0.1.0
 > **许可证**：Apache-2.0
-> **最后更新**：2026-08-09
+> **最后更新**：2026-08-12
+> **事实来源**：`docs/PROJECT_FACTS.md`
 
 ---
 
-## 目录
+## 1. 总览
 
-1. [执行摘要](#1-执行摘要)
-2. [架构驱动与约束](#2-架构驱动与约束)
-3. [范围、边界与非目标](#3-范围边界与非目标)
-4. [当前态与目标态](#4-当前态与目标态)
-5. [架构原则与关键决策](#5-架构原则与关键决策)
-6. [总体架构与分层](#6-总体架构与分层)
-7. [Crate 依赖与职责](#7-crate-依赖与职责)
-8. [运行时模型与并发](#8-运行时模型与并发)
-9. [核心数据流](#9-核心数据流)
-10. [状态机与生命周期](#10-状态机与生命周期)
-11. [语义模型（IR）](#11-语义模型ir)
-12. [错误处理与资源限制](#12-错误处理与资源限制)
-13. [原子输出策略](#13-原子输出策略)
-14. [Markdown 转换流水线](#14-markdown-转换流水线)
-15. [接口与 trait 设计](#15-接口与-trait-设计)
-16. [安全与信任边界](#16-安全与信任边界)
-17. [性能与资源预算](#17-性能与资源预算)
-18. [测试、验证与架构验收](#18-测试验证与架构验收)
-19. [风险、技术债与路线](#19-风险技术债与路线)
-20. [附录](#20-附录)
+**easypdf-rust 是一个纯 Rust PDF 操作 workspace，通过 `EasyPdf` 外观入口 + Builder 链式 API，将 PDF 创建、读取、操作、模板填充、Markdown 转换、OCR 和运行时服务统一为类型安全、资源受控、原子输出的操作序列。**
+
+| 指标 | 值 |
+|------|-----|
+| 总 crate 数 | 9（8 个可发布 + 1 个集成测试） |
+| 总测试数 | 1,522 |
+| 代码覆盖率 | 91.61% |
+| Fuzz 目标 | 6 |
+| Rust 代码行数 | ~52,626 |
+| MSRV | Rust 1.88 |
+| Edition | 2024 |
+| 许可证 | Apache-2.0 |
+| `unsafe_code` | `forbid`（workspace 级别） |
 
 ---
 
-## 1. 执行摘要
-
-### 1.1 一句话架构
-
-**easypdf-rust 是一个纯 Rust PDF 操作 workspace，通过 `EasyPdf` 外观入口 + Builder 链式 API + 引擎无关语义模型，将 PDF 创建、读取、操作、模板填充和 Markdown 转换统一为类型安全、资源受控、原子输出的操作序列。**
-
-### 1.2 一眼看懂
-
-```text
-用户代码
-    │
-    ▼
-EasyPdf 外观入口（easypdf crate）
-    │
-    ├──► PdfCreateBuilder ──► easypdf-writer (printpdf) ──► PDF 文件
-    ├──► PdfReadBuilder ────► easypdf-reader (lopdf) ────► 文本/元数据
-    ├──► PdfMarkdownExportBuilder ──► easypdf-markdown ──► .md 文件
-    ├──► PdfSplitBuilder ──► easypdf-manipulate (lopdf) ──► 多个 PDF
-    ├──► PdfManipulateBuilder ──► easypdf-manipulate ──► 修改后 PDF
-    └──► PdfFillBuilder ───► easypdf-template (lopdf) ──► 填充后 PDF
-                                   │
-                                   ▼
-                          easypdf-io（资源限制 + 原子输出）
-```
-
-### 1.3 关键架构决策
-
-| 决策 | 选择 | 理由 |
-|---|---|---|
-| 多引擎后端 | lopdf 读/操作, printpdf 写 | 各取所长，可替换 |
-| 单次解析会话 | Reader 持有 `lopdf::Document` | ~129x 性能提升 |
-| 引擎无关 IR | `easypdf-model` 独立 crate | Markdown 等转换不绑定引擎 |
-| 后端无关布局 | `LayoutSink` trait | Writer 实现消费，layout 不反向依赖 |
-| 原子输出 | 临时文件 + rename | 防止写入中断导致文件损坏 |
-| 结构化警告 | `MarkdownWarning` 枚举 | 未实现能力不伪装成功 |
-| `#![forbid(unsafe_code)]` | 所有 crate | 与 easyexcel-rs 安全策略一致 |
-
-## 2. 架构驱动与约束
-
-### 2.1 业务驱动
-
-| 驱动 | 优先级 | 说明 |
-|---|:---:|---|
-| 简单 API | P0 | Builder 模式链式调用，一行代码完成操作 |
-| 类型安全 | P0 | 编译期检查，无运行时反射 |
-| 纯 Rust | P0 | 零 FFI，零 unsafe |
-| 引擎可替换 | P1 | lopdf/printpdf 可替换为其他引擎 |
-| 与 easyexcel-rs 对齐 | P1 | 相同的 Builder/Listener/Handler/Converter 模式 |
-| 资源可控 | P1 | 防止恶意或过大输入导致 OOM |
-
-### 2.2 硬约束
-
-| 约束 | 说明 |
-|---|---|
-| Rust 1.88+ | MSRV，workspace 级别统一 |
-| Edition 2024 | 使用最新语言特性 |
-| `unsafe_code = "forbid"` | 所有 crate 强制禁止 |
-| `missing_docs = "warn"` | 公共 API 必须有文档 |
-| Apache-2.0 | 许可证 |
-
-## 3. 范围、边界与非目标
-
-### 3.1 系统边界
-
-```mermaid
-flowchart LR
-    User["用户代码"] --> Facade["easypdf\nEasyPdf"]
-    Facade --> Reader["easypdf-reader"]
-    Facade --> Writer["easypdf-writer"]
-    Facade --> Manip["easypdf-manipulate"]
-    Facade --> Tmpl["easypdf-template"]
-    Facade --> MD["easypdf-markdown"]
-
-    Reader --> lopdf["lopdf"]
-    Manip --> lopdf
-    Tmpl --> lopdf
-    MD --> lopdf
-
-    Writer --> printpdf["printpdf"]
-
-    Reader --> IO["easypdf-io"]
-    Writer --> IO
-    Manip --> IO
-    Tmpl --> IO
-    MD --> IO
-
-    Reader --> Model["easypdf-model"]
-    MD --> Model
-
-    Writer --> Layout["easypdf-layout"]
-```
-
-### 3.2 非目标
-
-| 非目标 | 理由 | 替代方案 |
-|---|---|---|
-| 加密 / 解密 | 未实现，返回 `UnsupportedFeature` | 待 v0.4 实现 |
-| 数字签名 | 未实现，返回 `UnsupportedFeature` | 待 v0.5 实现 |
-| OCR | 未实现，Markdown 发出 `OcrUnavailable` 警告 | 待接入 OCR 后端 |
-| 表格检测 | 未实现，Markdown 发出 `TableDetectionUnavailable` 警告 | 待接入表格检测后端 |
-| 图片提取 | 未实现，Markdown 发出 `ImageExtractionUnavailable` 警告 | 待接入图片提取 |
-| HTML → PDF | 需要 Chromium，feature-gated | `html` feature |
-| PDF → 图片 | 不在范围 | 外部渲染器 |
-| 1:1 Java EasyExcel 兼容 | PDF 和 Excel 是不同范式 | API 风格对齐，非功能克隆 |
-
-## 4. 当前态与目标态
-
-### 4.1 能力状态总览
-
-| 能力 | 当前态 | 目标态 | 差距 |
-|---|---|---|---|
-| 创建 PDF | ✅ 文本、内置字体、元数据 | 表格、图片、矢量、自定义字体 | v0.2 |
-| 读取 PDF | ✅ 文本提取、元数据、会话复用 | 流式读取、结构化内容提取 | v0.2+ |
-| PDF → Markdown | ✅ 原生文本、GFM/LLM/Plain profiles | 表格检测、图片提取、OCR | v0.2+ |
-| 合并 | ✅ 有效 `/Pages` 树 | — | 已完成 |
-| 拆分 | ✅ 有效 `/Pages` 树 | — | 已完成 |
-| 旋转/重排 | ✅ 按页或全部 | — | 已完成 |
-| 模板填充 | ✅ AcroForm 字段 | — | 已完成 |
-| 原子输出 | ✅ 临时文件 + rename | — | 已完成 |
-| 资源限制 | ✅ 文件大小、页数、文本长度 | 可配置限制 | v0.2 |
-| Reader 会话复用 | ✅ ~129x 加速 | — | 已完成 |
-| 加密 | ⛔ `UnsupportedFeature` | AES-256 | v0.4 |
-| 签名 | ⛔ `UnsupportedFeature` | 数字签名 | v0.5 |
-| 布局引擎 | 🚧 `FlowLayout` 骨架 | 自动定位元素 | v0.3 |
-
-### 4.2 已修正的架构问题
-
-| 问题 | 修正 |
-|---|---|
-| Reader 每次操作重新打开文件 | 改为单次解析会话，`lopdf::Document` 持有在 `PdfReader` 中 |
-| 0 基页范围与 PDF 1 基页码混用 | 统一为 0 基，Reader 内部映射 |
-| Writer 生命周期不完整 | 补全 `before_document` / `before_page` / `after_page` / `after_document` |
-| Merge/Split 生成无效 `/Pages` 树 | 修正为正确构建 Pages 层级结构 |
-| `easypdf-layout` 反向依赖 Writer | 引入 `LayoutSink` trait，Writer 实现消费 |
-| 加密/签名伪造成功 | 删除伪实现，返回 `UnsupportedFeature` |
-| 输出无原子保护 | 所有保存操作使用 `AtomicFileOutput` |
-
-## 5. 架构原则与关键决策
-
-### 5.1 原则
-
-| # | 原则 | 实践 |
-|---|---|---|
-| P1 | 纯 Rust, 零 unsafe | `#![forbid(unsafe_code)]` 在每个 crate |
-| P2 | 类型安全 Builder | `mut self → Self`, `#[must_use]` |
-| P3 | 多引擎后端 | lopdf 读/操作, printpdf 写, 可替换 |
-| P4 | 引擎无关 IR | `easypdf-model` 不依赖任何引擎 |
-| P5 | 编译期反射 | `#[derive(PdfModel)]` 替代运行时注解扫描 |
-| P6 | 单一错误类型 | `PdfError` 枚举 + `thiserror` |
-| P7 | 关注点分离 | Core ≠ 引擎实现 ≠ 外观 |
-| P8 | 原子输出 | 临时文件 + rename，失败不影响原文件 |
-| P9 | 结构化警告 | 未实现能力不伪装成功 |
-
-### 5.2 ADR-001：Reader 单次解析会话
-
-- **上下文**：原 Reader 每次调用 `extract_text()` 都重新打开文件
-- **决策**：`PdfReader::open()` 解析一次，持有 `lopdf::Document`
-- **后果**：~129x 性能提升；Reader 生命周期与 Document 绑定
-
-### 5.3 ADR-002：LayoutSink 解耦布局与写入
-
-- **上下文**：`easypdf-layout` 依赖 `easypdf-writer` 产生循环依赖风险
-- **决策**：定义 `LayoutSink` trait，Writer 实现该 trait
-- **后果**：layout 与 writer 解耦，可独立演进
-
-### 5.4 ADR-003：结构化警告替代模拟成功
-
-- **上下文**：原实现对未实现功能返回空成功
-- **决策**：`MarkdownWarning` 枚举 + `MarkdownExportReport`
-- **后果**：调用方可精确知道哪些能力缺失
-
-## 6. 总体架构与分层
-
-### 6.1 分层图
+## 2. 架构图
 
 ```mermaid
 flowchart TB
@@ -215,532 +36,625 @@ flowchart TB
     end
 
     subgraph Domain["领域层"]
-        R["easypdf-reader"]
-        W["easypdf-writer"]
-        M["easypdf-manipulate"]
-        T["easypdf-template"]
-        MD["easypdf-markdown"]
+        R["easypdf-reader\nlopdf 后端"]
+        W["easypdf-writer\nprintpdf 后端"]
+        MD["easypdf-markdown\nPDF 转 Markdown"]
+        OCR["easypdf-ocr\n云端 OCR 引擎"]
+        RT["easypdf-runtime\nMCP + 常驻守护进程"]
     end
 
-    subgraph Abstract["抽象层"]
-        L["easypdf-layout\nLayoutSink + FlowLayout"]
-        MO["easypdf-model\nPdfBlock/Page/Document"]
-    end
-
-    subgraph Infra["基础设施层"]
-        IO["easypdf-io\nLimits + Atomic"]
-        C["easypdf-core\nTypes + Errors"]
-        D["easypdf-derive\nproc-macro"]
+    subgraph Core["核心层"]
+        C["easypdf-core\n类型、Trait、错误\n加密、模型、IO、布局"]
+        D["easypdf-derive\n#[derive(PdfModel)]"]
     end
 
     subgraph Engine["引擎层"]
-        LPDF["lopdf"]
-        PPPDF["printpdf"]
+        LPDF["lopdf 0.44"]
+        PPPDF["printpdf 0.12.4"]
+        RING["ring 0.17"]
     end
 
-    E --> R & W & M & T & MD
-    R --> MO & IO & C & LPDF
-    W --> L & IO & C & PPPDF
-    M --> IO & C & LPDF
-    T --> IO & C & LPDF
-    MD --> R & MO & IO & LPDF
-    L --> C
-    MO --> C
-    IO --> C
-    D --> C
+    E --> C & D & R & W & MD & OCR & RT
+    R --> C & LPDF
+    W --> C & PPPDF
+    MD --> C & R
+    OCR --> C & MD
+    RT --> C & R & W & MD
+    C --> LPDF & RING
+    D -.->|"编译期"| C
 ```
 
-### 6.2 层次职责
+**依赖方向**：外观 -> 领域 -> 核心 -> 引擎。无反向依赖。`easypdf-derive` 是纯编译期过程宏。
 
-| 层 | 职责 | 不负责 |
-|---|---|---|
-| 外观 | 统一入口、Builder 路由、prelude | 引擎细节、IO 细节 |
-| 领域 | PDF 读/写/操作/模板/Markdown 具体逻辑 | 共享类型、IO 基础设施 |
-| 抽象 | 引擎无关模型和布局 | 具体引擎调用 |
-| 基础设施 | 类型、错误、IO 限制、原子输出、derive | PDF 业务逻辑 |
-| 引擎 | lopdf / printpdf | 本项目不修改引擎 |
+---
 
-## 7. Crate 依赖与职责
+## 3. 九个 Crate -- 详细职责
 
-### 7.1 依赖图
+### 3.1 `easypdf`（外观）
 
-```text
-easypdf (facade)
-├── easypdf-core          (types, errors)
-├── easypdf-model         (IR, depends on core)
-├── easypdf-io            (limits, depends on core)
-├── easypdf-derive        (proc-macro, depends on core)
-├── easypdf-layout        (layout, depends on core)
-├── easypdf-reader        (lopdf, depends on core + model + io)
-├── easypdf-writer        (printpdf, depends on core + layout + io)
-├── easypdf-manipulate    (lopdf, depends on core + io)
-├── easypdf-template      (lopdf, depends on core + io)
-└── easypdf-markdown      (optional, depends on reader + model + io)
+**路径**：`crates/easypdf/`
+**角色**：统一入口。提供 `EasyPdf` 结构体的静态工厂方法和 Builder 模式 API。
+
+**公开 API**：
+- `EasyPdf::create(path)` -- 创建新 PDF
+- `EasyPdf::read(path)` -- 读取已有 PDF
+- `EasyPdf::merge(inputs, output)` -- 合并多个 PDF
+- `EasyPdf::split(path)` -- 拆分 PDF
+- `EasyPdf::manipulate(path)` -- 旋转/重排/提取页面
+- `EasyPdf::fill_form(path, data)` -- 填充 AcroForm 字段
+- `EasyPdf::to_markdown(input)` -- PDF 转 Markdown（内存）
+- `EasyPdf::export_markdown(input, output)` -- PDF 转 Markdown（文件）
+- `EasyPdf::from_html(html)` -- HTML 转 PDF（feature 门控）
+- `EasyPdf::from_markdown(md)` -- Markdown 转 PDF（feature 门控）
+
+**Builder**：`PdfCreateBuilder`、`PdfReadBuilder`、`PdfManipulateBuilder`、`PdfSplitBuilder`、`PdfFillBuilder`、`PdfMarkdownBuilder`、`PdfMarkdownExportBuilder`、`HtmlToPdfBuilder`、`PdfTextBuilder`、`PdfImageBuilder`、`PdfTableBuilder`、`PdfPositionedTextBuilder`
+
+**关键文件**：`lib.rs`、`builders.rs`、`pdf_fill_builder.rs`、`writer_helpers.rs`、`html.rs`
+
+**Feature 标志**：`default`（markdown）、`markdown`、`markdown-table`、`markdown-ocr`、`ocr`、`render`、`html`、`runtime`、`mcp`、`resident`、`full`
+
+---
+
+### 3.2 `easypdf-core`（核心）
+
+**路径**：`crates/easypdf-core/`
+**角色**：中枢模块。类型、trait、错误定义、加密/签名、语义模型、IO 原语、布局引擎。零引擎依赖。
+
+**子模块**：
+- `enums.rs` -- `PageSize`、`Orientation`、`Rotation`、`TextAlignment`、`VerticalAlignment`、`ImageFormat`
+- `error.rs` -- `PdfError`（9 种变体）、`PdfErrorCode`
+- `content.rs` -- `PdfText`、`PdfTable`、`PdfTableCell`、`PdfImage`、`PdfLine`、`PdfRect`
+- `style.rs` -- `PdfFont`、`FontFamily`、`BuiltInFont`（14 种字体）、`PdfColor`、`TableStyle`、`TableBorder`
+- `metadata.rs` -- `PdfMetadata`、`PdfBookmark`
+- `traits.rs` -- `PdfModel`、`PdfReadListener`、`PdfWriteHandler`、`PdfConverter<T>`、`PdfEngine`、`EngineCapabilities`
+- `model/` -- `PdfDocumentModel`、`PdfPageModel`、`PdfBlock`（14 种变体）、`SourceLocation`、`ImageData`、`ListItem`
+- `io/` -- `ResourceLimits`、`PdfInput`、`AtomicFileOutput`、`guards.rs`（解压炸弹 + 元素爆炸防护）、`ssrf_guard.rs`、`repair.rs`
+- `crypto/` -- `encrypt.rs`（AES-128/256）、`sign.rs` / `sign_pdf.rs` / `sign_cms.rs` / `sign_der.rs`（PKCS#7 RSA-SHA256）
+- `layout/` -- `FlowLayout`、`LayoutSink` trait、`Direction`
+- `logging.rs` -- `init_logging()` / `init_logging_json()`
+
+**关键文件**：`lib.rs`、`traits.rs`、`model/pdf_block.rs`、`model/pdf_document_model.rs`、`crypto/encrypt.rs`、`crypto/sign_pdf.rs`、`io/guards.rs`、`io/ssrf_guard.rs`
+
+---
+
+### 3.3 `easypdf-derive`（过程宏）
+
+**路径**：`crates/easypdf-derive/`
+**角色**：`#[derive(PdfModel)]` 过程宏。编译期代码生成。
+
+**支持的属性**：
+- `#[pdf(page = A4, orientation = Portrait)]` -- 页面配置
+- `#[pdf(text, position = (x, y))]` -- 定位文本
+- `#[pdf(table, position = (x, y))]` -- 表格
+- `#[pdf(image, position = (x, y))]` -- 图片
+- `#[pdf(field = "name")]` -- 表单字段映射
+- `#[pdf(order = N)]`、`#[pdf(ignore)]`、`#[pdf(required)]`、`#[pdf(nested)]`
+
+**依赖**：`syn 3.0`、`quote 1.0`、`proc-macro2 1.0`、`proc-macro-crate 3.5`
+
+---
+
+### 3.4 `easypdf-reader`（PDF 读取）
+
+**路径**：`crates/easypdf-reader/`
+**角色**：PDF 读取、文本提取、页面操作（合并/拆分/旋转/重排/水印）。lopdf 后端。
+
+**公开 API**：
+- `PdfReader::open(path)` -- 自动策略选择
+- `PdfReader::from_bytes(bytes)` -- 从内存字节
+- `PdfReader::open_with_strategy(path, strategy)` -- 指定策略
+- `PdfReader::open_with_repair(path, repair, strategy)` -- 自修复
+- `PdfReader::open_with_limits(input, limits)` -- 资源限制
+- `reader.extract_text()`、`reader.extract_metadata()`、`reader.page_count()`、`reader.pages(range)`
+
+**ReadStrategy 自动选择**：
+| 文件大小 | 策略 |
+|---------|------|
+| 0 -- 5 MB | `Full`（lopdf Document 全部加载） |
+| 5 -- 100 MB | `Lazy`（按需加载页面） |
+| > 100 MB | `Streaming`（字节流扫描，不构建 Document） |
+
+**PdfManipulator**：`merge_files()`、`rotate_page()`、`reorder_pages()`、`extract_pages()`、`add_text_watermark()`、`add_layer()`、`validate_pdfa()`
+
+**Streaming 模块**：`StreamScanner`、CMap/ToUnicode 支持。精度低于 Full/Lazy。
+
+**关键文件**：`reader/mod.rs`、`reader/extract.rs`、`strategy.rs`、`manipulate.rs`、`streaming/scanner.rs`、`streaming/cmap.rs`
+
+---
+
+### 3.5 `easypdf-writer`（PDF 写入）
+
+**路径**：`crates/easypdf-writer/`
+**角色**：PDF 创建与写入。printpdf 后端。
+
+**公开 API**：
+- `PdfWriter::new(title)`、`PdfWriter::new_from_writer(writer)`
+- `writer.add_page()`、`writer.write_text()`、`writer.write_image()`、`writer.write_svg()`
+- `writer.draw_line()`、`writer.draw_rect_stroke()`、`writer.draw_circle()`
+- `writer.register_font_from_path()`、`writer.register_font_from_bytes()`
+- `writer.register_handler(handler)` -- 生命周期钩子
+- `writer.finish(path)` -- 原子保存
+
+**WriteBackend**：
+- `InMemory` -- 默认，适合小文档
+- `Spill` -- 页面级临时文件，恒定内存
+- `Auto(threshold)` -- 自动选择
+
+**PdfTemplateFiller**：通过 lopdf 的 AcroForm 表单填充。
+
+**关键文件**：`writer.rs`、`builder.rs`、`backend.rs`、`template.rs`、`font.rs`、`image.rs`、`shape.rs`
+
+---
+
+### 3.6 `easypdf-markdown`（PDF 转 Markdown）
+
+**路径**：`crates/easypdf-markdown/`
+**角色**：确定性 PDF 到 Markdown 转换管道，含表格检测、页面渲染和 OCR fallback。
+
+**管道**：`PdfInput -> PdfReader -> PdfDocumentModel -> ProcessorPipeline -> MarkdownRenderer -> String`
+
+**核心组件**：
+- `ProcessorPipeline` -- 优先级排序的处理器链
+- `MarkdownRenderer` -- 模型到 Markdown 渲染器
+- `PdfMarkdownBuilder` / `PdfMarkdownExportBuilder` -- 转换 Builder
+
+**内置处理器**：
+- `ReadingOrderProcessor` -- 阅读顺序检测
+- `HeadingDetectorProcessor` -- 标题检测
+- `LinkExtractorProcessor` -- 链接提取
+- `TableDetectorProcessor` -- 表格检测（feature 门控）
+- `OcrProcessor` -- OCR fallback（feature 门控）
+
+**Profile**：`MarkdownProfile` 预设（GFM、LLM、Plain）
+
+**渲染**：`PdfRenderer` trait，含 `TextRenderer`（默认）和 `PdfiumRenderer`（feature = "pdfium"）
+
+**OCR**：`OcrEngine` trait，含 `MockOcrEngine`、`ocrs` 后端（feature = "ocrs"）、`llm` 后端（feature = "llm"）
+
+**关键文件**：`pdf_markdown_processor.rs`、`processor_pipeline.rs`、`markdown_renderer.rs`、`table/detector.rs`、`render/traits.rs`、`ocr/engine.rs`
+
+---
+
+### 3.7 `easypdf-ocr`（云端 OCR）
+
+**路径**：`crates/easypdf-ocr/`
+**角色**：云端 OCR 引擎集合。同步 HTTP 客户端。
+
+**引擎**：
+- **GLM** -- `create_glm_ocr_engine()`、`GlmConfig`、`GlmOcrParser`
+- **HunyuanOCR** -- `create_hunyuan_ocr_engine()`、`HunyuanConfig`、`HunyuanOcrParser`
+- **百度** -- `BaiduOcrEngine`、`BaiduConfig`、`BaiduOcrParser`、`TokenManager`
+
+**通用 HTTP 层**：`HttpOcrEngine`、`HttpClientConfig`、`AuthMethod`、`RateLimitConfig`、`BackoffStrategy`、`OcrRequest`、`OcrResponseParser`
+
+**依赖**：`reqwest 0.12`（blocking、rustls-tls）、`hmac/sha2`、`base64`
+
+---
+
+### 3.8 `easypdf-runtime`（运行时）
+
+**路径**：`crates/easypdf-runtime/`
+**角色**：运行时层，提供 MCP 服务器（LLM agent 接口）和常驻守护进程（内存中 PDF 会话）。
+
+**MCP 模块**（feature = "mcp"）：
+- `McpServer`、`ToolDefinition`、`ToolResult`、`ContentBlock`
+- 7 个工具：`pdf_read_text`、`pdf_to_markdown`、`pdf_create_text`、`pdf_merge`、`pdf_split`、`pdf_metadata`、`pdf_page_count`
+- 二进制：`easypdf-mcp`
+
+**Resident 模块**（feature = "resident"）：
+- `ResidentServer`、`ResidentClient`、`ResidentConfig`
+- `DocumentSession`、`Request`/`Response` 协议
+- `AutosaveMode`：Disabled / Fixed / Adaptive
+- 传输层：`TcpTransport`、`UnixTransport`（cfg(unix)）
+- `serve()`、`try_attach()`、`default_socket_path()`、`socket_path_for_file()`
+
+---
+
+### 3.9 `easypdf-test`（集成测试）
+
+**路径**：`easypdf-test/`
+**角色**：端到端集成测试与 golden samples。不发布。
+
+**结构**：`src/lib.rs`、`src/bin/`、`tests/`、`golden/`、`samples/`
+
+---
+
+## 4. 关键数据流
+
+### 4.1 PDF 读取流
+
+```
+用户调用 EasyPdf::read(path)
+  -> PdfReadBuilder (easypdf)
+    -> PdfReader::open(path) (easypdf-reader)
+      -> ReadStrategy::auto(file_size) 选择策略
+        -> Full: lopdf::Document::load_mem()
+        -> Lazy: lopdf::Document::load_mem() + LazyPageLoader
+        -> Streaming: StreamScanner（字节流扫描，不构建 Document）
+      -> guard_element_explosion() (easypdf-core::io::guards)
+      -> reader.extract_text()
+        -> lopdf::Document::extract_text() 或 StreamScanner
+    -> PdfReadListener 回调 (easypdf-core::traits)
 ```
 
-### 7.2 各 Crate 详细职责
+### 4.2 PDF 写入流
 
-#### easypdf-core
-
-```text
-src/
-├── lib.rs          # 扁平重导出
-├── enums.rs        # PageSize, Orientation, Rotation, TextAlignment
-├── error.rs        # PdfError 枚举, Result<T> 别名
-├── content.rs      # PdfText, PdfTable, PdfImage, PdfLine, PdfRect
-├── style.rs        # PdfColor, PdfFont, FontFamily, BuiltInFont, TableStyle
-├── metadata.rs     # PdfMetadata, PdfBookmark
-├── traits.rs       # PdfModel, PdfReadListener, PdfWriteHandler, PdfConverter
-└── event.rs        # 重导出 PdfReadListener
+```
+用户调用 EasyPdf::create(path)
+  -> PdfCreateBuilder (easypdf)
+    -> PdfWriter::new(title) (easypdf-writer)
+      -> WriteBackend 选择（InMemory/Spill/Auto）
+      -> writer.add_page(size, orientation)
+        -> printpdf 后端创建页面
+      -> writer.write_text(text, x, y)
+        -> PdfWriteHandler.before_page() 钩子
+        -> printpdf 写入文本
+        -> PdfWriteHandler.after_page() 钩子
+      -> writer.finish(path)
+        -> AtomicFileOutput (easypdf-core::io) 原子写入
 ```
 
-零引擎依赖。所有其他 crate 的共享词汇。
+### 4.3 Markdown 转换流
 
-#### easypdf-model
-
-```text
-src/
-├── lib.rs
-├── pdf_block.rs          # PdfBlock: Text / Table / Image / Vector / ...
-├── pdf_page_model.rs     # PdfPageModel: blocks + page metadata
-├── pdf_document_model.rs # PdfDocumentModel: pages + doc metadata
-└── source_location.rs    # SourceLocation: page + position
+```
+用户调用 EasyPdf::to_markdown(input)
+  -> PdfMarkdownBuilder (easypdf)
+    -> PdfReader::open() (easypdf-reader) 解析 PDF
+    -> PdfDocumentModel 构建 (easypdf-core::model)
+    -> ProcessorPipeline 执行 (easypdf-markdown)
+      -> ReadingOrderProcessor（阅读顺序）
+      -> HeadingDetectorProcessor（标题检测）
+      -> LinkExtractorProcessor（链接提取）
+      -> TableDetectorProcessor（表格检测，可选）
+      -> OcrProcessor（OCR fallback，可选）
+    -> MarkdownRenderer 渲染为 Markdown 字符串
+    -> MarkdownConversionResult 返回
 ```
 
-引擎无关语义 IR。Markdown 流水线消费此模型，不直接依赖 lopdf 对象。
+### 4.4 签名/验证流
 
-#### easypdf-io
-
-```text
-src/
-├── lib.rs
-├── resource_limits.rs    # ResourceLimits: max_file_size, max_pages, max_text
-├── pdf_input.rs          # PdfInput: from_path / from_bytes, 读取+限制检查
-└── atomic_file_output.rs # AtomicFileOutput: 临时文件+rename
+```
+用户调用 sign_pdf(pdf_bytes, signer) (easypdf-core::crypto::sign)
+  -> PdfSigner 配置（证书 + 私钥 + 元信息）
+  -> sign_pdf.rs:
+    1. 解析 PDF，定位签名占位区域
+    2. 计算 /ByteRange
+    3. 构建 CMS SignedData（sign_cms.rs）
+       -> RSA-PKCS#1v1.5 + SHA-256（via ring）
+       -> DER 编码（sign_der.rs）
+    4. 嵌入签名到 PDF
+  -> verify_pdf_signature(pdf_bytes)
+    1. 解析签名字段
+    2. 提取 /ByteRange 和 /Contents
+    3. 验证 CMS 签名
+    4. 解析 X.509 证书（via x509-parser）
+    5. 返回 SignatureInfo
 ```
 
-所有领域 crate 共享的 IO 基础设施。
+### 4.5 加密/解密流
 
-#### easypdf-reader
+```
+用户调用 encrypt_pdf(pdf_bytes, encryption) (easypdf-core::crypto::encrypt)
+  -> PdfEncryption 配置（密码 + 算法 + 权限）
+  -> encrypt_pdf():
+    1. lopdf::Document::load_mem() 解析
+    2. generate_file_encryption_key() 生成密钥
+    3. build_encryption_version() 构建 V4/V5 配置
+    4. lopdf::EncryptionState::try_from() 派生加密状态
+    5. doc.encrypt() 透明加密所有对象
+    6. doc.save_to() 序列化
 
-单次解析会话。`open()` 解析一次，持有 `lopdf::Document`。支持 0 基页范围、事件监听器、资源限制。
+用户调用 decrypt_pdf(encrypted_bytes, password)
+  -> lopdf::Document::load_mem() 解析
+  -> doc.decrypt(password) 解密
+  -> doc.save_to() 序列化
+```
 
-#### easypdf-writer
+---
 
-printpdf 后端。支持文本、图片、矢量图形、内置字体、自定义字体注册、元数据、生命周期钩子。实现 `LayoutSink` trait。
+## 5. Trait 体系
 
-#### easypdf-manipulate
+### 5.1 Trait 总览
 
-lopdf 后端。合并、拆分、旋转、重排。输出有效 `/Pages` 树。原子输出。
+| Trait | Crate | 用途 | 实现者 |
+|-------|-------|------|--------|
+| `PdfModel` | easypdf-core | 结构体到 PDF 元素映射 | `#[derive(PdfModel)]` |
+| `PdfReadListener` | easypdf-core | 事件驱动文本提取（Send） | 用户自定义 |
+| `PdfWriteHandler` | easypdf-core | 页面生命周期钩子（Send） | 用户自定义；`PageNumberHandler` |
+| `PdfConverter<T>` | easypdf-core | 双向类型转换（Send） | 用户自定义 |
+| `PdfEngine` | easypdf-core | 抽象引擎接口（Send+Sync） | 预留（无实现） |
+| `PdfMarkdownProcessor` | easypdf-markdown | 语义增强处理器 | `ReadingOrderProcessor`、`HeadingDetectorProcessor`、`LinkExtractorProcessor`、`TableDetectorProcessor`、`OcrProcessor` |
+| `OcrEngine` | easypdf-markdown | OCR 识别 | `MockOcrEngine`、`ocrs` 后端、`llm` 后端 |
+| `PdfRenderer` | easypdf-markdown | PDF 页面渲染 | `TextRenderer`、`PdfiumRenderer` |
+| `LayoutSink` | easypdf-core | 后端无关布局输出 | 布局消费者 |
+| `Transport` | easypdf-runtime | 网络传输抽象 | `TcpTransport`、`UnixTransport` |
+| `Connection` | easypdf-runtime | 连接抽象 | TCP/Unix 连接 |
 
-#### easypdf-template
-
-lopdf 后端。AcroForm 字段填充。原子输出。
-
-#### easypdf-markdown
-
-PDF → Markdown 转换。消费 `PdfDocumentModel`（来自 easypdf-model）。支持 GFM/LLM/Plain profiles。结构化警告。
-
-#### easypdf-layout
-
-后端无关布局抽象。`LayoutSink` trait（Writer 实现）、`FlowLayout`（方向、边距、间距）。不依赖 Writer。
-
-#### easypdf-derive
-
-`#[derive(PdfModel)]` 过程宏。解析 `#[pdf(...)]` 属性，生成 impl 块。
-
-## 8. 运行时模型与并发
-
-### 8.1 线程模型
-
-- 所有操作均为同步阻塞调用（无 async）。
-- `PdfReader` / `PdfWriter` 不是 `Send`/`Sync`（lopdf/printpdf 限制）。
-- 用户需在单线程中操作单个 Reader/Writer 实例。
-- `PdfError` 和 `Result<T>` 是 `Send`，可跨线程传递错误。
-
-### 8.2 内存模型
-
-| 模式 | 内存复杂度 | 场景 |
-|---|---|---|
-| Reader 会话复用 | `O(document)` | 多次提取文本/元数据 |
-| Writer 增量构建 | `O(pages)` | 创建 PDF |
-| Manipulate 加载 | `O(input)` | 合并/拆分/旋转 |
-| Markdown 流水线 | `O(document)` | PDF → Markdown |
-
-## 9. 核心数据流
-
-### 9.1 创建 PDF
+### 5.2 Mermaid 类图
 
 ```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant F as EasyPdf
-    participant B as PdfCreateBuilder
-    participant W as PdfWriter
-    participant IO as AtomicFileOutput
-    participant FS as 文件系统
+classDiagram
+    class PdfModel {
+        +render() Result~Vec~RenderedElement~~
+        +metadata() PdfModelMetadata
+        +field_descriptors() Vec~PdfFieldDescriptor~
+    }
+    class PdfReadListener {
+        <<trait Send>>
+        +on_page_start(page_number) Result
+        +on_text(page_number, text) Result
+        +on_page_end(page_number) Result
+        +on_document_end() Result
+    }
+    class PdfWriteHandler {
+        <<trait Send>>
+        +before_document() Result
+        +before_page(page_number) Result
+        +after_page(page_number) Result
+        +after_document() Result
+    }
+    class PdfConverter~T~ {
+        <<trait Send>>
+        +to_pdf_string(value) Result~String~
+        +from_pdf_string(s) Result~T~
+    }
+    class PdfEngine {
+        <<trait Send+Sync>>
+        +name() &str
+        +capabilities() EngineCapabilities
+    }
+    class PdfMarkdownProcessor {
+        <<trait>>
+        +name() &str
+        +capabilities() ProcessorCapability
+        +process(blocks) Result
+    }
+    class OcrEngine {
+        <<trait>>
+        +recognize(image) Result~OcrResult~
+    }
+    class PdfRenderer {
+        <<trait>>
+        +render_page(index, config) Result~RenderedImage~
+        +render_page_to_path(index, config, path) Result
+    }
+    class LayoutSink {
+        <<trait>>
+        +push_text(text, x, y)
+        +push_image(image, x, y)
+    }
+    class Transport {
+        <<trait>>
+        +bind() Result
+        +accept() Result~Connection~
+    }
 
-    U->>F: create("out.pdf")
-    F->>B: new(path)
-    U->>B: page(A4).add_text("Hi").font(...)
-    B->>W: new("title")
-    B->>W: add_page(A4)
-    B->>W: write_text(...)
-    U->>B: do_write()
-    B->>IO: new(target_path)
-    IO->>FS: write to temp file
-    B->>W: finish(temp_path)
-    W->>FS: printpdf save
-    IO->>FS: atomic rename
+    PdfModel <|.. PdfModel_Derive : #[derive(PdfModel)]
+    PdfReadListener <|.. UserListener : 自定义实现
+    PdfWriteHandler <|.. PageNumberHandler : 页码处理器
+    PdfMarkdownProcessor <|.. ReadingOrderProcessor
+    PdfMarkdownProcessor <|.. HeadingDetectorProcessor
+    PdfMarkdownProcessor <|.. TableDetectorProcessor
+    PdfMarkdownProcessor <|.. OcrProcessor
+    OcrEngine <|.. MockOcrEngine
+    OcrEngine <|.. OcrsBackend : feature="ocrs"
+    PdfRenderer <|.. TextRenderer : 默认
+    PdfRenderer <|.. PdfiumRenderer : feature="pdfium"
+    Transport <|.. TcpTransport
+    Transport <|.. UnixTransport : cfg(unix)
 ```
 
-### 9.2 读取 PDF
+---
 
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant F as EasyPdf
-    participant B as PdfReadBuilder
-    participant R as PdfReader
-    participant LP as lopdf
+## 6. 数据模型（IR）
 
-    U->>F: read("input.pdf")
-    F->>B: new(path)
-    U->>B: pages(0..10)
-    U->>B: extract_text()
-    B->>R: open(path)
-    R->>LP: Document::load_mem
-    R-->>R: 持有 Document
-    B->>R: extract_text()
-    R->>LP: 遍历页面提取文本
-    R-->>U: String
+### 6.1 PdfDocumentModel 结构
+
 ```
-
-### 9.3 PDF → Markdown
-
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant B as PdfMarkdownExportBuilder
-    participant R as PdfReader
-    participant M as PdfDocumentModel
-    participant MR as MarkdownRenderer
-    participant IO as AtomicFileOutput
-
-    U->>B: export_markdown("in.pdf", "out.md")
-    U->>B: pages(0..20).profile(Llm)
-    U->>B: do_export()
-    B->>R: open_with_limits(input, limits)
-    R->>R: 单次解析
-    B->>R: build_document_model()
-    R->>M: 构建 PdfDocumentModel
-    B->>MR: render(model, profile)
-    MR->>MR: 遍历 pages → blocks → Markdown
-    MR-->>B: MarkdownExportReport + warnings
-    B->>IO: write output.md (atomic)
-```
-
-### 9.4 合并 / 拆分
-
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant M as PdfManipulator
-    participant LP as lopdf
-    participant IO as AtomicFileOutput
-
-    U->>M: merge_files(&["a.pdf","b.pdf"], "out.pdf")
-    M->>LP: 加载所有输入 PDF
-    M->>LP: 合并对象表
-    M->>LP: 构建有效 /Pages 树
-    M->>IO: 原子写入输出
-```
-
-## 10. 状态机与生命周期
-
-### 10.1 PdfWriter 生命周期
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created: PdfWriter::new()
-    Created --> PageAdded: add_page()
-    PageAdded --> PageAdded: write_text / draw_line / ...
-    PageAdded --> PageAdded: add_page() (新页)
-    PageAdded --> Finished: finish(path)
-    Finished --> [*]
-
-    Created --> Finished: finish(path) (空文档)
-```
-
-### 10.2 PdfReader 会话
-
-```mermaid
-stateDiagram-v2
-    [*] --> Parsed: open(path)
-    Parsed --> Filtered: pages(range)
-    Filtered --> Parsed: extract_text()
-    Parsed --> Parsed: extract_text() / extract_metadata()
-    Parsed --> [*]: drop
-```
-
-### 10.3 WriteHandler 回调顺序
-
-```text
-before_document()
-  ├─ before_page(0)
-  │   └─ after_page(0)
-  ├─ before_page(1)
-  │   └─ after_page(1)
-  └─ ...
-after_document()
-```
-
-## 11. 语义模型（IR）
-
-### 11.1 模型层次
-
-```text
 PdfDocumentModel
-├── metadata: PdfMetadata
-├── pages: Vec<PdfPageModel>
-│   ├── page_number: usize
-│   ├── blocks: Vec<PdfBlock>
-│   │   ├── Text { content, font_info, location }
-│   │   ├── Table { rows, location }
-│   │   ├── Image { data, location }
-│   │   └── Vector { ... }
-│   └── source: SourceLocation
-└── warnings: Vec<MarkdownWarning>
++-- metadata: PdfMetadata
+|   +-- title: Option<String>
+|   +-- author: Option<String>
+|   +-- subject: Option<String>
+|   +-- keywords: Option<String>
+|   +-- creator: Option<String>
+|   +-- producer: Option<String>
++-- pages: Vec<PdfPageModel>
+    +-- index: PageIndex（零基）
+    +-- blocks: Vec<PdfBlock>（14 种变体）
+    +-- width_pt: Option<f64>
+    +-- height_pt: Option<f64>
+    +-- rotation: u16（0/90/180/270）
 ```
 
-### 11.2 设计决策
+### 6.2 PdfBlock -- 14 种变体
 
-- `PdfBlock` 是枚举而非 trait object——便于模式匹配和序列化。
-- `SourceLocation` 记录原始页码和位置，便于调试和警告定位。
-- 模型是不可变的——构建后只读。
+所有变体均携带 `SourceLocation`（page_index + 置信度 f32）。标注 `#[non_exhaustive]`，未来可扩展。
 
-## 12. 错误处理与资源限制
+| 变体 | 字段 | 用途 |
+|------|------|------|
+| `Heading` | level(u8)、text、source | 分级标题（1-6） |
+| `Paragraph` | text、source | 普通段落 |
+| `List` | ordered(bool)、items(Vec<ListItem>)、source | 有序/无序列表 |
+| `Table` | headers(Vec<String>)、rows(Vec<Vec<String>>)、source | 表格 |
+| `Image` | data(ImageData)、source | 图片 |
+| `Code` | language(Option<String>)、text、source | 代码块 |
+| `Formula` | latex、source | LaTeX 公式 |
+| `PageBreak` | source | 分页符 |
+| `Footnote` | reference_id、text、source | 脚注 |
+| `TableCell` | row_span(u32)、col_span(u32)、text、source | 细粒度表格单元格 |
+| `BlockQuote` | text、source | 引用块 |
+| `HorizontalRule` | source | 水平分隔线 |
+| `Link` | url、text、source | 超链接 |
+| `Unknown` | raw、source | 无法识别内容 |
 
-### 12.1 错误枚举
+### 6.3 SourceLocation
 
-```rust
-pub enum PdfError {
-    Io(std::io::Error),
-    Parse(String),
-    InvalidPage(usize),
-    UnsupportedFeature(String),
-    ResourceLimitExceeded { resource: &'static str, limit: u64, actual: u64 },
-    Encryption(String),
-    Other(String),
-}
+```
+SourceLocation
++-- page_index: PageIndex（零基）
++-- confidence: f32（0.0-1.0，提取置信度）
 ```
 
-### 12.2 资源限制
+---
 
-| 资源 | 默认 | 检查点 |
-|---|---|---|
-| 文件大小 | 100 MB | `PdfInput::read()` |
-| 页数 | 10,000 | `PdfReader::open_with_limits()` |
-| 文本长度 | 10 MB | `PdfReader::extract_text()` |
+## 7. 性能特性
 
-超限返回 `ResourceLimitExceeded` 错误，不 panic。
+### 7.1 Streaming 内存策略
 
-## 13. 原子输出策略
+读取器使用三级策略平衡内存与保真度：
 
-### 13.1 流程
+| 策略 | 文件大小 | 内存 | 保真度 |
+|------|---------|------|--------|
+| `Full` | 0 -- 5 MB | O(document) | 最高 -- 完整对象树 |
+| `Lazy` | 5 -- 100 MB | O(page) | 高 -- 按需加载页面 |
+| `Streaming` | > 100 MB | O(1) | 较低 -- 字节流扫描，无 CMap |
 
-```mermaid
-flowchart LR
-    Op["保存操作"] --> Temp["写入临时文件"]
-    Temp --> Success{"成功?"}
-    Success -->|是| Rename["原子 rename"]
-    Success -->|否| Cleanup["删除临时文件"]
-    Rename --> Done["输出文件就绪"]
-    Cleanup --> Error["返回错误，原文件不受影响"]
-```
+### 7.2 WriteBackend 策略
 
-### 13.2 应用范围
+| 后端 | 内存 | 使用场景 |
+|------|------|---------|
+| `InMemory` | O(pages) | 小文档（默认） |
+| `Spill` | O(1) 每页 | 大文档，恒定内存 |
+| `Auto(threshold)` | 自动 | 按阈值切换 |
 
-| 操作 | 后端 | 原子输出 |
-|---|---|:---:|
-| PdfWriter::finish() | printpdf | ✅ |
-| PdfManipulator::merge/split/rotate/reorder | lopdf | ✅ |
-| PdfTemplateFiller::fill | lopdf | ✅ |
-| PdfMarkdownExportBuilder::do_export | lopdf | ✅ |
+### 7.3 基准数据
 
-## 14. Markdown 转换流水线
-
-### 14.1 架构
-
-```mermaid
-flowchart TB
-    Input["PDF 输入"] --> Reader["PdfReader\n单次解析"]
-    Reader --> Model["PdfDocumentModel\n引擎无关 IR"]
-    Model --> Renderer["MarkdownRenderer\nprofile 驱动"]
-    Renderer --> Output["输出 .md 文件\n原子写入"]
-    Renderer --> Report["MarkdownExportReport\n+ 结构化警告"]
-```
-
-### 14.2 Profile 对比
-
-| Profile | 目标 | 输出风格 | Token 效率 |
-|---|---|---|---|
-| Gfm | GitHub/GitLab | 标准 GFM 表格 + 围栏块 | 中 |
-| Llm | LLM 上下文 | 精简标记 | 高 |
-| Plain | 人类阅读 | 最小格式 | 最高 |
-
-### 14.3 结构化警告
-
-| 警告 | 触发条件 | 行为 |
-|---|---|---|
-| `TableDetectionUnavailable` | 遇到疑似表格但无表格检测后端 | 输出原始文本，警告记录在报告中 |
-| `ImageExtractionUnavailable` | 遇到图片但无图片提取后端 | 跳过图片，警告记录在报告中 |
-| `OcrUnavailable` | 遇到扫描页面但无 OCR 后端 | 跳过页面文本，警告记录在报告中 |
-
-## 15. 接口与 Trait 设计
-
-### 15.1 Trait 总览
-
-| Trait | 定义位置 | 实现者 | 用途 |
-|---|---|---|---|
-| `PdfModel` | easypdf-core | 用户 derive | 结构体 → PDF 元素映射 |
-| `PdfReadListener` | easypdf-core | 用户实现 | 事件驱动文本提取 |
-| `PdfWriteHandler` | easypdf-core | 用户实现 | 页面生命周期钩子 |
-| `PdfConverter<T>` | easypdf-core | 用户实现 | Rust ⇄ PDF 字符串 |
-| `LayoutSink` | easypdf-layout | easypdf-writer | 后端无关布局消费 |
-
-### 15.2 LayoutSink 接口
-
-```rust
-pub trait LayoutSink {
-    fn write_text_at(&mut self, text: &str, x: f64, y: f64) -> Result<()>;
-    fn write_image_at(&mut self, data: &[u8], x: f64, y: f64, w: f64, h: f64) -> Result<()>;
-    fn draw_line(&mut self, x1: f64, y1: f64, x2: f64, y2: f64) -> Result<()>;
-    fn new_page(&mut self, size: PageSize) -> Result<usize>;
-}
-```
-
-`easypdf-writer` 实现此 trait，`easypdf-layout` 通过它消费布局结果，不直接依赖 Writer。
-
-## 16. 安全与信任边界
-
-### 16.1 unsafe 策略
-
-所有 crate 使用 `#![forbid(unsafe_code)]`。lopdf 和 printpdf 内部可能使用 unsafe，但本项目不引入额外 unsafe。
-
-### 16.2 输入安全
-
-| 威胁 | 防护 |
-|---|---|
-| 超大文件 | `ResourceLimits.max_file_size` |
-| 超多页面 | `ResourceLimits.max_pages` |
-| 超长文本 | `ResourceLimits.max_text_length` |
-| 损坏 PDF | lopdf 解析错误 → `PdfError::Parse` |
-| 恶意路径 | 原子输出使用临时文件，不修改输入 |
-
-### 16.3 未实现功能的安全处理
-
-不模拟成功。`UnsupportedFeature` 错误是明确的，不会产生看似有效但实际不安全的输出。
-
-## 17. 性能与资源预算
-
-### 17.1 Reader 会话复用基准
+**Reader 会话复用**（对比每次操作重新打开）：
 
 | 操作 | 延迟 | 加速比 |
-|---|---:|---:|
+|------|------|--------|
 | 会话复用 | ~1,047 ns/iter | 1x |
 | 重新打开 | ~135,011 ns/iter | ~129x |
 
-### 17.2 资源预算
+**文本提取吞吐量**（100 页 PDF，Criterion）：
+- 墙钟时间：2.4 ms
+- 吞吐量：28.7 MiB/s
 
-| 资源 | 预算 | 来源 |
-|---|---|---|
-| 最大文件大小 | 100 MB | `ResourceLimits` 默认 |
-| 最大页数 | 10,000 | `ResourceLimits` 默认 |
-| 最大文本长度 | 10 MB | `ResourceLimits` 默认 |
-| 栈深度 | Rust 默认 | 无递归 |
+**峰值内存**（对比 pdftotext/Poppler）：
+- 小文件：easypdf 使用 pdftotext RSS 的 ~70-73%
+- 100 页文件：easypdf 使用 pdftotext RSS 的 ~83%
 
-## 18. 测试、验证与架构验收
+---
 
-### 18.1 验证矩阵
+## 8. 安全特性
 
-| 验证类型 | 范围 | 命令 | 状态 |
-|---|---|---|:---:|
-| 构建检查 | 全 workspace | `cargo check -p easypdf --all-features` | ✅ |
-| 无默认 feature | facade | `cargo check -p easypdf --no-default-features` | ✅ |
-| 单元测试 | 全 workspace | `cargo test --workspace --quiet` | ✅ (136 pass) |
-| Clippy | 新 crate | `clippy -D warnings` on model/io/markdown | ✅ |
-| 文档构建 | 全 workspace | `cargo doc --workspace --no-deps` | ✅ |
-| 基准 | reader | `cargo bench -p easypdf-reader --bench reader_session` | ✅ |
-| 编译期测试 | derive | trybuild (1 ignored legacy) | ✅ |
+### 8.1 安全防护
 
-### 18.2 架构验收
+| 防护 | 位置 | 目的 |
+|------|------|------|
+| `guard_decompression_bomb()` | `easypdf-core::io::guards` | 防止 zip 炸弹（比率 + 绝对大小检查） |
+| `guard_element_explosion()` | `easypdf-core::io::guards` | 限制 PDF 元素数量（默认：500 万） |
+| `validate_url()` | `easypdf-core::io::ssrf_guard` | SSRF 防护（IPv4/IPv6 私有范围） |
+| `AtomicFileOutput` | `easypdf-core::io` | 防止写入失败导致文件损坏 |
+| `ResourceLimits` | `easypdf-core::io` | 文件大小（100MB）、页数（10K）、文本（10MB）限制 |
 
-| 架构声明 | 验收条件 | 证据 |
-|---|---|---|
-| 引擎无关 IR 不依赖引擎 | `easypdf-model` 无 lopdf/printpdf 依赖 | Cargo.toml |
-| Reader 单次解析 | `open()` 后复用 Document | 源码 + 基准 |
-| LayoutSink 解耦 | `easypdf-layout` 不依赖 `easypdf-writer` | Cargo.toml |
-| 原子输出 | 所有 save/finish 使用 AtomicFileOutput | 源码 |
-| 结构化警告 | Markdown 返回 `MarkdownExportReport` | 测试 |
-| 零 unsafe | 所有 crate `#![forbid(unsafe_code)]` | lib.rs |
+### 8.2 加密与签名
 
-## 19. 风险、技术债与路线
+| 特性 | 算法 | 状态 |
+|------|------|------|
+| 加密 | AES-128（V4/R4）、AES-256（V5/R6） | 已实现 |
+| 解密 | lopdf 透明解密 | 已实现 |
+| 数字签名 | RSA-PKCS#1v1.5 + SHA-256（via ring） | 已实现 |
+| 签名验证 | CMS + X.509（via x509-parser） | 已实现 |
+| 时间戳（RFC 3161） | -- | 字段已预留，尚未实现 |
+| 权限控制 | PRINT/MODIFY/COPY/FILL_FORMS + 4 种 | 已实现 |
 
-### 19.1 风险
+### 8.3 API 密钥保护
 
-| ID | 风险 | 概率 | 影响 | 缓解 |
-|---|---|:---:|:---:|---|
-| R-001 | lopdf 文本提取质量不足 | 高 | 中 | 接入 OCR 后端 |
-| R-002 | printpdf 不支持自定义字体格式 | 中 | 中 | 字体注册抽象 |
-| R-003 | 大文件 OOM | 低 | 高 | ResourceLimits 限制 |
+所有 OCR 配置类型（`GlmConfig`、`HunyuanConfig`、`BaiduConfig`、`AuthMethod`）均实现自定义 `Debug`，对密钥进行脱敏。
 
-### 19.2 技术债
+### 8.4 审计状态
 
-| 债务 | 当前代价 | 目标 | 偿还阶段 |
-|---|---|---|---|
-| 表格检测未实现 | Markdown 表格输出为纯文本 | 接入表格检测后端 | v0.2 |
-| 图片提取未实现 | Markdown 跳过图片 | 接入图片提取 | v0.2 |
-| OCR 未实现 | 扫描页无法提取文本 | 接入 OCR | v0.2+ |
-| 布局引擎仅骨架 | 手动定位所有元素 | 自动布局 | v0.3 |
+安全审计发现 4 个问题（均已修复）：
+1. 小压缩载荷绕过比率检查（中等） -- 通过绝对安全阈值修复
+2. IPv6 回环 SSRF 绕过（高危） -- 通过 `std::net::IpAddr` 解析修复
+3. GlmConfig Debug 泄露 API 密钥（高危） -- 通过手动 Debug 脱敏修复
+4. BaiduConfig Debug 泄露 API 密钥（高危） -- 通过手动 Debug 脱敏修复
 
-### 19.3 实施路线
+27 个安全回归测试覆盖所有发现领域。
 
-| 阶段 | 架构交付物 | 退出条件 |
-|---|---|---|
-| v0.1 ✅ | 11 crates, 核心类型, Builder API, IR, IO, Markdown | 136 tests pass |
-| v0.2 | 表格/图片/矢量/自定义字体 | 功能测试 + 集成测试 |
-| v0.3 | 布局引擎 + 水印 | 自动定位测试 |
-| v0.4 | 加密 | 加密/解密往返测试 |
-| v0.5 | 签名 + PDF/A | 合规验证 |
-| v1.0 | 稳定 API | 完整测试覆盖 + 基准 |
+---
 
-## 20. 附录
+## 9. 测试体系
 
-### 附录 A：术语表
+### 9.1 覆盖率
+
+| 指标 | 值 |
+|------|-----|
+| 总测试数 | 1,522 |
+| 代码覆盖率 | 91.61% |
+| Fuzz 目标 | 6 |
+| 安全回归测试 | 27 |
+
+### 9.2 测试类型
+
+| 类型 | 范围 | 位置 |
+|------|------|------|
+| 单元测试 | 每个 crate 内联 | `#[cfg(test)]` |
+| 集成测试 | 跨 crate | `easypdf-test/tests/` |
+| 安全审计 | 防护 + API 密钥泄露 | `easypdf-test/tests/security_audit.rs` |
+| Fuzz 测试 | 输入解析 | 6 个 fuzz 目标 |
+| 基准测试 | 读取器性能 | `easypdf-reader/benches/reader_session.rs` |
+| 编译期测试 | Derive 宏 | `easypdf-derive` trybuild |
+| Golden samples | PDF 对比 | `easypdf-test/golden/` |
+
+### 9.3 CI 验证
+
+```bash
+# 全 workspace 构建
+cargo check --workspace
+
+# 全部测试
+cargo test --workspace
+
+# Clippy（严格模式）
+cargo clippy --workspace --all-targets -D warnings
+
+# 基准测试
+cargo bench -p easypdf-reader --bench reader_session
+
+# 安全审计
+cargo audit
+```
+
+---
+
+## 附录 A：术语表
 
 | 术语 | 定义 |
-|---|---|
+|------|------|
 | Facade | 用户可见的统一入口结构体 `EasyPdf` |
 | Builder | 链式配置器，最终调用 `do_write()` / `do_export()` 等终态方法 |
 | IR | 引擎无关的中间表示（`PdfDocumentModel`） |
-| LayoutSink | 后端无关的布局消费 trait |
 | 会话复用 | Reader 解析一次 PDF，后续操作复用已解析对象 |
 | 原子输出 | 写入临时文件，成功后 rename 替换目标 |
+| Streaming | 字节流扫描，不构建完整对象树 |
+| Spill | 页面级临时文件后端，用于恒定内存写入 |
+| ProcessorPipeline | 优先级排序的语义增强处理器链 |
 
-### 附录 B：质量门禁汇总
+## 附录 B：依赖图（文本）
 
-| 门禁 | 命令 | 状态 |
-|---|---|:---:|
-| 无默认 feature 构建 | `cargo check -p easypdf --no-default-features` | ✅ |
-| 全 feature 构建 | `cargo check -p easypdf --all-features` | ✅ |
-| 测试 | `cargo test --workspace --quiet` | ✅ |
-| 文档 | `cargo doc --workspace --no-deps` | ✅ |
-| Clippy (新 crate) | `clippy -D warnings` on model/io/markdown | ✅ |
-| 基准 | `cargo bench -p easypdf-reader --bench reader_session` | ✅ |
+```
+easypdf（外观）
++-- easypdf-core（必选）
++-- easypdf-derive（必选）
++-- easypdf-reader（必选）
++-- easypdf-writer（必选）
++-- easypdf-markdown（可选，feature = "markdown"）
++-- easypdf-ocr（可选，feature = "ocr"）
++-- easypdf-runtime（可选，feature = "runtime"）
+
+easypdf-reader     -> easypdf-core, lopdf
+easypdf-writer     -> easypdf-core, printpdf, lopdf（template）
+easypdf-markdown   -> easypdf-core, easypdf-reader
+easypdf-ocr        -> easypdf-core, easypdf-markdown, reqwest
+easypdf-runtime    -> easypdf-core, easypdf-reader, easypdf-writer, easypdf-markdown
+easypdf-derive     -> syn, quote（仅编译期）
+easypdf-core       -> lopdf, ring, aes, x509-parser, bitflags
+```
 
 ---
 
 **文档版本**：0.1.0
-**最后更新**：2026-08-09
-**文档状态**：已批准
+**最后更新**：2026-08-12

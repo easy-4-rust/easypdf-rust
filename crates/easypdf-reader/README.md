@@ -1,66 +1,98 @@
 # easypdf-reader
 
-> PDF 读取层：解析、文本提取、页面操作（合并/拆分/旋转），支持三种读取策略。
+> PDF reading layer: parsing, text extraction, page manipulation (merge/split/rotate/reorder/watermark), with three adaptive read strategies.
 
-## 角色
+## Role
 
-`easypdf-reader` 负责从 PDF 文件中提取内容。它基于 `lopdf` 后端解析 PDF 文档，提供文本提取、元数据读取、页面操作（合并、拆分、旋转）等能力。根据文件大小自动选择最佳读取策略，兼顾小文件的速度与大文件的内存效率。
+`easypdf-reader` handles all PDF input operations in the easypdf-rust workspace. Built on the `lopdf` backend, it provides text extraction, metadata reading, page manipulation (merge, split, rotate, reorder, watermark, layer), and PDF/A validation. It automatically selects the optimal read strategy based on file size to balance speed for small files against memory efficiency for large ones.
 
-## 核心能力
+## Core Capabilities
 
-- **三种读取策略**（`Full` / `Lazy` / `Streaming`）——根据文件大小自动选择最优解析方式
-- **文本提取**（`extract_text`）——从 PDF 中提取纯文本内容
-- **页面操作**（`PdfManipulator`）——合并多个 PDF、拆分页面、旋转页面
-- **PDF 修复**（`open_with_repair`）——自动检测并修复损坏的 PDF 文件
-- **资源限制**——防止解压炸弹和元素爆炸
+- **Three read strategies** (`Full` / `Lazy` / `Streaming`) -- auto-selected by file size: 0-5 MB = Full, 5-100 MB = Lazy, >100 MB = Streaming (`crates/easypdf-reader/src/strategy.rs:56-68`)
+- **Text extraction** (`extract_text()`) -- plain text from PDF, with CMap/ToUnicode support for CJK fonts (`crates/easypdf-reader/src/reader/extract.rs`)
+- **Page manipulation** (`PdfManipulator`) -- merge, split, rotate, reorder, extract pages, add text watermark, add optional content groups (layers) (`crates/easypdf-reader/src/manipulate.rs`)
+- **PDF repair** (`open_with_repair()`) -- auto-detect and fix corrupted PDF files (`crates/easypdf-core/src/io/repair.rs`)
+- **Resource guards** -- decompression bomb and element explosion protection via `ResourceLimits` (`crates/easypdf-core/src/io/guards.rs`)
+- **Streaming scanner** (`StreamScanner`) -- byte-stream scanning without building a full `Document` object for very large files (`crates/easypdf-reader/src/streaming/`)
+- **PDF/A validation** (`validate_pdfa()`) -- check PDF/A-1b compliance (`crates/easypdf-reader/src/manipulate.rs:260`)
+- **Benchmark suite** -- reader session benchmarks (`crates/easypdf-reader/benches/reader_session.rs`)
 
-## 依赖
+## Dependencies
 
-- `easypdf-core`: 核心类型（`PdfInput`、`ResourceLimits`、`PageRange`、错误类型）
-- `lopdf`: PDF 底层解析引擎
-- `flate2`: 流解压缩（Streaming 策略）
+### Internal
 
-## 主要 API
+| Crate | Purpose |
+|-------|---------|
+| `easypdf-core` | Core types (`PdfInput`, `ResourceLimits`, `PageRange`, error types, IO guards) |
 
-### `PdfReader`
+### External
+
+| Crate | Version | Purpose |
+|-------|---------|---------|
+| `lopdf` | 0.44.0 | PDF parsing engine |
+| `flate2` | 1.1.9 | Stream decompression (Streaming strategy) |
+
+## Main API
+
+### PdfReader
+
 ```rust
 use easypdf_reader::{PdfReader, ReadStrategy};
 
-// 自动策略（根据文件大小选择）
+// Auto strategy (selected by file size)
 let reader = PdfReader::open("document.pdf")?;
 let text = reader.extract_text()?;
 
-// 指定策略
+// Specify strategy
 let reader = PdfReader::open_with_strategy("large.pdf", ReadStrategy::Lazy)?;
 let text = reader.pages(0..5).extract_text()?;
 
-// 从内存字节
+// From memory bytes
 let reader = PdfReader::from_bytes(pdf_bytes)?;
+
+// With auto-repair
+let reader = PdfReader::open_with_repair("corrupted.pdf", true, ReadStrategy::Full)?;
+
+// With custom resource limits
+let reader = PdfReader::open_with_limits(input, ResourceLimits::default())?;
 ```
 
-### `ReadStrategy`
+### ReadStrategy
+
 ```rust
 use easypdf_reader::ReadStrategy;
 
+// Auto-select by file size
 let strategy = ReadStrategy::auto(50_000_000); // 50 MB -> Lazy
-assert!(strategy.is_lazy());
+
+// Manual selection
+let s = ReadStrategy::Full;     // <5 MB, full object tree
+let s = ReadStrategy::Lazy;     // 5-100 MB, lazy page loading
+let s = ReadStrategy::Streaming; // >100 MB, byte-stream scan
 ```
 
-### `PdfManipulator`
+### PdfManipulator
+
 ```rust
 use easypdf_reader::PdfManipulator;
 
-// 合并多个 PDF
+// Merge multiple PDFs
 PdfManipulator::merge_files(&["a.pdf", "b.pdf"], "merged.pdf")?;
 
-// 拆分
-let manipulator = PdfManipulator::open("input.pdf")?;
-manipulator.split(0..5, "part1.pdf")?;
-manipulator.split(5..10, "part2.pdf")?;
-
-// 旋转
-manipulator.rotate_pages(&[0, 1], Rotation::Degrees90, "rotated.pdf")?;
+// Open and manipulate
+let mut m = PdfManipulator::open("input.pdf")?;
+m.rotate_page(0, Rotation::Clockwise90)?;
+m.reorder_pages(&[2, 0, 1])?;
+m.extract_pages(&(0..5))?;
+m.add_text_watermark("CONFIDENTIAL", 48.0, 0.3)?;
+m.add_layer("Annotations")?;
+m.validate_pdfa()?;
 ```
+
+## Known Limitations
+
+- `ReadStrategy::Streaming` does not build a complete object tree -- precision is lower than Full/Lazy, especially for CJK text boundaries (`crates/easypdf-reader/src/strategy.rs:47-51`)
+- Streaming mode skips cross-reference parsing and font encoding (CMap/ToUnicode) for speed
 
 ## License
 
@@ -68,5 +100,6 @@ Apache-2.0
 
 ---
 
-**项目主页**：https://github.com/easy-4-rust/easypdf-rust
-**crates.io**：https://crates.io/crates/easypdf-reader
+**Project**: https://github.com/easy-4-rust/easypdf-rust
+**crates.io**: https://crates.io/crates/easypdf-reader
+**docs.rs**: https://docs.rs/easypdf-reader

@@ -1,61 +1,92 @@
 # easypdf-writer
 
-> PDF 写入层：创建新 PDF 文档（文本、表格、图片、形状、自定义字体），支持常量内存模式。
+> PDF writing layer: create new PDF documents (text, tables, images, SVG, shapes, custom fonts), with constant-memory spill mode for large documents.
 
-## 角色
+## Role
 
-`easypdf-writer` 负责创建新的 PDF 文档。它基于 `printpdf` 后端构建 PDF，支持文本、表格、图片、SVG、形状等元素的写入，并提供两种写入后端：默认的内存模式和适合大文档的页面级溢出（spill）模式。
+`easypdf-writer` handles all PDF output operations in the easypdf-rust workspace. Built on the `printpdf` backend, it supports text (14 built-in fonts + custom TTF/TTC), tables with styling, PNG/JPEG images, SVG vector graphics, and shape primitives. It offers two write backends: `InMemory` (default, fast for small docs) and `Spill` (page-level temp files, constant memory for large docs), plus an `Auto` mode that selects based on page count threshold.
 
-## 核心能力
+## Core Capabilities
 
-- **文本写入**（内置字体 + 自定义 TTF/TTC 字体）——支持 14 种内置字体和外部字体文件
-- **表格写入**——带表头、样式、边框的表格渲染
-- **图片写入**——PNG/JPEG 图片嵌入
-- **SVG 写入**——矢量图形嵌入
-- **形状绘制**——直线、矩形、圆形
-- **元数据与书签**——文档属性与目录
-- **Handler 生命周期**——`before_document` / `before_page` / `after_page` / `after_document` 钩子
-- **两种写入后端**——`InMemory`（默认）和 `Spill`（大文档常量内存）
+- **Text writing** -- 14 built-in fonts (`BuiltInFont`) + custom TTF/TTC font registration (`crates/easypdf-writer/src/writer.rs`)
+- **Table writing** -- headers, rows, cell styles, borders via `PdfTable` + `TableStyle` (`crates/easypdf-core/src/content.rs`, `crates/easypdf-core/src/style.rs`)
+- **Image writing** -- PNG/JPEG embedding from path or bytes (`crates/easypdf-writer/src/writer.rs`)
+- **SVG writing** -- vector graphics embedding (`crates/easypdf-writer/src/writer.rs`)
+- **Shape drawing** -- lines, rectangles, circles (`crates/easypdf-writer/src/writer.rs`)
+- **Handler lifecycle** -- `PdfWriteHandler` hooks: `before_document` / `before_page` / `after_page` / `after_document` (`crates/easypdf-core/src/traits.rs:183`)
+- **AcroForm template filling** -- `PdfTemplateFiller` for filling existing PDF forms (`crates/easypdf-writer/src/template.rs`)
+- **Two write backends** -- `InMemory` (default) and `Spill` (constant memory via page-level temp files) with `Auto` threshold selection (`crates/easypdf-writer/src/backend.rs`)
 
-## 依赖
+## Dependencies
 
-- `easypdf-core`: 核心类型（`PdfText`、`PdfTable`、`PdfImage`、`PdfFont`、`PdfWriteHandler`）
-- `printpdf`: PDF 构建引擎
-- `lopdf`: PDF 对象模型（用于后处理）
-- `image`: 图片解码
-- `chrono`: 时间戳
+### Internal
 
-## 主要 API
+| Crate | Purpose |
+|-------|---------|
+| `easypdf-core` | Core types (`PdfText`, `PdfTable`, `PdfImage`, `PdfFont`, `PdfWriteHandler`, `AtomicFileOutput`) |
 
-### `PdfWriter`
+### External
+
+| Crate | Version | Purpose |
+|-------|---------|---------|
+| `printpdf` | 0.12.4 | PDF creation engine (features: png, html, svg) |
+| `lopdf` | 0.44.0 | PDF object model (for post-processing & template filling) |
+| `image` | 0.25.9 | Image decoding |
+| `serde` / `serde_json` | 1.x | Template data serialization |
+| `chrono` | 0.4.45 | Timestamps |
+
+## Main API
+
+### PdfWriter
+
 ```rust
 use easypdf_writer::PdfWriter;
 use easypdf_core::*;
 
 let mut w = PdfWriter::new("My Document");
 w.add_page(PageSize::A4, Orientation::Portrait)?;
-w.write_text(&PdfText::new("Hello").font(PdfFont::helvetica(14.0)), 100.0, 700.0)?;
+w.write_text("Hello, world!", 100.0, 700.0)?;
 w.add_text(&PdfFont::times_roman(12.0), "Auto-positioned text")?;
-w.finish(&"output.pdf")?;
+w.write_image_from_path("logo.png", 50.0, 50.0, 200.0, 100.0)?;
+w.draw_line(50.0, 680.0, 545.0, 680.0, 1.0)?;
+w.register_font_from_path("custom.ttf")?;
+w.finish("output.pdf")?;
 ```
 
-### `PdfWriterBuilder`
+### PdfWriterBuilder
+
 ```rust
 use easypdf_writer::{PdfWriterBuilder, WriteBackend};
 
 let w = PdfWriterBuilder::new("Big Report")
     .metadata(PdfMetadata::new().title("Q4 Report"))
-    .backend(WriteBackend::auto(500)) // 自动选择后端
+    .backend(WriteBackend::auto(500)) // auto-select at 500 pages
     .constant_memory(true)
     .build()?;
 ```
 
-### `PdfTemplateFiller`
+### PdfTemplateFiller
+
 ```rust
 use easypdf_writer::PdfTemplateFiller;
 
 let filler = PdfTemplateFiller::new("template.pdf")?;
 let output = filler.fill(&model)?.save_to("filled.pdf")?;
+```
+
+### WriteBackend
+
+```rust
+use easypdf_writer::WriteBackend;
+
+// Default: in-memory (fast, small docs)
+let backend = WriteBackend::InMemory;
+
+// Spill: page-level temp files, constant memory
+let backend = WriteBackend::Spill;
+
+// Auto: select at page threshold
+let backend = WriteBackend::auto(500);
 ```
 
 ## License
@@ -64,5 +95,6 @@ Apache-2.0
 
 ---
 
-**项目主页**：https://github.com/easy-4-rust/easypdf-rust
-**crates.io**：https://crates.io/crates/easypdf-writer
+**Project**: https://github.com/easy-4-rust/easypdf-rust
+**crates.io**: https://crates.io/crates/easypdf-writer
+**docs.rs**: https://docs.rs/easypdf-writer
