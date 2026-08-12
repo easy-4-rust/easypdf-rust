@@ -1039,7 +1039,6 @@ similar_names = { level = "allow", priority = -1 }  # 测试代码误报
 
 ```
 docs/
-├── architecture.md
 ├── compatibility.md
 ├── easypdf-rust-Architecture.md
 ├── easypdf-rust-Architecture.zh_CN.md
