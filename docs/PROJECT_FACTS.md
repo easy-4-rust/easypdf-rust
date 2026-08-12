@@ -1039,19 +1039,18 @@ similar_names = { level = "allow", priority = -1 }  # 测试代码误报
 
 ```
 docs/
-├── RELEASE_CHECKLIST.md
-├── RELEASE_LOG_0.1.0.md
 ├── architecture.md
 ├── compatibility.md
 ├── easypdf-rust-Architecture.md
 ├── easypdf-rust-Architecture.zh_CN.md
-├── implementation-plan.md
 ├── migration-verification.md
 ├── performance/
 ├── printpdf-evaluation.md
-├── roadmap.md
 ├── security/
-├── technology-selection.md
+├── superpowers/
+│   ├── plans/            (7 plan files)
+│   ├── specs/            (11 spec files)
+│   └── version-plan.md
 └── usage-guide.md
 ```
 

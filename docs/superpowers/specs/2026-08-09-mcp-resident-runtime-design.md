@@ -289,5 +289,5 @@ EasyPdf API ←──────────────→ PDF 文件
 
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 8 节「easypdf-runtime 运行时」
 - 使用指南：`docs/usage-guide.md` 第 10 节「MCP 集成」
-- Roadmap：`docs/roadmap.md` 0.2 Architecture Consolidation（MCP + Resident）
+- Roadmap：`docs/superpowers/version-plan.md` 0.2 Architecture Consolidation（MCP + Resident）
 - 源码：`crates/easypdf-runtime/src/mcp/`、`crates/easypdf-runtime/src/resident/`

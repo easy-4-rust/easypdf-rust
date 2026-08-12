@@ -177,7 +177,7 @@ Available targets: `pdf_parse`, `streaming_scan`, `pdf_encrypt_decrypt`,
 ## Release Process
 
 Releases follow this sequence (see also
-[docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)):
+[docs/superpowers/version-plan.md](docs/superpowers/version-plan.md)):
 
 1. **Bump version** in root `Cargo.toml` (`workspace.package.version`).
 2. **Update CHANGELOG.md** with the new version section.

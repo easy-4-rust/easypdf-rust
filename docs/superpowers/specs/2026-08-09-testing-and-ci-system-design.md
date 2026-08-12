@@ -288,5 +288,5 @@ pdf_parse(input)
 - Cargo-deny 配置：`deny.toml`
 - Fuzz targets：`fuzz/fuzz_targets/`
 - 性能基准：`crates/easypdf-reader/benches/reader_session.rs`
-- Roadmap：`docs/roadmap.md`（质量指标汇总）
+- Roadmap：`docs/superpowers/version-plan.md`（质量指标汇总）
 - 安全审计：`docs/security/AUDIT.md`

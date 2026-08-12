@@ -249,5 +249,5 @@ Tj/TJ 操作符 → CID 序列
 
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 5 节「easypdf-reader 读取引擎」
 - 使用指南：`docs/usage-guide.md` 第 4 节「PDF 读取」
-- Roadmap：`docs/roadmap.md` 0.2 Architecture Consolidation（Streaming / CMap）
+- Roadmap：`docs/superpowers/version-plan.md` 0.2 Architecture Consolidation（Streaming / CMap）
 - 源码：`crates/easypdf-reader/src/strategy.rs`、`crates/easypdf-reader/src/streaming/`

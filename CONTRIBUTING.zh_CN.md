@@ -175,7 +175,7 @@ cargo +nightly fuzz run <target>
 ## 发布流程
 
 发布按以下顺序进行（另见
-[docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)）：
+[docs/superpowers/version-plan.md](docs/superpowers/version-plan.md)）：
 
 1. **修改版本号**：根 `Cargo.toml` 中的 `workspace.package.version`。
 2. **更新 CHANGELOG.md**：添加新版本段落。

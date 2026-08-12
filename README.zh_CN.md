@@ -323,7 +323,7 @@ easypdf = { version = "0.1.0", features = ["full"] }
 | [使用指南](docs/usage-guide.md) | 完整API指南，12章示例 |
 | [性能基准](docs/performance/BENCHMARK.md) | 与pdftotext的性能对比 |
 | [兼容性](docs/compatibility.md) | 功能矩阵 + 覆盖率报告 |
-| [路线图](docs/roadmap.md) | 详细路线图 |
+| [版本规划](docs/superpowers/version-plan.md) | 版本规划与路线图 |
 | [变更日志](CHANGELOG.md) | 版本历史 |
 | [贡献指南](CONTRIBUTING.md) | 开发环境和规范 |
 

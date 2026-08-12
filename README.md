@@ -323,7 +323,7 @@ easypdf = { version = "0.1.0", features = ["full"] }
 | [Usage Guide](docs/usage-guide.md) | Complete API guide with 12 chapters |
 | [Benchmark Report](docs/performance/BENCHMARK.md) | Performance baseline vs pdftotext |
 | [Compatibility](docs/compatibility.md) | Feature matrix + coverage report |
-| [Roadmap](docs/roadmap.md) | Detailed roadmap |
+| [版本规划](docs/superpowers/version-plan.md) | Version plan and roadmap |
 | [Changelog](CHANGELOG.md) | Version history |
 | [Contributing](CONTRIBUTING.md) | Development setup and conventions |
 
@@ -350,7 +350,7 @@ easypdf = { version = "0.1.0", features = ["full"] }
 | v0.6 | Converters: HTML-to-PDF (Chromium-based, feature-gated), Markdown-to-PDF optimization, SVG-to-PDF, PDF-to-image rasterize | Partial |
 | v1.0 | Stable: public API on crates.io, semver guarantees (0.2.x to 0.3.x to 1.0), CI matrix (Linux + macOS), Windows MSRV testing, property-based testing, complete migration guide | Planned |
 
-详见 [docs/roadmap.md](docs/roadmap.md) 和 [docs/implementation-plan.md](docs/implementation-plan.md)。
+详见 [docs/superpowers/version-plan.md](docs/superpowers/version-plan.md)。
 
 ## Contributing
 

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: rust-testing, rust-code-review
 
-**Goal:** 基于 `docs/implementation-plan.md` 的 F1-F16 功能编号和 C1/C2 架构改进，实现表格渲染、图片插入、自定义字体、矢量图形、页眉页脚、多页写入器、水印、加密、权限、数字签名、HTML→PDF、SVG→PDF、Markdown→PDF、布局引擎等全部功能。
+**Goal:** 基于原 `docs/implementation-plan.md`（已并入本 plan，见末尾附录）的 F1-F16 功能编号和 C1/C2 架构改进，实现表格渲染、图片插入、自定义字体、矢量图形、页眉页脚、多页写入器、水印、加密、权限、数字签名、HTML→PDF、SVG→PDF、Markdown→PDF、布局引擎等全部功能。
 
 **Architecture:** 复用 Phase 1 的 crate 分层。加密/签名逻辑放在 `easypdf-core::crypto` 模块。HTML→PDF 通过 printpdf 的 `from_html()` 实现（需 Chromium）。SVG 通过 printpdf 的 `Svg::parse()` 实现。
 
@@ -240,3 +240,83 @@ Task 1 (Tables)
     ├── Task 12 (Markdown→PDF)
     └── Task 13 (Layout Engine)
 ```
+
+---
+
+## 附：历史规划素材（来自 implementation-plan.md）
+
+> 以下内容从原 `docs/implementation-plan.md`（已并入本 plan）中提取，保留历史规划视角。
+
+### Engine Capability Summary 引擎能力摘要
+
+| Feature | printpdf v0.8 | lopdf v0.34 | 第三方方案 |
+|:---|:---:|:---:|:---|
+| Tables | 无原生支持 | 无 | 用 Line + Text Op 自建 |
+| Images from bytes | `RawImage::decode_from_bytes` | 无 | -- |
+| Custom TTF/OTF | `ParsedFont::from_bytes` | 无 | -- |
+| Lines | `Op::DrawLine` | 原始 PDF 算子 | -- |
+| Rectangles | `rect.to_polygon()` / `rect.to_line()` | 原始 PDF 算子 | -- |
+| Circles/Ellipses | 无 Op | 贝塞尔曲线 | -- |
+| Fill/Stroke control | 丰富 | 原始算子 | -- |
+| SVG | `Svg::parse` -> XObject | 无 | usvg + svg2pdf |
+| Watermark overlay | 仅生成 | `add_page_contents` | -- |
+| Encryption | `PdfSaveOptions.secure` 为空 | 仅解密 | `aes` + 自建 |
+| PDF/A | 无 | 无 | `pdf-a` 或自建校验 |
+| Digital signatures | 无 | 无 | `rsa` + 自建 |
+| HTML->PDF | 无 | 无 | headless chrome / `printpdf::from_html` |
+
+### Implementation Priority Matrix 优先级矩阵
+
+按**用户价值 x 实现成本**排序：
+
+| Priority | Feature | Phase | Size | Value | Cost | Score |
+|:---:|:---|:---:|:---:|:---:|:---:|:---:|
+| 1 | F6 Multi-page Writer | v0.2 | S | 最高 | S | **最高** |
+| 2 | F2 Images | v0.2 | S | 最高 | S | **最高** |
+| 3 | F3 Custom Fonts | v0.2 | M | 高 | M | 高 |
+| 4 | F4 Shapes (line/rect) | v0.2 | M | 中 | M | 中 |
+| 5 | F15 SVG->PDF | v0.6 | S | 中 | S | 中 |
+| 6 | F5 Headers/Footers | v0.2 | M | 高 | M | 中 |
+| 7 | F1 Tables | v0.2 | L | 最高 | L | 中 |
+| 8 | F12 XMP Metadata | v0.5 | S | 低 | S | 低 |
+| 9 | F7 Watermarks | v0.3 | M | 中 | M | 低 |
+| 10 | F14 HTML->PDF | v0.6 | L | 中 | L | 低 |
+| 11 | F16 Markdown->PDF | v0.6 | M | 低 | M | 低 |
+| 12 | F9 Encryption | v0.4 | L | 高 | L | 推迟 |
+| 13 | F10 Permissions | v0.4 | S | 低 | S | 推迟 |
+| 14 | F4 Circle/Ellipse | v0.2 | M | 低 | M | 推迟 |
+| 15 | F8 PDF Layers | v0.3 | L | 极低 | L | 推迟 |
+| 16 | F11 PDF/A | v0.5 | XL | 低 | XL | 推迟 |
+| 17 | F13 Digital Sig. | v0.5 | XL | 低 | XL | 推迟 |
+
+### v0.2 Recommended Sprint Plan v0.2 推荐冲刺计划
+
+```
+Sprint 1 (1 week):
+  Day 1-2: F6 Multi-page Writer (S)    <- 修复 v0.1 核心缺陷
+  Day 3-4: F2 Images (S)               <- 高频需求
+  Day 5:   F3 Custom Fonts (M) 开始
+
+Sprint 2 (1 week):
+  Day 1-3: F3 Custom Fonts (M) 完成
+  Day 4-5: F4 Shapes line + rect (M)
+
+Sprint 3 (1 week):
+  Day 1-3: F5 Headers/Footers (M)
+  Day 4-5: F1 Tables basic (L) 开始
+
+Sprint 4 (2 weeks):
+  Day 1-7: F1 Tables 完成 (L)
+  Day 8-10: F15 SVG->PDF (S) -- 快赢功能
+```
+
+### Risk Register 风险登记册
+
+| Risk | Likelihood | Impact | Mitigation |
+|:---|:---:|:---:|:---|
+| printpdf API 大版本变更 | 中 | 高 | 锁版本，关注 changelog，提前适配 |
+| lopdf API 大版本变更 | 中 | 中 | 同上 |
+| Chromium 依赖（HTML->PDF） | 高 | 中 | 提供 feature gate，默认不启用 |
+| 字体子集化复杂度（TTF） | 中 | 低 | v0.2 嵌入完整字体，后续子集化 |
+| 加密实现安全性 | 高 | 高 | 参考成熟实现（ms-offcrypto-writer），加入安全审计 |
+| PDF 规范兼容性 | 中 | 中 | 用真实 PDF reader 验证输出（Adobe Acrobat 等） |

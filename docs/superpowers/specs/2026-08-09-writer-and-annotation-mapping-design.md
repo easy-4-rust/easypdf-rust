@@ -273,5 +273,5 @@ write_text_with_custom_font("Hello", "custom_font", 12.0, x, y)
 
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 6 节「easypdf-writer 写入引擎」
 - 使用指南：`docs/usage-guide.md` 第 5 节「PDF 写入」、第 6 节「表格和图片」
-- Roadmap：`docs/roadmap.md` 0.1 Foundation（基础写入）、0.3 Rich Content（增强）
+- Roadmap：`docs/superpowers/version-plan.md` 0.1 Foundation（基础写入）、0.3 Rich Content（增强）
 - 源码：`crates/easypdf-writer/src/`（writer.rs / backend.rs / builder/ / image.rs / shape.rs）

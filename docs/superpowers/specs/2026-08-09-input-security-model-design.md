@@ -311,6 +311,6 @@ sign_pdf(pdf_bytes, &signer)
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 9 节「安全模型」
 - 安全审计：`docs/security/AUDIT.md`
 - 使用指南：`docs/usage-guide.md` 第 11 节「加密与签名」
-- Roadmap：`docs/roadmap.md` 0.2 Architecture Consolidation（加密签名）、0.4 Security
+- Roadmap：`docs/superpowers/version-plan.md` 0.2 Architecture Consolidation（加密签名）、0.4 Security
 - 源码：`crates/easypdf-core/src/io/ssrf_guard.rs`、`crates/easypdf-core/src/crypto/`
 - Spec：`specs/2026-08-09-iso-32000-crypto-design.md`（加密签名详细设计）

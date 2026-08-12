@@ -190,13 +190,107 @@
 
 ---
 
+## Non-Goals
+
+> 来源：原 `docs/roadmap.md` Non-Goals 段（已并入）。
+
+- Full PDF rendering/viewer engine (use external viewers)
+- 1:1 Java PDFBox compatibility (API inspired-by, not clone-of)
+- Real-time collaborative editing
+- PDF to Word/Excel conversion
+- OCR/LLM image description (via trait injection, not default dependency)
+- Old-style `.pdf` to `.doc` conversion
+
+---
+
+## 发布流程（Release Process）
+
+> 来源：原 `docs/RELEASE_CHECKLIST.md` 流程性内容（已并入）。
+
+### 依赖顺序发布
+
+发布必须按依赖层级顺序进行，每个 `cargo publish` 完成后等待 crates.io 索引传播（约 45 秒）再发布下一个：
+
+1. **Layer 1**：`easypdf-core`（无内部依赖，必须最先发布）
+2. **Layer 2**：`easypdf-derive`、`easypdf-reader`、`easypdf-writer`（依赖 core，可任意顺序）
+3. **Layer 3**：`easypdf-markdown`（依赖 core + reader）
+4. **Layer 4**：`easypdf-ocr`（依赖 core + markdown）
+5. **Layer 5**：`easypdf-runtime`（依赖 core + reader + writer + markdown）
+6. **Layer 6**：`easypdf` 门面（依赖所有）
+7. `easypdf-test` 设为 `publish = false`，跳过
+
+### Rate Limit 处理
+
+crates.io 对新 crate 发布有速率限制（约 5 个新 crate / 10 分钟窗口）。遇到 HTTP 429 Too Many Requests 时，等待 rate limit 窗口重置（约 10 分钟）后重试。
+
+### 元数据检查要点
+
+- 所有 crate 从 `[workspace.package]` 继承 `version`、`edition`、`rust-version`、`license`、`repository`、`keywords`、`categories`
+- 内部路径依赖必须使用 `workspace = true`（解析为 `path` + `version`）
+- Dev-dependency 保持 path-only（避免 Cargo 在打包时尝试 crates.io 解析）
+- `readme` 字段使用 workspace 继承
+
+### Dry-Run 流程
+
+```bash
+# 叶子 crate 应通过 dry-run
+cargo publish -p easypdf-core --dry-run
+cargo publish -p easypdf-derive --dry-run
+
+# 依赖 crate 在上游未发布时 expected pre-publish failure
+# 发布 core 后重试即可通过
+```
+
+---
+
+## v0.1.0 发布记录
+
+> 来源：原 `docs/RELEASE_LOG_0.1.0.md`（已并入）。
+
+- **发布日期**: 2026-08-12 (UTC: 2026-08-11)
+- **发布版本**: 0.1.0
+- **发布账户**: easy-4-rust
+- **总 crate 数**: 8
+- **全部成功**: 是
+
+### 发布顺序与结果
+
+| # | Crate | 发布时间 (UTC+8) | 结果 | 备注 |
+|---|-------|-----------------|------|------|
+| 1 | easypdf-core | 03:50:23 | 成功 | 叶子 crate，无内部依赖 |
+| 2 | easypdf-derive | 03:51:13 | 成功 | 依赖 core |
+| 3 | easypdf-reader | 03:52:02 | 成功 | 依赖 core |
+| 4 | easypdf-writer | 03:52:53 | 成功 | 依赖 core |
+| 5 | easypdf-markdown | 03:53:44 | 成功 | 依赖 core + reader + writer |
+| 6 | easypdf-ocr | 03:56:36 | 成功（重试） | 依赖 core + markdown；首次遇 429 rate limit |
+| 7 | easypdf-runtime | 04:07:57 | 成功（重试） | 依赖 reader + writer + markdown；两次遇 429 |
+| 8 | easypdf | 04:19:22 | 成功（重试） | 门面 crate；两次遇 429 |
+
+### Rate Limit 经验
+
+- 第 1-5 个 crate 连续成功
+- 第 6 个 crate 首次遇到 429 Too Many Requests，等待约 10 分钟后重试成功
+- 第 7、8 个 crate 同样需要等待 rate limit 窗口重置后重试
+- 建议未来发布时预先规划 rate limit 窗口，避免连续发布超过 5 个新 crate
+
+### 发布参数
+
+```bash
+cargo publish -p <crate> --allow-dirty --no-verify
+```
+
+- `--allow-dirty`: working tree 有未 commit 的修改
+- `--no-verify`: 首次发布前无 git tag，跳过 tag 验证
+
+---
+
 ## 相关文档
 
-- Roadmap: `docs/roadmap.md`
-- 实施计划历史: `docs/implementation-plan.md`
+- 版本规划: `docs/superpowers/version-plan.md`（本文件）
+- 实施计划历史: `docs/superpowers/plans/2026-07-21-alpha2-rich-content.md`（含原 implementation-plan 内容）
+- 技术选型: `docs/superpowers/specs/2026-07-24-technology-selection-design.md`
 - 架构文档: `docs/easypdf-rust-Architecture.md`
 - 项目事实: `docs/PROJECT_FACTS.md`
 - CHANGELOG: `CHANGELOG.md`
-- 发布日志: `docs/RELEASE_LOG_0.1.0.md`
 - 安全审计: `docs/security/AUDIT.md`
 - 性能基准: `docs/performance/BENCHMARK.md`

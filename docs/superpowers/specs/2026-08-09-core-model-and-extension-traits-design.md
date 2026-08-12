@@ -203,5 +203,5 @@ MarkdownRenderer → String
 
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 4 节「easypdf-core 模型设计」
 - 使用指南：`docs/usage-guide.md` 第 3 节「语义模型」、第 7 节「高级特性」
-- Roadmap：`docs/roadmap.md` 0.1 Foundation、0.2 Architecture Consolidation
+- Roadmap：`docs/superpowers/version-plan.md` 0.1 Foundation、0.2 Architecture Consolidation
 - 源码：`crates/easypdf-core/src/model/`、`crates/easypdf-core/src/traits.rs`

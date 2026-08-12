@@ -286,5 +286,5 @@ Markdown 输出: [OCR text: "识别结果"]
 
 - 架构文档：`docs/easypdf-rust-Architecture.md` 第 7 节「easypdf-markdown 转换」
 - 使用指南：`docs/usage-guide.md` 第 8 节「Markdown 转换」
-- Roadmap：`docs/roadmap.md` 0.1 Foundation（基础转换）、0.3 Rich Content（增强）
+- Roadmap：`docs/superpowers/version-plan.md` 0.1 Foundation（基础转换）、0.3 Rich Content（增强）
 - 源码：`crates/easypdf-markdown/src/`（markdown_profile.rs / processor_pipeline.rs / table/ / processors/）
