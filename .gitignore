@@ -85,3 +85,7 @@ __pycache__/
 Cargo.lock
 *.profraw
 *.profdata
+
+# cargo-fuzz corpus (libFuzzer auto-generated test cases; reproducible via `cargo fuzz`)
+fuzz/corpus/
+fuzz/artifacts/

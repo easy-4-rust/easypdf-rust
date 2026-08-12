@@ -1,19 +1,109 @@
 # Contributing to easypdf-rust
 
-## Development Setup
+Thank you for your interest in contributing to easypdf-rust! This document
+provides guidelines and instructions for contributing.
+
+## Code of Conduct
+
+This project follows a Code of Conduct. By participating, you agree to
+uphold a respectful and inclusive environment. See
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+## Getting Started
+
+### Prerequisites
+
+- **Rust toolchain**: MSRV 1.88, Edition 2024
+- **Git**: For version control
+
+### Fork and Clone
 
 ```bash
-git clone https://github.com/easy-4-rust/easypdf-rust
+# Fork the repository on GitHub, then:
+git clone https://github.com/<your-username>/easypdf-rust.git
 cd easypdf-rust
-cargo build
+git remote add upstream https://github.com/easy-4-rust/easypdf-rust.git
 ```
 
-## Quality Gates
-
-Before submitting a PR:
+### Build and Verify
 
 ```bash
-# Format
+# Build the workspace
+cargo build
+
+# Run all tests
+cargo test --workspace
+
+# Lint (zero warnings required)
+cargo clippy --workspace --all-targets -- -D warnings
+
+# Verify documentation builds cleanly
+cargo doc --workspace --no-deps
+
+# Run fuzz targets (requires nightly)
+cargo +nightly fuzz run pdf_parse
+cargo +nightly fuzz run streaming_scan
+cargo +nightly fuzz run pdf_encrypt_decrypt
+cargo +nightly fuzz run pdf_sign_verify
+cargo +nightly fuzz run markdown_convert
+cargo +nightly fuzz run ssrf_url
+```
+
+All of the above must pass before submitting a pull request.
+
+## Development Workflow
+
+### Branch Strategy
+
+- **`dev`** is the primary development branch. Create feature branches from `dev`.
+- **`main`** is the stable release branch. Do not commit directly to `main`.
+- Feature branches: `feat/<short-description>`, `fix/<short-description>`,
+  `docs/<short-description>`, etc.
+
+### Commit Messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add streaming read strategy for large PDFs
+fix: correct UTF-16BE metadata encoding in writer
+docs: update architecture diagram for 9-crate layout
+test: add fuzz target for PDF signature verification
+refactor: consolidate model types into easypdf-core
+chore: update lopdf dependency to 0.44.0
+```
+
+Prefix with scope when relevant: `feat(reader):`, `fix(writer):`, `docs(ocr):`.
+
+### Code Style
+
+- **Zero unsafe**: `#![deny(unsafe_code)]` is enforced workspace-wide.
+- **Clippy pedantic**: `clippy::all = "warn"` and `clippy::pedantic = "warn"`
+  are set in the workspace `Cargo.toml`.
+- **Formatting**: Run `cargo fmt --all` before committing.
+- **File size**: Keep individual files under 800 lines.
+
+### Testing Requirements
+
+The project maintains 1522+ tests with 91.61% code coverage. All changes must:
+
+1. Include tests for new functionality.
+2. Not reduce existing coverage.
+3. Pass `cargo test --workspace` with zero failures.
+
+## Pull Request Process
+
+1. **Create a feature branch** from `dev`.
+2. **Make your changes** following the guidelines above.
+3. **Run all quality gates** (see below).
+4. **Update CHANGELOG.md** if the change is user-visible.
+5. **Submit a pull request** to the `dev` branch.
+6. **At least 1 reviewer** must approve before merge.
+
+### Quality Gates (CI must pass)
+
+```bash
+# Format check
 cargo fmt --all -- --check
 
 # Lint
@@ -25,83 +115,109 @@ cargo check -p easypdf --no-default-features
 # Build (all features)
 cargo check -p easypdf --all-features
 
-# Test
-cargo test --workspace --quiet
+# Tests
+cargo test --workspace
 
-# Docs
+# Documentation
 cargo doc --workspace --no-deps
+
+# Security audit
+cargo audit
+cargo deny check
 ```
 
 ## Project Structure
 
+The workspace contains 9 crates (consolidated from the original 22):
+
+| Crate | Path | Role |
+|-------|------|------|
+| `easypdf` | `crates/easypdf/` | Facade crate -- `EasyPdf` entry point and builder API |
+| `easypdf-core` | `crates/easypdf-core/` | Core types, traits, errors, crypto, model, IO, layout |
+| `easypdf-derive` | `crates/easypdf-derive/` | `#[derive(PdfModel)]` proc-macro |
+| `easypdf-reader` | `crates/easypdf-reader/` | PDF reading, text extraction, merge/split/rotate (lopdf backend) |
+| `easypdf-writer` | `crates/easypdf-writer/` | PDF creation and writing (printpdf backend) |
+| `easypdf-markdown` | `crates/easypdf-markdown/` | PDF-to-Markdown pipeline (table detection, render, OCR) |
+| `easypdf-ocr` | `crates/easypdf-ocr/` | Cloud OCR engines (GLM / HunyuanOCR / Baidu) |
+| `easypdf-runtime` | `crates/easypdf-runtime/` | Runtime layer: MCP server + resident daemon |
+| `easypdf-test` | `easypdf-test/` | Integration tests and golden samples (not published) |
+
+For detailed architecture, see
+[docs/easypdf-rust-Architecture.md](docs/easypdf-rust-Architecture.md) and
+[docs/PROJECT_FACTS.md](docs/PROJECT_FACTS.md).
+
+## Testing
+
+### Unit Tests
+
+Unit tests live inside each crate in `#[cfg(test)] mod tests` blocks.
+
+```bash
+# Run tests for a specific crate
+cargo test -p easypdf-core
+cargo test -p easypdf-reader
 ```
-easypdf-rust/
-├── crates/
-│   ├── easypdf/           facade — public API, EasyPdf, all Builders
-│   ├── easypdf-core/      shared types, enums, traits, errors
-│   ├── easypdf-model/     engine-neutral semantic IR
-│   ├── easypdf-io/        resource limits, atomic output, input abstraction
-│   ├── easypdf-derive/    #[derive(PdfModel)] proc-macro
-│   ├── easypdf-layout/    backend-neutral layout (LayoutSink, FlowLayout)
-│   ├── easypdf-reader/    PDF parsing and text extraction (lopdf)
-│   ├── easypdf-writer/    PDF creation (printpdf)
-│   ├── easypdf-manipulate/ merge, split, rotate, reorder (lopdf)
-│   ├── easypdf-template/  AcroForm field filling (lopdf)
-│   └── easypdf-markdown/  PDF → Markdown conversion
-├── docs/
-│   ├── easypdf-rust-Architecture.md       architecture (English)
-│   ├── easypdf-rust-Architecture.zh_CN.md architecture (中文)
-│   ├── roadmap.md          detailed roadmap
-│   ├── usage-guide.md      user guide
-│   ├── compatibility.md    feature compatibility matrix
-│   └── implementation-plan.md
-├── benches/                reproducible benchmarks
-└── tests/                  workspace-level integration tests
+
+### Integration Tests
+
+Cross-crate integration tests are in `easypdf-test/tests/` with golden PDF
+samples in `easypdf-test/golden/` and `easypdf-test/samples/`.
+
+### Fuzz Testing
+
+Fuzz targets are in `fuzz/` and require a nightly toolchain:
+
+```bash
+cargo +nightly fuzz run <target>
 ```
 
-## Design Principles
+Available targets: `pdf_parse`, `streaming_scan`, `pdf_encrypt_decrypt`,
+`pdf_sign_verify`, `markdown_convert`, `ssrf_url`.
 
-1. **Zero unsafe** — `#![forbid(unsafe_code)]` in every crate
-2. **Fluent builders** — `mut self -> Self` with `#[must_use]`
-3. **Multi-engine backend** — lopdf for read/manipulate, printpdf for create
-4. **Engine-neutral IR** — `easypdf-model` has zero engine dependencies
-5. **Trait extensibility** — `PdfModel`, `PdfReadListener`, `PdfWriteHandler`, `PdfConverter`, `LayoutSink`
-6. **Single error type** — `PdfError` enum, `type Result<T> = ...`
-7. **Atomic output** — temp file + rename for all save operations
-8. **Structured warnings** — unimplemented capabilities emit warnings, not fake success
+## Release Process
 
-## Adding a New Feature
+Releases follow this sequence (see also
+[docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)):
 
-1. Define core types in `easypdf-core` (if needed)
-2. Implement engine logic in the appropriate crate (reader/writer/manipulate/template/markdown)
-3. Expose via `easypdf` facade
-4. Add tests in the implementing crate's `#[cfg(test)]` module
-5. Update documentation: README.md, README.zh-CN.md, docs/usage-guide.md, docs/roadmap.md
+1. **Bump version** in root `Cargo.toml` (`workspace.package.version`).
+2. **Update CHANGELOG.md** with the new version section.
+3. **Dry-run verification**:
+   ```bash
+   cargo publish -p easypdf-core --dry-run
+   cargo publish -p easypdf-derive --dry-run
+   ```
+4. **Publish in dependency order** (each step waits ~45s for crates.io propagation):
+   ```bash
+   # Layer 1: no internal deps
+   cargo publish -p easypdf-core && sleep 45
 
-## Crate Dependency Rules
+   # Layer 2: depends on core
+   cargo publish -p easypdf-derive && sleep 45
+   cargo publish -p easypdf-reader && sleep 45
+   cargo publish -p easypdf-writer && sleep 45
 
-- `easypdf-core` has zero engine dependencies
-- `easypdf-model` and `easypdf-io` have zero engine dependencies
-- `easypdf-layout` does NOT depend on `easypdf-writer`
-- Domain crates (reader, writer, manipulate, template, markdown) do NOT depend on each other
-- Only the `easypdf` facade depends on all sub-crates
+   # Layer 3: depends on core + reader
+   cargo publish -p easypdf-markdown && sleep 45
 
-## Commit Convention
+   # Layer 4: depends on markdown
+   cargo publish -p easypdf-ocr && sleep 45
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+   # Layer 5: depends on reader + writer + markdown
+   cargo publish -p easypdf-runtime && sleep 45
 
-- `feat:` new feature
-- `fix:` bug fix
-- `docs:` documentation
-- `test:` tests
-- `refactor:` code change without feature/fix
-- `chore:` build, CI, dependencies
-- `perf:` performance improvement
+   # Layer 6: facade (depends on everything)
+   cargo publish -p easypdf
+   ```
+5. **Tag and release**:
+   ```bash
+   git tag v<version>
+   git push origin v<version>
+   ```
+6. **Create GitHub Release** with changelog content.
+7. **Verify** crates.io listing and docs.rs build.
 
-## Release Order
+## Questions?
 
-```text
-easypdf-core → easypdf-model → easypdf-io → easypdf-derive → easypdf-layout
-→ easypdf-reader → easypdf-writer → easypdf-manipulate → easypdf-template
-→ easypdf-markdown → easypdf
-```
+- Open a [GitHub Issue](https://github.com/easy-4-rust/easypdf-rust/issues)
+  for bugs, feature requests, or questions.
+- Check existing [documentation](docs/) for architecture and usage guides.

@@ -329,16 +329,28 @@ easypdf = { version = "0.1.0", features = ["full"] }
 
 ## Roadmap
 
+| Metric | Current |
+|--------|---------|
+| Tests passing | 1522 |
+| Test coverage | 91.61% |
+| Cargo audit CVEs | 0 |
+| Clippy warnings | 0 |
+| Rustdoc warnings | 0 |
+| Fuzz targets | 6 |
+| crates.io published | v0.1.0 (8 crates) |
+| Workspace crates | 9 (consolidated from 22) |
+
 | Version | Focus | Status |
 |---|---|:---:|
-| v0.1 | Foundation: core types, read/write/manipulate/template, derive macro | Done |
-| v0.2 | Architecture consolidation: 9 crates, streaming, OCR, MCP, resident | Done |
-| v0.3 | Rich content: tables, images, shapes, custom fonts | In Progress |
-| v0.4 | Watermarks and layout engine | Planned |
-| v0.5 | AES-256 encryption/decryption, password protection | Planned |
-| v0.6 | PDF/A validation, digital signatures, XMP metadata | Planned |
-| v0.7 | HTML/Markdown/SVG to PDF converters | Planned |
-| v1.0 | Stable API, full test coverage, benchmarks | Planned |
+| v0.1 | Foundation: core types, read/write/manipulate/template, derive macro, 22-crate-to-9-crate consolidation, `EasyPdf` builder, `#[derive(PdfModel)]`, PDF read/write/merge/split/rotate/reorder, AcroForm template fill, PDF-to-Markdown, atomic output, resource limits, `#![forbid(unsafe_code)]`, 136 tests | Done |
+| v0.2 | Architecture Consolidation: 22-to-9 crate consolidation, Streaming ReadStrategy, CMap/ToUnicode (CJK), WriteBackend selection (InMemory/Spill/Auto), ConverterRegistry, 4 cloud OCR engines (GLM/Hunyuan/Baidu/DeepSeek), Resident daemon (Unix socket + Windows TCP), MCP server (7 tools), PdfBlock IR expanded to 14 variants, ProcessorPipeline, ISO 32000 encryption (AES-128/256), PKCS#7 signature, tracing observability, security fixes (rsa-to-ring, SSRF IPv6, API key redact), cargo-fuzz (6 targets), 91.61% coverage, v0.1.0 published to crates.io | Done |
+| v0.3 | Rich Content: `add_table` Builder API, table border style enhancements (zebra striping, custom borders), image insertion (JPEG/PNG) with size/position control, vector shapes (lines, rectangles, circles), custom TTF/OTF font registration and embedding, multi-page writer with automatic page breaks | In Progress |
+| v0.4 | Security: AES-256 encryption/decryption, password protection (user + owner), permission flags (print/copy/modify/annotate), PDF-to-Markdown OCR real integration | Mostly Done |
+| v0.5 | Compliance: PDF/A-1b, PDF/A-2b, PDF/A-3b validation, XMP metadata, document info dictionary standardization | Planned |
+| v0.6 | Converters: HTML-to-PDF (Chromium-based, feature-gated), Markdown-to-PDF optimization, SVG-to-PDF, PDF-to-image rasterize | Partial |
+| v1.0 | Stable: public API on crates.io, semver guarantees (0.2.x to 0.3.x to 1.0), CI matrix (Linux + macOS), Windows MSRV testing, property-based testing, complete migration guide | Planned |
+
+详见 [docs/roadmap.md](docs/roadmap.md) 和 [docs/implementation-plan.md](docs/implementation-plan.md)。
 
 ## Contributing
 
