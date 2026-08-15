@@ -66,6 +66,9 @@ pub fn remove_port_file() {
 mod tests {
     use super::*;
 
+    /// 端口文件测试共享同一个全局路径，必须串行执行避免 TOCTOU 竞争。
+    static PORT_FILE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     #[test]
     fn test_port_file_path_contains_name() {
         let path = port_file_path();
@@ -74,6 +77,9 @@ mod tests {
 
     #[test]
     fn test_write_read_roundtrip() {
+        let _guard = PORT_FILE_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         // Use a unique suffix to avoid collisions
         let ts = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -105,6 +111,9 @@ mod tests {
 
     #[test]
     fn test_read_port_file_not_found() {
+        let _guard = PORT_FILE_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         // This test assumes no port file exists at the default path.
         // If one does exist (e.g. from a running server), the test is a no-op.
         let path = port_file_path();
