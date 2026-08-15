@@ -21,7 +21,7 @@ Inspired by [Alibaba EasyExcel](https://github.com/alibaba/easyexcel)'s builder-
 
 ---
 
-> **Version**: `0.1.0` · **MSRV**: Rust `1.88` · **Edition**: `2024` · **License**: Apache-2.0
+> **Version**: `0.1.1` · **MSRV**: Rust `1.88` · **Edition**: `2024` · **License**: Apache-2.0
 
 ## Architecture
 
@@ -73,7 +73,7 @@ flowchart TB
 ```toml
 # Cargo.toml
 [dependencies]
-easypdf = "0.1.0"
+easypdf = "0.1.1"
 ```
 
 **Create a PDF:**
@@ -295,13 +295,13 @@ Benchmarked against pdftotext (Poppler) on Apple M4 Pro:
 
 ```toml
 # Default: markdown enabled
-easypdf = "0.1.0"
+easypdf = "0.1.1"
 
 # Minimal build (no markdown)
-easypdf = { version = "0.1.0", default-features = false }
+easypdf = { version = "0.1.1", default-features = false }
 
 # Enable everything
-easypdf = { version = "0.1.0", features = ["full"] }
+easypdf = { version = "0.1.1", features = ["full"] }
 ```
 
 ## Toolchain
@@ -337,7 +337,7 @@ easypdf = { version = "0.1.0", features = ["full"] }
 | Clippy warnings | 0 |
 | Rustdoc warnings | 0 |
 | Fuzz targets | 6 |
-| crates.io published | v0.1.0 (8 crates) |
+| crates.io published | v0.1.1 (8 crates) |
 | Workspace crates | 9 (consolidated from 22) |
 
 | Version | Focus | Status |

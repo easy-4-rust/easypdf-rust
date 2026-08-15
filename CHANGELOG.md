@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased changes._
 
+## [0.1.1] - 2026-08-16
+
+Quality and compliance patch release. No public API changes; all existing
+paths remain valid.
+
+### Fixed
+
+- **CI restored to green**: the global `bin/` and `*.json` gitignore rules
+  silently excluded 4 test-utility binaries and 6 golden baseline files that
+  were declared in Cargo.toml/tests -- fresh checkouts failed to build.
+  Added negation rules and committed the files.
+- **`pdfium` feature compiles again**: pdfium-render 0.8.37 API drift
+  (u16 page indexes, `set_maximum_height` builder, non-Send/Sync `Pdfium`
+  handle) plus a broken doc example.
+- **`ocrs` feature clippy-clean**: pedantic cast warnings on pixel coords.
+- **Flaky resident port-file test**: TOCTOU race between parallel tests on
+  Linux CI eliminated via a module mutex.
+- **432 rustfmt violations** across 104 files formatted.
+
+### Changed
+
+- **mod.rs purity**: 12 `mod.rs` files no longer define types/functions;
+  definitions moved to dedicated per-type files with `pub use` re-exports
+  (all public paths unchanged).
+- **Chinese documentation**: every pub type and pub method across ~150
+  production files now carries Chinese doc comments (code examples
+  byte-preserved; test modules unchanged).
+- **Code spec compliance**: zero production wildcard imports, zero
+  todo!/unimplemented!(), zero files above 800 lines.
+- **deny.toml added**: explicit license allowlist matching the dependency
+  tree, advisory ignores documented with reasons; `cargo deny check`
+  passes all four categories.
+
+### Verification
+
+1535 tests + 71 doctests (all features); clippy/fmt/rustdoc zero warnings;
+MSRV 1.88; coverage 90.86% lines (excluding dev utility bins).
+
 ## [0.1.0] - 2026-08-12
 
 First public release of easypdf-rust -- a pure-Rust PDF library with builder API,

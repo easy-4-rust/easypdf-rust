@@ -21,7 +21,7 @@
 
 ---
 
-> **版本**：`0.1.0` · **MSRV**：Rust `1.88` · **Edition**：`2024` · **许可证**：Apache-2.0
+> **版本**：`0.1.1` · **MSRV**：Rust `1.88` · **Edition**：`2024` · **许可证**：Apache-2.0
 
 ## 架构
 
@@ -73,7 +73,7 @@ flowchart TB
 ```toml
 # Cargo.toml
 [dependencies]
-easypdf = "0.1.0"
+easypdf = "0.1.1"
 ```
 
 **创建PDF：**
@@ -295,13 +295,13 @@ server.run()?;
 
 ```toml
 # 默认：启用markdown
-easypdf = "0.1.0"
+easypdf = "0.1.1"
 
 # 最小构建（无markdown）
-easypdf = { version = "0.1.0", default-features = false }
+easypdf = { version = "0.1.1", default-features = false }
 
 # 启用全部功能
-easypdf = { version = "0.1.0", features = ["full"] }
+easypdf = { version = "0.1.1", features = ["full"] }
 ```
 
 ## 工具链

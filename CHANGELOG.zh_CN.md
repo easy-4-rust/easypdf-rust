@@ -9,6 +9,39 @@
 
 _暂无未发布变更。_
 
+## [0.1.1] - 2026-08-16
+
+质量与合规补丁版本。公共 API 无变化，所有既有路径保持有效。
+
+### 修复
+
+- **CI 恢复全绿**：全局 `bin/` 与 `*.json` gitignore 规则误伤了 4 个测试工具
+  二进制与 6 个 golden 基线文件（均在 Cargo.toml/测试中声明），导致全新检出
+  无法构建。已添加反向规则并补齐入库。
+- **`pdfium` feature 恢复编译**：修复 pdfium-render 0.8.37 API 漂移
+  （u16 页索引、`set_maximum_height` 构建器、非 Send/Sync 的 `Pdfium` 句柄）
+  及失效的文档示例。
+- **`ocrs` feature clippy 清零**：像素坐标的 pedantic 类型转换警告。
+- **resident 端口文件测试竞态**：通过模块级互斥锁消除 Linux CI 并行测试的
+  TOCTOU 竞争。
+- **432 处 rustfmt 违规**（104 个文件）全量格式化。
+
+### 变更
+
+- **mod.rs 纯净化**：12 个 `mod.rs` 不再定义类型/函数；定义移入按类型命名的
+  独立文件并以 `pub use` 重导出（全部公共路径不变）。
+- **中文文档**：约 150 个生产文件的所有 pub 类型与 pub 方法补齐中文 doc
+  注释（代码示例逐字节保留；测试模块不变）。
+- **代码规范合规**：生产代码零 wildcard import、零 todo!/unimplemented!()、
+  零超 800 行文件。
+- **新增 deny.toml**：与依赖树匹配的显式许可证白名单、附理由的公告豁免；
+  `cargo deny check` 四项全过。
+
+### 验证
+
+1535 测试 + 71 doctest（全 feature）；clippy/fmt/rustdoc 零警告；MSRV 1.88；
+覆盖率 90.86% 行（排除开发工具 bin）。
+
 ## [0.1.0] - 2026-08-12
 
 easypdf-rust 首次公开发布 -- 纯 Rust PDF 库，提供 builder API、OCR、
