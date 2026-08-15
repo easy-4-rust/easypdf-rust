@@ -20,8 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut writer = EasyPdf::writer("Pipeline Source").build()?;
         writer.add_page(PageSize::A4, Orientation::Portrait)?;
 
-        let heading = PdfText::new("Pipeline Demo")
-            .font(PdfFont::helvetica(18.0).bold());
+        let heading = PdfText::new("Pipeline Demo").font(PdfFont::helvetica(18.0).bold());
         writer.write_text(&heading, 72.0, 750.0)?;
 
         let body = PdfText::new(
@@ -40,7 +39,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Created GFM pipeline (empty, ready for processors).");
 
     // Step 3: Convert with different profiles.
-    for profile in [MarkdownProfile::Gfm, MarkdownProfile::Llm, MarkdownProfile::Plain] {
+    for profile in [
+        MarkdownProfile::Gfm,
+        MarkdownProfile::Llm,
+        MarkdownProfile::Plain,
+    ] {
         let result = EasyPdf::to_markdown(&pdf_path)
             .profile(profile)
             .do_convert()?;

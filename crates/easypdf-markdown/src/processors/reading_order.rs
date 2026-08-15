@@ -1,7 +1,7 @@
 //! 阅读顺序检测处理器。
 
-use easypdf_core::Result;
 use easypdf_core::PdfInput;
+use easypdf_core::Result;
 use easypdf_core::{PdfBlock, PdfDocumentModel, PdfPageModel};
 
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning, PdfMarkdownProcessor};
@@ -77,8 +77,8 @@ fn rebuild_page(page: &PdfPageModel, blocks: Vec<&PdfBlock>) -> PdfPageModel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use easypdf_core::{PageIndex, PdfMetadata};
     use easypdf_core::SourceLocation;
+    use easypdf_core::{PageIndex, PdfMetadata};
 
     #[test]
     fn capabilities_include_reading_order() {

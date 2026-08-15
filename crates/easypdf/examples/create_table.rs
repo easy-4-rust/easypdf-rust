@@ -16,14 +16,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let out_path: PathBuf = out_dir.path().join("table.pdf");
 
     // Build a table with headers and data rows.
-    let table = PdfTable::new(vec![
-        "Name".into(),
-        "Role".into(),
-        "Score".into(),
-    ])
-    .row(vec!["Alice".into(), "Engineer".into(), "95".into()])
-    .row(vec!["Bob".into(), "Designer".into(), "88".into()])
-    .row(vec!["Charlie".into(), "Manager".into(), "92".into()]);
+    let table = PdfTable::new(vec!["Name".into(), "Role".into(), "Score".into()])
+        .row(vec!["Alice".into(), "Engineer".into(), "95".into()])
+        .row(vec!["Bob".into(), "Designer".into(), "88".into()])
+        .row(vec!["Charlie".into(), "Manager".into(), "92".into()]);
 
     // Place the table in the PDF with custom column widths and row height.
     EasyPdf::create(&out_path)

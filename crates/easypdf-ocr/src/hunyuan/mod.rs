@@ -11,9 +11,9 @@ pub use config::{HunyuanConfig, HunyuanMode};
 pub use parser::HunyuanOcrParser;
 pub use request::HunyuanOcrRequest;
 
+use crate::http::HttpOcrEngine;
 use crate::http::build_http_engine;
 use crate::http::error::Result;
-use crate::http::HttpOcrEngine;
 
 /// Create a Tencent Cloud OCR engine with default HTTP configuration.
 ///

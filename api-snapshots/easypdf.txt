@@ -1,162 +1,3 @@
-   Compiling serde v1.0.229
-   Compiling libm v0.2.16
-   Compiling libc v0.2.189
-    Checking simd-adler32 v0.3.10
-   Compiling num-traits v0.2.19
-   Compiling version_check v0.9.5
-    Checking arrayvec v0.7.8
-   Compiling syn v3.0.3
-   Compiling syn v2.0.119
-    Checking tinyvec v1.12.0
-    Checking memchr v2.8.3
-   Compiling fst v0.4.7
-    Checking miniz_oxide v0.8.9
-   Compiling semver v1.0.28
-    Checking fdeflate v0.3.7
-   Compiling serde_core v1.0.229
-   Compiling proc-macro2-diagnostics v0.10.1
-   Compiling rustc_version v0.4.1
-    Checking flate2 v1.1.9
-   Compiling slotmap v1.1.1
-   Compiling pathfinder_simd v0.5.6
-   Compiling yansi v1.0.1
-    Checking unicode-normalization v0.1.25
-    Checking alloc-no-stdlib v2.0.4
-    Checking float-cmp v0.9.0
-    Checking rustc-hash v2.1.3
-    Checking weezl v0.1.12
-   Compiling unicode-joining-type v1.0.0
-   Compiling unicode-general-category v1.1.0
-   Compiling heck v0.4.1
-   Compiling unicode-canonical-combining-class v1.0.0
-    Checking color_quant v1.1.0
-    Checking core_maths v0.1.1
-    Checking euclid v0.22.14
-    Checking ttf-parser v0.25.1
-    Checking strict-num v0.1.1
-    Checking alloc-stdlib v0.2.4
-   Compiling serde_derive v1.0.229
-   Compiling bytemuck_derive v1.12.0
-   Compiling thiserror-impl v2.0.20
-   Compiling enumflags2_derive v0.7.12
-    Checking getrandom v0.4.3
-    Checking cpufeatures v0.3.0
-    Checking bytemuck v1.25.2
-    Checking lyon_geom v1.0.19
-    Checking arrayref v0.3.9
-    Checking byteorder-lite v0.1.0
-    Checking aliasable v0.1.3
-   Compiling ouroboros_macro v0.18.5
-    Checking thiserror v2.0.20
-    Checking static_assertions v1.1.0
-    Checking aes v0.9.2
-    Checking enumflags2 v0.7.12
-    Checking lyon_path v1.0.19
-    Checking rand v0.10.2
-    Checking serde_json v1.0.151
-    Checking sha2 v0.11.0
-    Checking errno v0.3.14
-    Checking memmap2 v0.9.11
-   Compiling tracing-attributes v0.1.31
-    Checking ouroboros v0.18.5
-    Checking brotli-decompressor v5.0.3
-    Checking pathfinder_geometry v0.5.1
-    Checking chrono v0.4.45
-    Checking stringprep v0.1.5
-    Checking png v0.18.1
-    Checking nom v8.0.0
-    Checking polycool v0.4.0
-    Checking unicode-script v0.5.8
-    Checking zune-core v0.5.3
-    Checking pxfm v0.1.30
-    Checking unicode-ccc v0.4.0
-    Checking ucd-trie v0.1.7
-    Checking xmlwriter v0.1.0
-   Compiling pocket-resources v0.3.2
-    Checking glyph-names v0.2.0
-    Checking unicode-bidi-mirroring v0.4.0
-    Checking siphasher v1.0.3
-    Checking bitflags v1.3.2
-    Checking base64 v0.22.1
-    Checking png v0.17.16
-    Checking tracing v0.1.44
-    Checking font-types v0.11.3
-    Checking tiny-skia-path v0.11.4
-    Checking zune-jpeg v0.5.15
-    Checking read-fonts v0.39.2
-    Checking fontdb v0.23.0
-    Checking rustix v1.1.4
-    Checking mmapio v0.9.1
-    Checking gif v0.14.2
-    Checking simplecss v0.2.2
-    Checking imagesize v0.13.0
-    Checking unicode-vo v0.1.0
-    Checking data-url v0.3.2
-    Checking pico-args v0.5.0
-    Checking float_next_after v1.0.0
-    Checking azul-simplecss v0.2.0
-    Checking zune-core v0.4.12
-    Checking roxmltree v0.20.0
-    Checking lopdf v0.44.0
-    Checking quick-error v2.0.1
-    Checking zune-jpeg v0.4.21
-    Checking azul-css v0.0.13
-    Checking image-webp v0.2.4
-    Checking tempfile v3.27.0
-    Checking moxcms v0.8.1
-    Checking lyon_tessellation v1.0.20
-    Checking tiny-skia v0.11.4
-    Checking rgb v0.8.53
-    Checking allsorts-azul v0.17.2
-    Checking lyon_algorithms v1.0.20
-    Checking gif v0.13.3
-   Compiling hashbrown v0.17.1
-    Checking gl-context-loader v0.1.10
-    Checking grid v1.0.1
-   Compiling winnow v1.0.4
-    Checking ryu v1.0.23
-   Compiling equivalent v1.0.2
-    Checking pdf-writer v0.12.1
-    Checking taffy v0.10.1
-   Compiling indexmap v2.14.0
-    Checking smallvec v1.15.2
-   Compiling bincode v1.3.3
-    Checking kurbo v0.11.3
-   Compiling hyphenation_commons v0.8.4
-    Checking kurbo v0.13.1
-    Checking rustybuzz v0.20.1
-    Checking svgtypes v0.15.3
-    Checking tracing-serde v0.1.3
-    Checking tracing-subscriber v0.3.18
-   Compiling toml_parser v1.1.3+spec-1.1.0
-   Compiling hyphenation v0.8.4
-    Checking lyon v1.0.19
-    Checking roxmltree v0.21.1
-    Checking agg-rust-azul v1.1.2
-    Checking xmlparser v0.13.6
-    Checking unicode-segmentation v1.13.3
-    Checking lru v0.16.4
-   Compiling toml_datetime v1.1.1+spec-1.1.0
-    Checking image v0.25.10
-   Compiling toml_edit v0.25.13+spec-1.1.0
-    Checking easypdf-core v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-core)
-    Checking write-fonts v0.48.1
-    Checking skrifa v0.42.1
-   Compiling proc-macro-crate v3.5.0
-    Checking usvg v0.45.1
-    Checking easypdf-reader v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-reader)
-   Compiling easypdf-derive v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-derive)
-    Checking easypdf-markdown v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-markdown)
-    Checking resvg v0.45.1
-    Checking rust-fontconfig v4.4.11
-    Checking azul-core v0.0.13
-    Checking subsetter v0.2.6
-    Checking svg2pdf v0.13.0
-    Checking azul-layout v0.0.13
-    Checking printpdf v0.12.5
-    Checking easypdf-writer v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-writer)
- Documenting easypdf v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19.44s
 pub mod easypdf
 pub use easypdf::<<easypdf_core::*>>
 pub use easypdf::AtomicFileOutput
@@ -237,16 +78,18 @@ pub use easypdf::prelude::WriteBackend
 pub struct easypdf::prelude::EasyPdf
 impl easypdf::EasyPdf
 pub fn easypdf::EasyPdf::create(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfCreateBuilder
-pub fn easypdf::EasyPdf::encrypt(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::export_markdown(impl core::convert::Into<std::path::PathBuf>, impl core::convert::Into<std::path::PathBuf>) -> easypdf_markdown::pdf_markdown_export_builder::PdfMarkdownExportBuilder
 pub fn easypdf::EasyPdf::fill_form(impl core::convert::Into<std::path::PathBuf>, &dyn easypdf_core::traits::PdfModel) -> easypdf::PdfFillBuilder
 pub fn easypdf::EasyPdf::manipulate(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfManipulateBuilder
-pub fn easypdf::EasyPdf::markdown_pipeline(easypdf_markdown::markdown_profile::MarkdownProfile) -> easypdf_markdown::processor_pipeline::ProcessorPipeline
 pub fn easypdf::EasyPdf::merge(&[impl core::convert::AsRef<std::path::Path>], impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::read(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfReadBuilder
-pub fn easypdf::EasyPdf::sign(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::split(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfSplitBuilder
 pub fn easypdf::EasyPdf::to_markdown(impl core::convert::Into<std::path::PathBuf>) -> easypdf_markdown::pdf_markdown_builder::PdfMarkdownBuilder
+impl easypdf::EasyPdf
+pub fn easypdf::EasyPdf::encrypt(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
+pub fn easypdf::EasyPdf::sign(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &std::path::Path, &std::path::Path, &str) -> easypdf_core::error::Result<()>
+impl easypdf::EasyPdf
+pub fn easypdf::EasyPdf::markdown_pipeline(easypdf_markdown::markdown_profile::MarkdownProfile) -> easypdf_markdown::processor_pipeline::ProcessorPipeline
 pub fn easypdf::EasyPdf::writer(impl core::convert::Into<alloc::string::String>) -> easypdf_writer::builder::PdfWriterBuilder
 impl core::marker::Freeze for easypdf::EasyPdf
 impl core::marker::Send for easypdf::EasyPdf
@@ -255,6 +98,10 @@ impl core::marker::Unpin for easypdf::EasyPdf
 impl core::marker::UnsafeUnpin for easypdf::EasyPdf
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::EasyPdf
 impl core::panic::unwind_safe::UnwindSafe for easypdf::EasyPdf
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::EasyPdf where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::EasyPdf where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::EasyPdf where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::EasyPdf where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::EasyPdf where U: core::convert::From<T>
 pub fn easypdf::EasyPdf::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::EasyPdf where U: core::convert::Into<T>
@@ -284,23 +131,28 @@ impl<T> tracing::instrument::Instrument for easypdf::EasyPdf
 impl<T> tracing::instrument::WithSubscriber for easypdf::EasyPdf
 impl<T> typenum::type_operators::Same for easypdf::EasyPdf
 pub type easypdf::EasyPdf::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::EasyPdf where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::EasyPdf where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::EasyPdf::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::EasyPdf where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::EasyPdf::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::EasyPdf where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::EasyPdf::vzip(self) -> V
 pub struct easypdf::EasyPdf
 impl easypdf::EasyPdf
 pub fn easypdf::EasyPdf::create(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfCreateBuilder
-pub fn easypdf::EasyPdf::encrypt(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::export_markdown(impl core::convert::Into<std::path::PathBuf>, impl core::convert::Into<std::path::PathBuf>) -> easypdf_markdown::pdf_markdown_export_builder::PdfMarkdownExportBuilder
 pub fn easypdf::EasyPdf::fill_form(impl core::convert::Into<std::path::PathBuf>, &dyn easypdf_core::traits::PdfModel) -> easypdf::PdfFillBuilder
 pub fn easypdf::EasyPdf::manipulate(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfManipulateBuilder
-pub fn easypdf::EasyPdf::markdown_pipeline(easypdf_markdown::markdown_profile::MarkdownProfile) -> easypdf_markdown::processor_pipeline::ProcessorPipeline
 pub fn easypdf::EasyPdf::merge(&[impl core::convert::AsRef<std::path::Path>], impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::read(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfReadBuilder
-pub fn easypdf::EasyPdf::sign(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
 pub fn easypdf::EasyPdf::split(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfSplitBuilder
 pub fn easypdf::EasyPdf::to_markdown(impl core::convert::Into<std::path::PathBuf>) -> easypdf_markdown::pdf_markdown_builder::PdfMarkdownBuilder
+impl easypdf::EasyPdf
+pub fn easypdf::EasyPdf::encrypt(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &str) -> easypdf_core::error::Result<()>
+pub fn easypdf::EasyPdf::sign(impl core::convert::AsRef<std::path::Path>, impl core::convert::AsRef<std::path::Path>, &std::path::Path, &std::path::Path, &str) -> easypdf_core::error::Result<()>
+impl easypdf::EasyPdf
+pub fn easypdf::EasyPdf::markdown_pipeline(easypdf_markdown::markdown_profile::MarkdownProfile) -> easypdf_markdown::processor_pipeline::ProcessorPipeline
 pub fn easypdf::EasyPdf::writer(impl core::convert::Into<alloc::string::String>) -> easypdf_writer::builder::PdfWriterBuilder
 impl core::marker::Freeze for easypdf::EasyPdf
 impl core::marker::Send for easypdf::EasyPdf
@@ -309,6 +161,10 @@ impl core::marker::Unpin for easypdf::EasyPdf
 impl core::marker::UnsafeUnpin for easypdf::EasyPdf
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::EasyPdf
 impl core::panic::unwind_safe::UnwindSafe for easypdf::EasyPdf
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::EasyPdf where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::EasyPdf where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::EasyPdf where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::EasyPdf where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::EasyPdf where U: core::convert::From<T>
 pub fn easypdf::EasyPdf::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::EasyPdf where U: core::convert::Into<T>
@@ -338,10 +194,13 @@ impl<T> tracing::instrument::Instrument for easypdf::EasyPdf
 impl<T> tracing::instrument::WithSubscriber for easypdf::EasyPdf
 impl<T> typenum::type_operators::Same for easypdf::EasyPdf
 pub type easypdf::EasyPdf::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::EasyPdf where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::EasyPdf where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::EasyPdf::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::EasyPdf where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::EasyPdf::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::EasyPdf where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::EasyPdf::vzip(self) -> V
 pub struct easypdf::PageNumberHandler
 impl easypdf::PageNumberHandler
 pub fn easypdf::PageNumberHandler::font(self, easypdf_core::style::PdfFont) -> Self
@@ -360,6 +219,10 @@ impl core::marker::Unpin for easypdf::PageNumberHandler
 impl core::marker::UnsafeUnpin for easypdf::PageNumberHandler
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::PageNumberHandler
 impl core::panic::unwind_safe::UnwindSafe for easypdf::PageNumberHandler
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PageNumberHandler where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PageNumberHandler where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PageNumberHandler where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PageNumberHandler where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PageNumberHandler where U: core::convert::From<T>
 pub fn easypdf::PageNumberHandler::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PageNumberHandler where U: core::convert::Into<T>
@@ -389,10 +252,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PageNumberHandler
 impl<T> tracing::instrument::WithSubscriber for easypdf::PageNumberHandler
 impl<T> typenum::type_operators::Same for easypdf::PageNumberHandler
 pub type easypdf::PageNumberHandler::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PageNumberHandler where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PageNumberHandler where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PageNumberHandler::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PageNumberHandler where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PageNumberHandler::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PageNumberHandler where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PageNumberHandler::vzip(self) -> V
 pub struct easypdf::PdfCreateBuilder
 impl easypdf::PdfCreateBuilder
 pub fn easypdf::PdfCreateBuilder::add_image(self, &easypdf_core::content::PdfImage) -> easypdf::PdfImageBuilder
@@ -412,6 +278,10 @@ impl core::marker::Unpin for easypdf::PdfCreateBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfCreateBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfCreateBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf::PdfCreateBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfCreateBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfCreateBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfCreateBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfCreateBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfCreateBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfCreateBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfCreateBuilder where U: core::convert::Into<T>
@@ -441,10 +311,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfCreateBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfCreateBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfCreateBuilder
 pub type easypdf::PdfCreateBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfCreateBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfCreateBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfCreateBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfCreateBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfCreateBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfCreateBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfCreateBuilder::vzip(self) -> V
 pub struct easypdf::PdfFillBuilder
 impl easypdf::PdfFillBuilder
 pub fn easypdf::PdfFillBuilder::field(self, impl core::convert::Into<alloc::string::String>, impl core::convert::Into<alloc::string::String>) -> Self
@@ -457,6 +330,10 @@ impl core::marker::Unpin for easypdf::PdfFillBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfFillBuilder
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfFillBuilder
 impl core::panic::unwind_safe::UnwindSafe for easypdf::PdfFillBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfFillBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfFillBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfFillBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfFillBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfFillBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfFillBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfFillBuilder where U: core::convert::Into<T>
@@ -486,10 +363,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfFillBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfFillBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfFillBuilder
 pub type easypdf::PdfFillBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfFillBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfFillBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfFillBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfFillBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfFillBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfFillBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfFillBuilder::vzip(self) -> V
 pub struct easypdf::PdfImageBuilder
 impl easypdf::PdfImageBuilder
 pub fn easypdf::PdfImageBuilder::do_write(self) -> easypdf_core::error::Result<std::path::PathBuf>
@@ -502,6 +382,10 @@ impl core::marker::Unpin for easypdf::PdfImageBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfImageBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfImageBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf::PdfImageBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfImageBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfImageBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfImageBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfImageBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfImageBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfImageBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfImageBuilder where U: core::convert::Into<T>
@@ -531,10 +415,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfImageBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfImageBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfImageBuilder
 pub type easypdf::PdfImageBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfImageBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfImageBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfImageBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfImageBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfImageBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfImageBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfImageBuilder::vzip(self) -> V
 pub struct easypdf::PdfManipulateBuilder
 impl easypdf::PdfManipulateBuilder
 pub fn easypdf::PdfManipulateBuilder::reorder_pages(self, &[usize]) -> Self
@@ -549,6 +436,10 @@ impl core::marker::Unpin for easypdf::PdfManipulateBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfManipulateBuilder
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfManipulateBuilder
 impl core::panic::unwind_safe::UnwindSafe for easypdf::PdfManipulateBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfManipulateBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfManipulateBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfManipulateBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfManipulateBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfManipulateBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfManipulateBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfManipulateBuilder where U: core::convert::Into<T>
@@ -578,10 +469,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfManipulateBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfManipulateBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfManipulateBuilder
 pub type easypdf::PdfManipulateBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfManipulateBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfManipulateBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfManipulateBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfManipulateBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfManipulateBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfManipulateBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfManipulateBuilder::vzip(self) -> V
 pub struct easypdf::PdfPositionedTextBuilder
 impl easypdf::PdfPositionedTextBuilder
 pub fn easypdf::PdfPositionedTextBuilder::do_write(self) -> easypdf_core::error::Result<std::path::PathBuf>
@@ -592,6 +486,10 @@ impl core::marker::Unpin for easypdf::PdfPositionedTextBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfPositionedTextBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfPositionedTextBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf::PdfPositionedTextBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfPositionedTextBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfPositionedTextBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfPositionedTextBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfPositionedTextBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfPositionedTextBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfPositionedTextBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfPositionedTextBuilder where U: core::convert::Into<T>
@@ -621,15 +519,18 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfPositionedTextBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfPositionedTextBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfPositionedTextBuilder
 pub type easypdf::PdfPositionedTextBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfPositionedTextBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfPositionedTextBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfPositionedTextBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfPositionedTextBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfPositionedTextBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfPositionedTextBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfPositionedTextBuilder::vzip(self) -> V
 pub struct easypdf::PdfReadBuilder
 impl easypdf::PdfReadBuilder
 pub fn easypdf::PdfReadBuilder::extract_text(self) -> easypdf_core::error::Result<alloc::string::String>
 pub fn easypdf::PdfReadBuilder::metadata(self) -> easypdf_core::error::Result<easypdf_core::metadata::PdfMetadata>
-pub fn easypdf::PdfReadBuilder::open(self) -> easypdf_core::error::Result<easypdf_reader::PdfReader>
+pub fn easypdf::PdfReadBuilder::open(self) -> easypdf_core::error::Result<easypdf_reader::reader::PdfReader>
 pub fn easypdf::PdfReadBuilder::page_count(self) -> easypdf_core::error::Result<usize>
 pub fn easypdf::PdfReadBuilder::pages(self, core::ops::range::Range<usize>) -> Self
 pub const fn easypdf::PdfReadBuilder::strategy(self, easypdf_reader::strategy::ReadStrategy) -> Self
@@ -640,6 +541,10 @@ impl core::marker::Unpin for easypdf::PdfReadBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfReadBuilder
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfReadBuilder
 impl core::panic::unwind_safe::UnwindSafe for easypdf::PdfReadBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfReadBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfReadBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfReadBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfReadBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfReadBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfReadBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfReadBuilder where U: core::convert::Into<T>
@@ -669,10 +574,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfReadBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfReadBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfReadBuilder
 pub type easypdf::PdfReadBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfReadBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfReadBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfReadBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfReadBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfReadBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfReadBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfReadBuilder::vzip(self) -> V
 pub struct easypdf::PdfSplitBuilder
 impl easypdf::PdfSplitBuilder
 pub const fn easypdf::PdfSplitBuilder::every_n_pages(self, usize) -> Self
@@ -684,6 +592,10 @@ impl core::marker::Unpin for easypdf::PdfSplitBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfSplitBuilder
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfSplitBuilder
 impl core::panic::unwind_safe::UnwindSafe for easypdf::PdfSplitBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfSplitBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfSplitBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfSplitBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfSplitBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfSplitBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfSplitBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfSplitBuilder where U: core::convert::Into<T>
@@ -713,10 +625,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfSplitBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfSplitBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfSplitBuilder
 pub type easypdf::PdfSplitBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfSplitBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfSplitBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfSplitBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfSplitBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfSplitBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfSplitBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfSplitBuilder::vzip(self) -> V
 pub struct easypdf::PdfTableBuilder
 impl easypdf::PdfTableBuilder
 pub fn easypdf::PdfTableBuilder::column_widths(self, alloc::vec::Vec<f64>) -> Self
@@ -731,6 +646,10 @@ impl core::marker::Unpin for easypdf::PdfTableBuilder
 impl core::marker::UnsafeUnpin for easypdf::PdfTableBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfTableBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf::PdfTableBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfTableBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfTableBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfTableBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfTableBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfTableBuilder where U: core::convert::From<T>
 pub fn easypdf::PdfTableBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfTableBuilder where U: core::convert::Into<T>
@@ -760,10 +679,13 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfTableBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfTableBuilder
 impl<T> typenum::type_operators::Same for easypdf::PdfTableBuilder
 pub type easypdf::PdfTableBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfTableBuilder where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfTableBuilder where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfTableBuilder::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfTableBuilder where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfTableBuilder::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfTableBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfTableBuilder::vzip(self) -> V
 pub struct easypdf::PdfTextBuilder<P>
 impl easypdf::PdfTextBuilder<easypdf::PdfCreateBuilder>
 pub fn easypdf::PdfTextBuilder<easypdf::PdfCreateBuilder>::do_write(self) -> easypdf_core::error::Result<std::path::PathBuf>
@@ -776,6 +698,10 @@ impl<P> core::marker::Unpin for easypdf::PdfTextBuilder<P> where P: core::marker
 impl<P> core::marker::UnsafeUnpin for easypdf::PdfTextBuilder<P> where P: core::marker::UnsafeUnpin
 impl<P> core::panic::unwind_safe::RefUnwindSafe for easypdf::PdfTextBuilder<P> where P: core::panic::unwind_safe::RefUnwindSafe
 impl<P> core::panic::unwind_safe::UnwindSafe for easypdf::PdfTextBuilder<P> where P: core::panic::unwind_safe::UnwindSafe
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf::PdfTextBuilder<P> where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf::PdfTextBuilder<P> where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf::PdfTextBuilder<P> where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf::PdfTextBuilder<P> where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf::PdfTextBuilder<P> where U: core::convert::From<T>
 pub fn easypdf::PdfTextBuilder<P>::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf::PdfTextBuilder<P> where U: core::convert::Into<T>
@@ -805,8 +731,11 @@ impl<T> tracing::instrument::Instrument for easypdf::PdfTextBuilder<P>
 impl<T> tracing::instrument::WithSubscriber for easypdf::PdfTextBuilder<P>
 impl<T> typenum::type_operators::Same for easypdf::PdfTextBuilder<P>
 pub type easypdf::PdfTextBuilder<P>::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf::PdfTextBuilder<P> where T: ?core::marker::Sized
 impl<U, T> write_fonts::from_obj::ToOwnedObj<U> for easypdf::PdfTextBuilder<P> where U: write_fonts::from_obj::FromObjRef<T>
 pub fn easypdf::PdfTextBuilder<P>::to_owned_obj(&self, read_fonts::font_data::FontData<'_>) -> U
 impl<U, T> write_fonts::from_obj::ToOwnedTable<U> for easypdf::PdfTextBuilder<P> where U: write_fonts::from_obj::FromTableRef<T>
 pub fn easypdf::PdfTextBuilder<P>::to_owned_table(&self) -> U
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf::PdfTextBuilder<P> where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf::PdfTextBuilder<P>::vzip(self) -> V
 pub fn easypdf::write_table(&mut easypdf_writer::writer::PdfWriter, &easypdf_core::content::PdfTable, f64, f64, &[f64], f64, &easypdf_core::style::PdfFont) -> easypdf_core::error::Result<()>

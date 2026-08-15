@@ -1,8 +1,10 @@
 //! PDF signature dictionary construction, signing, and verification.
-use crate::crypto::CryptoError;
-use super::SignatureInfo;
 use super::PdfSigner;
-use super::cms::{build_cms_signed_data, parse_cms_signed_data, parse_private_key, parse_x509_cert};
+use super::SignatureInfo;
+use super::cms::{
+    build_cms_signed_data, parse_cms_signed_data, parse_private_key, parse_x509_cert,
+};
+use crate::crypto::CryptoError;
 
 const SIG_HEX_PLACEHOLDER_LEN: usize = 8192;
 const BR_PREFIX: &str = "/ByteRange [";
@@ -21,9 +23,27 @@ fn sig_dict_suffix(reason: &str, location: &str, contact: &str) -> Vec<u8> {
     let mut s = String::from(">\n");
     s.push_str("/Filter /Adobe.PPKLite\n");
     s.push_str("/SubFilter /adbe.pkcs7.detached\n");
-    if !reason.is_empty() { let _ = writeln!(s, "/Reason ({})", reason.replace('(', "\\(").replace(')', "\\)")); }
-    if !location.is_empty() { let _ = writeln!(s, "/Location ({})", location.replace('(', "\\(").replace(')', "\\)")); }
-    if !contact.is_empty() { let _ = writeln!(s, "/ContactInfo ({})", contact.replace('(', "\\(").replace(')', "\\)")); }
+    if !reason.is_empty() {
+        let _ = writeln!(
+            s,
+            "/Reason ({})",
+            reason.replace('(', "\\(").replace(')', "\\)")
+        );
+    }
+    if !location.is_empty() {
+        let _ = writeln!(
+            s,
+            "/Location ({})",
+            location.replace('(', "\\(").replace(')', "\\)")
+        );
+    }
+    if !contact.is_empty() {
+        let _ = writeln!(
+            s,
+            "/ContactInfo ({})",
+            contact.replace('(', "\\(").replace(')', "\\)")
+        );
+    }
     s.push_str("/M (D:20260101000000+00'00')\n>>\n");
     s.into_bytes()
 }
@@ -53,7 +73,8 @@ pub fn sign_pdf(pdf_bytes: &[u8], signer: &PdfSigner) -> Result<Vec<u8>, CryptoE
     let suffix = sig_dict_suffix(reason, location, contact);
     let sig_val_pos = orig_len + prefix.len();
     let sig_end = sig_val_pos + SIG_HEX_PLACEHOLDER_LEN;
-    let mut output = Vec::with_capacity(orig_len + prefix.len() + SIG_HEX_PLACEHOLDER_LEN + suffix.len() + 200);
+    let mut output =
+        Vec::with_capacity(orig_len + prefix.len() + SIG_HEX_PLACEHOLDER_LEN + suffix.len() + 200);
     output.extend_from_slice(pdf_bytes);
     output.extend_from_slice(&prefix);
     output.extend(std::iter::repeat_n(b'0', SIG_HEX_PLACEHOLDER_LEN));
@@ -70,14 +91,21 @@ pub fn sign_pdf(pdf_bytes: &[u8], signer: &PdfSigner) -> Result<Vec<u8>, CryptoE
     msg.extend_from_slice(&output[sig_end..total_len]);
     let rng = SystemRandom::new();
     let mut sig_buf = vec![0u8; key_pair.public().modulus_len()];
-    key_pair.sign(&ring::signature::RSA_PKCS1_SHA256, &rng, &msg, &mut sig_buf).map_err(|e| CryptoError::Signature(format!("{e}")))?;
+    key_pair
+        .sign(&ring::signature::RSA_PKCS1_SHA256, &rng, &msg, &mut sig_buf)
+        .map_err(|e| CryptoError::Signature(format!("{e}")))?;
     let cms = build_cms_signed_data(&signer.certificate, &sig_buf, &issuer_der, serial_bytes);
     let cms_hex = hex::encode(&cms);
     if cms_hex.len() > SIG_HEX_PLACEHOLDER_LEN {
-        return Err(CryptoError::Signature(format!("CMS SignedData hex ({} bytes) exceeds placeholder ({} bytes)", cms_hex.len(), SIG_HEX_PLACEHOLDER_LEN)));
+        return Err(CryptoError::Signature(format!(
+            "CMS SignedData hex ({} bytes) exceeds placeholder ({} bytes)",
+            cms_hex.len(),
+            SIG_HEX_PLACEHOLDER_LEN
+        )));
     }
     let cms_hex_padded = format!("{cms_hex:0<SIG_HEX_PLACEHOLDER_LEN$}");
-    output[sig_val_pos..sig_val_pos + SIG_HEX_PLACEHOLDER_LEN].copy_from_slice(cms_hex_padded.as_bytes());
+    output[sig_val_pos..sig_val_pos + SIG_HEX_PLACEHOLDER_LEN]
+        .copy_from_slice(cms_hex_padded.as_bytes());
     Ok(output)
 }
 
@@ -87,45 +115,84 @@ pub fn sign_pdf(pdf_bytes: &[u8], signer: &PdfSigner) -> Result<Vec<u8>, CryptoE
 ///
 /// Returns [`CryptoError`] if verification fails.
 pub fn verify_pdf_signature(pdf_bytes: &[u8]) -> Result<SignatureInfo, CryptoError> {
-    let sig_start = rfind_bytes(pdf_bytes, b"/Type /Sig").ok_or_else(|| CryptoError::InvalidSignedPdf("no /Type /Sig found".into()))?;
+    let sig_start = rfind_bytes(pdf_bytes, b"/Type /Sig")
+        .ok_or_else(|| CryptoError::InvalidSignedPdf("no /Type /Sig found".into()))?;
     let sig_region = &pdf_bytes[sig_start..];
-    let br_pos = find_bytes(sig_region, b"/ByteRange [").ok_or_else(|| CryptoError::InvalidSignedPdf("no /ByteRange found".into()))?;
+    let br_pos = find_bytes(sig_region, b"/ByteRange [")
+        .ok_or_else(|| CryptoError::InvalidSignedPdf("no /ByteRange found".into()))?;
     let br_vals_start = br_pos + 12;
-    let br_close = sig_region[br_vals_start..].iter().position(|&b| b == b']').ok_or_else(|| CryptoError::InvalidSignedPdf("unterminated /ByteRange".into()))?;
-    let br_str = std::str::from_utf8(&sig_region[br_vals_start..br_vals_start + br_close]).map_err(|_| CryptoError::InvalidSignedPdf("non-UTF-8 ByteRange".into()))?.trim();
-    let parts: Vec<usize> = br_str.split_whitespace().map(str::parse::<usize>).collect::<Result<_, _>>().map_err(|_| CryptoError::InvalidSignedPdf("invalid /ByteRange values".into()))?;
-    if parts.len() != 4 { return Err(CryptoError::InvalidSignedPdf(format!("expected 4 ByteRange values, got {}", parts.len()))); }
-    if parts[0] + parts[1] > pdf_bytes.len() || parts[2] + parts[3] > pdf_bytes.len() {
-        return Err(CryptoError::InvalidSignedPdf("ByteRange extends beyond PDF length".into()));
+    let br_close = sig_region[br_vals_start..]
+        .iter()
+        .position(|&b| b == b']')
+        .ok_or_else(|| CryptoError::InvalidSignedPdf("unterminated /ByteRange".into()))?;
+    let br_str = std::str::from_utf8(&sig_region[br_vals_start..br_vals_start + br_close])
+        .map_err(|_| CryptoError::InvalidSignedPdf("non-UTF-8 ByteRange".into()))?
+        .trim();
+    let parts: Vec<usize> = br_str
+        .split_whitespace()
+        .map(str::parse::<usize>)
+        .collect::<Result<_, _>>()
+        .map_err(|_| CryptoError::InvalidSignedPdf("invalid /ByteRange values".into()))?;
+    if parts.len() != 4 {
+        return Err(CryptoError::InvalidSignedPdf(format!(
+            "expected 4 ByteRange values, got {}",
+            parts.len()
+        )));
     }
-    let contents_rel = find_bytes(sig_region, b"/Contents <").ok_or_else(|| CryptoError::InvalidSignedPdf("no /Contents found".into()))?;
+    if parts[0] + parts[1] > pdf_bytes.len() || parts[2] + parts[3] > pdf_bytes.len() {
+        return Err(CryptoError::InvalidSignedPdf(
+            "ByteRange extends beyond PDF length".into(),
+        ));
+    }
+    let contents_rel = find_bytes(sig_region, b"/Contents <")
+        .ok_or_else(|| CryptoError::InvalidSignedPdf("no /Contents found".into()))?;
     let hex_start = sig_start + contents_rel + 11;
-    let hex_close = pdf_bytes[hex_start..].iter().position(|&b| b == b'>').ok_or_else(|| CryptoError::InvalidSignedPdf("unterminated /Contents".into()))?;
-    let cms_der = hex::decode(&pdf_bytes[hex_start..hex_start + hex_close]).map_err(|e| CryptoError::InvalidSignedPdf(format!("invalid hex in /Contents: {e}")))?;
+    let hex_close = pdf_bytes[hex_start..]
+        .iter()
+        .position(|&b| b == b'>')
+        .ok_or_else(|| CryptoError::InvalidSignedPdf("unterminated /Contents".into()))?;
+    let cms_der = hex::decode(&pdf_bytes[hex_start..hex_start + hex_close])
+        .map_err(|e| CryptoError::InvalidSignedPdf(format!("invalid hex in /Contents: {e}")))?;
     let parsed_cms = parse_cms_signed_data(&cms_der)?;
     let (cert_info, public_key_der) = parse_x509_cert(&parsed_cms.certificate_der)?;
     let mut msg = Vec::with_capacity(parts[1] + parts[3]);
     msg.extend_from_slice(&pdf_bytes[parts[0]..parts[0] + parts[1]]);
     msg.extend_from_slice(&pdf_bytes[parts[2]..parts[2] + parts[3]]);
-    let public_key = ring::signature::UnparsedPublicKey::new(&ring::signature::RSA_PKCS1_2048_8192_SHA256, &public_key_der);
+    let public_key = ring::signature::UnparsedPublicKey::new(
+        &ring::signature::RSA_PKCS1_2048_8192_SHA256,
+        &public_key_der,
+    );
     let is_valid = public_key.verify(&msg, &parsed_cms.signature).is_ok();
     Ok(SignatureInfo {
-        signer_cert: parsed_cms.certificate_der, signed_at: extract_paren_field_bytes(sig_region, b"/M"),
-        reason: extract_paren_field_bytes(sig_region, b"/Reason"), location: extract_paren_field_bytes(sig_region, b"/Location"),
-        is_valid, signer_name: cert_info.cn, issuer: Some(cert_info.issuer),
-        cert_not_before: Some(cert_info.not_before), cert_not_after: Some(cert_info.not_after),
+        signer_cert: parsed_cms.certificate_der,
+        signed_at: extract_paren_field_bytes(sig_region, b"/M"),
+        reason: extract_paren_field_bytes(sig_region, b"/Reason"),
+        location: extract_paren_field_bytes(sig_region, b"/Location"),
+        is_valid,
+        signer_name: cert_info.cn,
+        issuer: Some(cert_info.issuer),
+        cert_not_before: Some(cert_info.not_before),
+        cert_not_after: Some(cert_info.not_after),
     })
 }
 
 fn rfind_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    if needle.is_empty() || needle.len() > haystack.len() { return None; }
+    if needle.is_empty() || needle.len() > haystack.len() {
+        return None;
+    }
     let mut pos = None;
-    for i in 0..=haystack.len() - needle.len() { if &haystack[i..i + needle.len()] == needle { pos = Some(i); } }
+    for i in 0..=haystack.len() - needle.len() {
+        if &haystack[i..i + needle.len()] == needle {
+            pos = Some(i);
+        }
+    }
     pos
 }
 
 pub(super) fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    if needle.is_empty() || needle.len() > haystack.len() { return None; }
+    if needle.is_empty() || needle.len() > haystack.len() {
+        return None;
+    }
     (0..=haystack.len() - needle.len()).find(|&i| &haystack[i..i + needle.len()] == needle)
 }
 
@@ -134,5 +201,7 @@ fn extract_paren_field_bytes(text: &[u8], key: &[u8]) -> Option<String> {
     let after_key = &text[pos + key.len()..];
     let start = after_key.iter().position(|&b| b == b'(')? + 1;
     let end = after_key[start..].iter().position(|&b| b == b')')?;
-    std::str::from_utf8(&after_key[start..start + end]).ok().map(String::from)
+    std::str::from_utf8(&after_key[start..start + end])
+        .ok()
+        .map(String::from)
 }

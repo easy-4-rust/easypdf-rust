@@ -8,7 +8,7 @@ pub mod parser;
 pub mod request;
 
 use crate::http::error::Result;
-use crate::http::{build_http_engine, HttpOcrEngine};
+use crate::http::{HttpOcrEngine, build_http_engine};
 
 pub use config::{GlmConfig, GlmOutputFormat};
 pub use parser::GlmOcrParser;
@@ -35,9 +35,9 @@ pub fn create_glm_ocr_engine(
 mod tests {
     #![allow(clippy::default_trait_access)]
     use super::*;
-    use easypdf_markdown::ocr::{OcrEngine, OcrImage};
     use crate::http::request::OcrRequest;
     use crate::http::response::OcrResponseParser;
+    use easypdf_markdown::ocr::{OcrEngine, OcrImage};
 
     fn make_test_image() -> OcrImage {
         let pixels = vec![255u8; 4 * 4 * 4]; // 4x4 RGBA

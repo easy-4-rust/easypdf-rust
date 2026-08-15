@@ -53,8 +53,9 @@ impl McpServer {
 
             let response = Self::handle_line(line);
             if let Some(resp) = response {
-                let json = serde_json::to_string(&resp)
-                    .map_err(|e| super::error::McpError::internal(format!("JSON serialization: {e}")))?;
+                let json = serde_json::to_string(&resp).map_err(|e| {
+                    super::error::McpError::internal(format!("JSON serialization: {e}"))
+                })?;
                 writeln!(stdout, "{json}")?;
                 stdout.flush()?;
             }
@@ -225,7 +226,6 @@ mod tests {
 
     #[test]
     fn tools_list_returns_all_tools() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(2)),
@@ -237,10 +237,7 @@ mod tests {
         let result = resp.result.unwrap();
         let tools = result["tools"].as_array().unwrap();
         assert_eq!(tools.len(), 7);
-        let names: Vec<&str> = tools
-            .iter()
-            .map(|t| t["name"].as_str().unwrap())
-            .collect();
+        let names: Vec<&str> = tools.iter().map(|t| t["name"].as_str().unwrap()).collect();
         assert!(names.contains(&"pdf_read_text"));
         assert!(names.contains(&"pdf_to_markdown"));
         assert!(names.contains(&"pdf_create_text"));
@@ -252,7 +249,6 @@ mod tests {
 
     #[test]
     fn tools_call_missing_name() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(3)),
@@ -266,7 +262,6 @@ mod tests {
 
     #[test]
     fn tools_call_unknown_tool() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(4)),
@@ -283,7 +278,6 @@ mod tests {
 
     #[test]
     fn tools_call_missing_path_returns_error_result() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(5)),
@@ -300,7 +294,6 @@ mod tests {
 
     #[test]
     fn ping_returns_empty_result() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(6)),
@@ -314,7 +307,6 @@ mod tests {
 
     #[test]
     fn unknown_method_returns_error() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(7)),
@@ -328,7 +320,6 @@ mod tests {
 
     #[test]
     fn notification_returns_none() {
-
         let req = JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: None,
@@ -340,7 +331,6 @@ mod tests {
 
     #[test]
     fn parse_error_returns_error_response() {
-
         let resp = McpServer::handle_line("not json");
         let resp = resp.unwrap();
         assert!(resp.error.is_some());
@@ -349,7 +339,6 @@ mod tests {
 
     #[test]
     fn empty_line_returns_none() {
-
         // handle_line is called with trimmed non-empty lines in run(),
         // but test the trim path anyway.
         assert!(McpServer::handle_line("").is_none());
@@ -360,7 +349,6 @@ mod tests {
     fn full_stdio_roundtrip() {
         // Simulate a full initialize -> tools/list -> tools/call flow
         // by calling handle_line with serialized requests.
-
 
         // 1. initialize
         let init_req = serde_json::to_string(&JsonRpcRequest {

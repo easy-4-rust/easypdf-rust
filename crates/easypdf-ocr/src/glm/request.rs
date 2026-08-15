@@ -1,10 +1,10 @@
 //! Request builder for the Zhipu GLM-OCR API.
 
-use easypdf_markdown::ocr::OcrImage;
 use crate::http::auth::AuthMethod;
 use crate::http::error::Result;
-use crate::http::image::{encode_for_request, ImageEncoding};
+use crate::http::image::{ImageEncoding, encode_for_request};
 use crate::http::request::{OcrRequest, RequestConfig};
+use easypdf_markdown::ocr::OcrImage;
 
 use super::config::{GlmConfig, GlmOutputFormat};
 
@@ -73,8 +73,7 @@ impl OcrRequest for GlmOcrRequest {
                 body["output_format"] = serde_json::Value::String("text".to_owned());
             }
             GlmOutputFormat::TextWithBoxes => {
-                body["output_format"] =
-                    serde_json::Value::String("text_with_boxes".to_owned());
+                body["output_format"] = serde_json::Value::String("text_with_boxes".to_owned());
             }
         }
 
@@ -86,9 +85,7 @@ impl OcrRequest for GlmOcrRequest {
     }
 
     fn languages(&self) -> &[&str] {
-        &[
-            "zh", "en", "fr", "es", "ru", "de", "ja", "ko",
-        ]
+        &["zh", "en", "fr", "es", "ru", "de", "ja", "ko"]
     }
 }
 
@@ -149,7 +146,12 @@ mod tests {
             .unwrap();
 
         assert_eq!(body["model"], "glm-ocr");
-        assert!(body["file"].as_str().unwrap().starts_with("data:image/png;base64,"));
+        assert!(
+            body["file"]
+                .as_str()
+                .unwrap()
+                .starts_with("data:image/png;base64,")
+        );
         assert_eq!(body["output_format"], "text");
         assert!(body.get("language").is_none());
     }

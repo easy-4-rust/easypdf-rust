@@ -20,8 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut writer = EasyPdf::writer("Markdown Source").build()?;
         writer.add_page(PageSize::A4, Orientation::Portrait)?;
 
-        let title = PdfText::new("Annual Report 2025")
-            .font(PdfFont::helvetica(20.0).bold());
+        let title = PdfText::new("Annual Report 2025").font(PdfFont::helvetica(20.0).bold());
         writer.write_text(&title, 72.0, 750.0)?;
 
         let body = PdfText::new(

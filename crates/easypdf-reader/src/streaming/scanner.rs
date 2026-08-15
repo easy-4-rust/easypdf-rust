@@ -7,14 +7,14 @@
 use std::collections::HashMap;
 use std::io::Read;
 
-use easypdf_core::{PdfError, PdfMetadata, PdfReadListener, Result};
-use easypdf_core::io::guards::guard_decompression_bomb;
 use easypdf_core::ResourceLimits;
+use easypdf_core::io::guards::guard_decompression_bomb;
+use easypdf_core::{PdfError, PdfMetadata, PdfReadListener, Result};
 
-use super::byte_finder::{find_keyword, find_endstream, skip_whitespace, usize_to_u64};
+use super::StreamScanResult;
+use super::byte_finder::{find_endstream, find_keyword, skip_whitespace, usize_to_u64};
 use super::cmap::CMap;
 use super::text_extract::extract_text_with_cmap;
-use super::StreamScanResult;
 
 // ---------------------------------------------------------------------------
 // Stream boundary detection types
@@ -151,8 +151,7 @@ impl<'a> StreamScanner<'a> {
         // to find the enclosing `<< ... >>` dict.  Look for `/Filter`.
         // We limit the look-back to 4 KB to avoid scanning huge dicts.
         let look_back = range.data_start.min(4096);
-        let dict_region =
-            &self.data[range.data_start - look_back..range.data_start];
+        let dict_region = &self.data[range.data_start - look_back..range.data_start];
 
         // Look for /Filter followed by /FlateDecode (with optional whitespace).
         let region_str = String::from_utf8_lossy(dict_region);
@@ -280,9 +279,7 @@ fn find_font_cmaps(data: &[u8], limits: &ResourceLimits) -> HashMap<String, CMap
         }
         // We have /Type /Font at type_pos.  Extract a surrounding region for
         // the dict.  Scan backwards for `<<` and forwards for `>>`.
-        let dict_start = text[..type_pos]
-            .rfind("<<")
-            .unwrap_or(0);
+        let dict_start = text[..type_pos].rfind("<<").unwrap_or(0);
         let font_region_end = text[ws_end + 5..]
             .find(">>")
             .map_or(text.len(), |p| ws_end + 5 + p + 2);
@@ -461,9 +458,7 @@ fn count_page_entries(data: &[u8]) -> usize {
             if rest < data.len() && data[rest..].starts_with(b"/Page") {
                 // Ensure it's exactly "/Page" and not "/Pages".
                 let page_end = rest + 5; // len("/Page")
-                if page_end >= data.len()
-                    || !data[page_end].is_ascii_alphabetic()
-                {
+                if page_end >= data.len() || !data[page_end].is_ascii_alphabetic() {
                     count += 1;
                 }
             }

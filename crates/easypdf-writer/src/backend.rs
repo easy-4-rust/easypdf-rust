@@ -15,9 +15,9 @@
 //! PDF's page-level (rather than row-level) content unit.
 
 use easypdf_core::error::{PdfError, Result};
+use flate2::Compression;
 use flate2::read::GzDecoder;
 use flate2::write::GzEncoder;
-use flate2::Compression;
 use printpdf::Op;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -155,8 +155,7 @@ impl PageSpillWriter {
             std::fs::create_dir_all(&d)?;
             (d, None)
         } else {
-            let td = tempfile::tempdir()
-                .map_err(PdfError::Io)?;
+            let td = tempfile::tempdir().map_err(PdfError::Io)?;
             let path = td.path().to_path_buf();
             (path, Some(td))
         };
@@ -178,10 +177,7 @@ impl PageSpillWriter {
     /// # Errors
     ///
     /// Returns an error if serialization or file I/O fails.
-    pub fn maybe_spill(
-        &mut self,
-        page_data: &SpilledPageData,
-    ) -> Result<Option<()>> {
+    pub fn maybe_spill(&mut self, page_data: &SpilledPageData) -> Result<Option<()>> {
         self.finalized_count += 1;
         if self.finalized_count <= self.threshold_pages {
             return Ok(None);

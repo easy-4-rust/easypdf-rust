@@ -16,7 +16,7 @@
 //! ```
 
 use easypdf_core::error::Result;
-use easypdf_core::handler_chain::{WriteHandlerChain, PRIORITY_NORMAL};
+use easypdf_core::handler_chain::{PRIORITY_NORMAL, WriteHandlerChain};
 use easypdf_core::{PdfMetadata, PdfWriteHandler};
 
 use crate::backend::WriteBackend;
@@ -133,7 +133,7 @@ impl PdfWriterBuilder {
     pub fn build(self) -> Result<PdfWriter> {
         let backend = if self.constant_memory {
             WriteBackend::Spill {
-                    spill_dir: match self.backend {
+                spill_dir: match self.backend {
                     WriteBackend::Spill { spill_dir, .. } => spill_dir,
                     WriteBackend::InMemory => None,
                 },
@@ -148,7 +148,11 @@ impl PdfWriterBuilder {
                     threshold_pages,
                 } => WriteBackend::Spill {
                     spill_dir,
-                    compress: if self.compress_temp_files { compress } else { false },
+                    compress: if self.compress_temp_files {
+                        compress
+                    } else {
+                        false
+                    },
                     threshold_pages,
                 },
                 other @ WriteBackend::InMemory => other,

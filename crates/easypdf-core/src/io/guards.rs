@@ -146,7 +146,10 @@ mod tests {
         let result = guard_decompression_bomb(1_000, over, &limits);
         assert!(result.is_err());
         let msg = format!("{}", result.unwrap_err());
-        assert!(msg.contains("decompressed size"), "unexpected message: {msg}");
+        assert!(
+            msg.contains("decompressed size"),
+            "unexpected message: {msg}"
+        );
     }
 
     #[test]
@@ -156,7 +159,10 @@ mod tests {
         let result = guard_decompression_bomb(100_000, 20_000_000, &limits);
         assert!(result.is_err());
         let msg = format!("{}", result.unwrap_err());
-        assert!(msg.contains("compression ratio"), "unexpected message: {msg}");
+        assert!(
+            msg.contains("compression ratio"),
+            "unexpected message: {msg}"
+        );
     }
 
     #[test]

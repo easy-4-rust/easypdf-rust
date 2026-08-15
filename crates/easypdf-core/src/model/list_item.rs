@@ -150,13 +150,11 @@ mod tests {
 
     #[test]
     fn nested_children() {
-        let item = ListItem::new("L0")
-            .with_level(0)
-            .with_child(
-                ListItem::new("L1")
-                    .with_level(1)
-                    .with_child(ListItem::new("L2").with_level(2)),
-            );
+        let item = ListItem::new("L0").with_level(0).with_child(
+            ListItem::new("L1")
+                .with_level(1)
+                .with_child(ListItem::new("L2").with_level(2)),
+        );
         assert_eq!(item.children().len(), 1);
         assert_eq!(item.children()[0].children().len(), 1);
         assert_eq!(item.children()[0].children()[0].text(), "L2");

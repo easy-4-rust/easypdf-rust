@@ -5,370 +5,23 @@
 //! sufficient for OCR pipelines. No external dependencies are required.
 #![cfg_attr(test, allow(clippy::similar_names))]
 
-use std::path::Path;
+mod glyph;
+mod renderer;
 
-use easypdf_reader::PdfReader;
+pub use renderer::TextRenderer;
 
-use crate::render::config::{Background, RenderConfig};
-use crate::render::error::{RenderError, Result};
-use crate::render::traits::{PdfRenderer, RenderedImage};
-
-// A4 at 72 DPI: 595 x 842 points.
-const A4_WIDTH_PT: f64 = 595.0;
-const A4_HEIGHT_PT: f64 = 842.0;
-
-/// Minimal bitmap font glyph (5 wide x 7 tall, stored as 7 bytes).
-/// Each byte represents one row; bit 4 is the leftmost pixel.
-type Glyph = [u8; 7];
-
-/// Return the 5x7 bitmap glyph for an ASCII character.
-/// Unknown characters return a filled block.
-fn glyph_for(ch: u8) -> Glyph {
-    match ch {
-        b' ' => [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-        b'!' => [0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x04],
-        b'"' => [0x0A, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00],
-        b'#' => [0x0A, 0x1F, 0x0A, 0x1F, 0x0A, 0x00, 0x00],
-        b'$' => [0x04, 0x1E, 0x05, 0x0E, 0x14, 0x0F, 0x04],
-        b'%' => [0x03, 0x13, 0x08, 0x04, 0x19, 0x18, 0x00],
-        b'&' => [0x06, 0x09, 0x05, 0x12, 0x09, 0x16, 0x00],
-        b'\'' => [0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00],
-        b'(' => [0x08, 0x04, 0x02, 0x02, 0x02, 0x04, 0x08],
-        b')' => [0x02, 0x04, 0x08, 0x08, 0x08, 0x04, 0x02],
-        b'*' => [0x00, 0x04, 0x15, 0x0E, 0x15, 0x04, 0x00],
-        b'+' => [0x00, 0x04, 0x04, 0x1F, 0x04, 0x04, 0x00],
-        b',' => [0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x02],
-        b'-' => [0x00, 0x00, 0x00, 0x1F, 0x00, 0x00, 0x00],
-        b'.' => [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04],
-        b'/' => [0x00, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00],
-        b'0' => [0x0E, 0x11, 0x19, 0x15, 0x13, 0x11, 0x0E],
-        b'1' => [0x04, 0x06, 0x04, 0x04, 0x04, 0x04, 0x0E],
-        b'2' => [0x0E, 0x11, 0x10, 0x08, 0x04, 0x02, 0x1F],
-        b'3' => [0x1F, 0x08, 0x04, 0x08, 0x10, 0x11, 0x0E],
-        b'4' => [0x08, 0x0C, 0x0A, 0x09, 0x1F, 0x08, 0x08],
-        b'5' => [0x1F, 0x01, 0x0F, 0x10, 0x10, 0x11, 0x0E],
-        b'6' => [0x0C, 0x02, 0x01, 0x0F, 0x11, 0x11, 0x0E],
-        b'7' => [0x1F, 0x10, 0x08, 0x04, 0x02, 0x02, 0x02],
-        b'8' => [0x0E, 0x11, 0x11, 0x0E, 0x11, 0x11, 0x0E],
-        b'9' => [0x0E, 0x11, 0x11, 0x1E, 0x10, 0x08, 0x06],
-        b':' => [0x00, 0x00, 0x04, 0x00, 0x04, 0x00, 0x00],
-        b';' => [0x00, 0x00, 0x04, 0x00, 0x04, 0x02, 0x00],
-        b'<' => [0x08, 0x04, 0x02, 0x01, 0x02, 0x04, 0x08],
-        b'=' => [0x00, 0x00, 0x1F, 0x00, 0x1F, 0x00, 0x00],
-        b'>' => [0x02, 0x04, 0x08, 0x10, 0x08, 0x04, 0x02],
-        b'?' => [0x0E, 0x11, 0x10, 0x08, 0x04, 0x00, 0x04],
-        b'@' => [0x0E, 0x11, 0x15, 0x1D, 0x01, 0x01, 0x1E],
-        b'A' => [0x0E, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11],
-        b'B' => [0x0F, 0x11, 0x11, 0x0F, 0x11, 0x11, 0x0F],
-        b'C' => [0x0E, 0x11, 0x01, 0x01, 0x01, 0x11, 0x0E],
-        b'D' => [0x07, 0x09, 0x11, 0x11, 0x11, 0x09, 0x07],
-        b'E' => [0x1F, 0x01, 0x01, 0x0F, 0x01, 0x01, 0x1F],
-        b'F' => [0x1F, 0x01, 0x01, 0x0F, 0x01, 0x01, 0x01],
-        b'G' => [0x0E, 0x11, 0x01, 0x1D, 0x11, 0x11, 0x0E],
-        b'H' => [0x11, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11],
-        b'I' => [0x0E, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0E],
-        b'J' => [0x1C, 0x08, 0x08, 0x08, 0x08, 0x09, 0x06],
-        b'K' => [0x11, 0x09, 0x05, 0x03, 0x05, 0x09, 0x11],
-        b'L' => [0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1F],
-        b'M' => [0x11, 0x1B, 0x15, 0x15, 0x11, 0x11, 0x11],
-        b'N' => [0x11, 0x11, 0x13, 0x15, 0x19, 0x11, 0x11],
-        b'O' => [0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E],
-        b'P' => [0x0F, 0x11, 0x11, 0x0F, 0x01, 0x01, 0x01],
-        b'Q' => [0x0E, 0x11, 0x11, 0x11, 0x15, 0x09, 0x16],
-        b'R' => [0x0F, 0x11, 0x11, 0x0F, 0x05, 0x09, 0x11],
-        b'S' => [0x0E, 0x11, 0x01, 0x0E, 0x10, 0x11, 0x0E],
-        b'T' => [0x1F, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04],
-        b'U' => [0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E],
-        b'V' => [0x11, 0x11, 0x11, 0x11, 0x0A, 0x0A, 0x04],
-        b'W' => [0x11, 0x11, 0x11, 0x15, 0x15, 0x1B, 0x11],
-        b'X' => [0x11, 0x11, 0x0A, 0x04, 0x0A, 0x11, 0x11],
-        b'Y' => [0x11, 0x11, 0x0A, 0x04, 0x04, 0x04, 0x04],
-        b'Z' => [0x1F, 0x10, 0x08, 0x04, 0x02, 0x01, 0x1F],
-        b'[' => [0x0E, 0x02, 0x02, 0x02, 0x02, 0x02, 0x0E],
-        b'\\' => [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x00],
-        b']' => [0x0E, 0x08, 0x08, 0x08, 0x08, 0x08, 0x0E],
-        b'^' => [0x04, 0x0A, 0x11, 0x00, 0x00, 0x00, 0x00],
-        b'_' => [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F],
-        b'`' => [0x02, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00],
-        b'a' => [0x00, 0x00, 0x0E, 0x10, 0x1E, 0x11, 0x1E],
-        b'b' => [0x01, 0x01, 0x0F, 0x11, 0x11, 0x11, 0x0F],
-        b'c' => [0x00, 0x00, 0x0E, 0x01, 0x01, 0x11, 0x0E],
-        b'd' => [0x10, 0x10, 0x16, 0x19, 0x11, 0x11, 0x1E],
-        b'e' => [0x00, 0x00, 0x0E, 0x11, 0x1F, 0x01, 0x0E],
-        b'f' => [0x0C, 0x12, 0x02, 0x07, 0x02, 0x02, 0x02],
-        b'g' => [0x00, 0x1E, 0x11, 0x11, 0x1E, 0x10, 0x0E],
-        b'h' => [0x01, 0x01, 0x0D, 0x13, 0x11, 0x11, 0x11],
-        b'i' => [0x04, 0x00, 0x06, 0x04, 0x04, 0x04, 0x0E],
-        b'j' => [0x08, 0x00, 0x0C, 0x08, 0x08, 0x09, 0x06],
-        b'k' => [0x01, 0x01, 0x09, 0x05, 0x03, 0x05, 0x09],
-        b'l' => [0x06, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0E],
-        b'm' => [0x00, 0x00, 0x05, 0x1B, 0x15, 0x11, 0x11],
-        b'n' => [0x00, 0x00, 0x0D, 0x13, 0x11, 0x11, 0x11],
-        b'o' => [0x00, 0x00, 0x0E, 0x11, 0x11, 0x11, 0x0E],
-        b'p' => [0x00, 0x00, 0x0F, 0x11, 0x0F, 0x01, 0x01],
-        b'q' => [0x00, 0x00, 0x16, 0x19, 0x1E, 0x10, 0x10],
-        b'r' => [0x00, 0x00, 0x0D, 0x13, 0x01, 0x01, 0x01],
-        b's' => [0x00, 0x00, 0x0E, 0x01, 0x0E, 0x10, 0x0F],
-        b't' => [0x02, 0x02, 0x07, 0x02, 0x02, 0x12, 0x0C],
-        b'u' => [0x00, 0x00, 0x11, 0x11, 0x11, 0x19, 0x16],
-        b'v' => [0x00, 0x00, 0x11, 0x11, 0x11, 0x0A, 0x04],
-        b'w' => [0x00, 0x00, 0x11, 0x11, 0x15, 0x15, 0x0A],
-        b'x' => [0x00, 0x00, 0x11, 0x0A, 0x04, 0x0A, 0x11],
-        b'y' => [0x00, 0x00, 0x11, 0x11, 0x1E, 0x10, 0x0E],
-        b'z' => [0x00, 0x00, 0x1F, 0x08, 0x04, 0x02, 0x1F],
-        b'{' => [0x08, 0x04, 0x04, 0x02, 0x04, 0x04, 0x08],
-        b'|' => [0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04],
-        b'}' => [0x02, 0x04, 0x04, 0x08, 0x04, 0x04, 0x02],
-        b'~' => [0x00, 0x04, 0x02, 0x1F, 0x02, 0x04, 0x00],
-        // Fallback: filled block for unknown characters.
-        _ => [0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F],
-    }
-}
-
-/// Pure-Rust text fallback renderer.
-///
-/// Opens a PDF with [`PdfReader`], extracts text per page, and renders it as
-/// a simple raster image using a built-in 5x7 bitmap font. The output is
-/// suitable for OCR pipelines where visual fidelity is not critical.
-///
-/// # Examples
-///
-/// ```no_run
-/// use std::path::Path;
-/// use easypdf_markdown::render::backends::text_backend::TextRenderer;
-/// use easypdf_markdown::render::{PdfRenderer, RenderConfig};
-///
-/// let renderer = TextRenderer::open(Path::new("document.pdf"))?;
-/// let image = renderer.render_page(0, &RenderConfig::default())?;
-/// image.save(Path::new("page_0.png"))?;
-/// # Ok::<(), easypdf_markdown::render::RenderError>(())
-/// ```
-pub struct TextRenderer {
-    /// Raw PDF bytes retained so we can create a fresh `PdfReader` per render
-    /// call (because `PdfReader::pages()` consumes `self`).
-    pdf_bytes: Vec<u8>,
-    page_count: usize,
-}
-
-impl TextRenderer {
-    /// Open a PDF file for text-based rendering.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`RenderError::Io`] if the file cannot be read, or
-    /// [`RenderError::Parse`] if the PDF is malformed.
-    pub fn open(path: &Path) -> Result<Self> {
-        let pdf_bytes = std::fs::read(path)?;
-        let reader =
-            PdfReader::from_bytes(pdf_bytes.clone()).map_err(|e| RenderError::Parse(e.to_string()))?;
-        let page_count = reader
-            .page_count()
-            .map_err(|e| RenderError::Parse(e.to_string()))?;
-        Ok(Self {
-            pdf_bytes,
-            page_count,
-        })
-    }
-
-    /// Open a PDF from in-memory bytes.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`RenderError::Parse`] if the bytes are not a valid PDF.
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self> {
-        let reader =
-            PdfReader::from_bytes(bytes.clone()).map_err(|e| RenderError::Parse(e.to_string()))?;
-        let page_count = reader
-            .page_count()
-            .map_err(|e| RenderError::Parse(e.to_string()))?;
-        Ok(Self {
-            pdf_bytes: bytes,
-            page_count,
-        })
-    }
-
-    /// Extract text for a single page (0-based index).
-    fn extract_page_text(&self, page_index: usize) -> String {
-        PdfReader::from_bytes(self.pdf_bytes.clone())
-            .ok()
-            .and_then(|r| r.pages(page_index..page_index + 1).extract_text().ok())
-            .unwrap_or_default()
-    }
-
-    /// Compute pixel dimensions for an A4 page at the given DPI.
-    fn page_pixels(dpi: u32) -> (u32, u32) {
-        let scale = f64::from(dpi) / 72.0;
-        let w = f64_to_u32(A4_WIDTH_PT * scale);
-        let h = f64_to_u32(A4_HEIGHT_PT * scale);
-        (w.max(1), h.max(1))
-    }
-
-    /// Render extracted text onto an RGBA pixel buffer.
-    fn render_text_to_pixels(
-        text: &str,
-        width: u32,
-        height: u32,
-        dpi: u32,
-        background: Background,
-    ) -> Vec<u8> {
-        let bg_color: [u8; 4] = match background {
-            Background::White => [255, 255, 255, 255],
-            Background::Transparent => [0, 0, 0, 0],
-        };
-        let fg_color: [u8; 4] = [0, 0, 0, 255];
-
-        let mut pixels = vec![0u8; usize::try_from(width * height * 4).unwrap_or(0)];
-
-        // Fill background.
-        for chunk in pixels.chunks_exact_mut(4) {
-            chunk.copy_from_slice(&bg_color);
-        }
-
-        // Scale factor: at 72 DPI the font is 1x, at 150 DPI ~2x, etc.
-        let scale = f64_to_u32((f64::from(dpi) / 72.0).max(1.0));
-        let glyph_w = 5 * scale + scale; // 5 pixel glyph + 1 pixel spacing
-        let glyph_h = 7 * scale + scale; // 7 pixel glyph + 1 pixel spacing
-        let line_height = glyph_h + scale;
-        let margin = 2 * scale;
-
-        let cols = usize::try_from((width.saturating_sub(margin * 2)) / glyph_w).unwrap_or(1).max(1);
-        let rows = usize::try_from((height.saturating_sub(margin * 2)) / line_height).unwrap_or(1).max(1);
-
-        // Split text into lines that fit the page width.
-        let lines: Vec<&str> = text.lines().collect();
-        let mut drawn_rows: usize = 0;
-
-        for line in &lines {
-            if drawn_rows >= rows {
-                break;
-            }
-
-            // Wrap long lines.
-            let mut remaining = *line;
-            while !remaining.is_empty() && drawn_rows < rows {
-                let take = remaining.len().min(cols);
-                let (chunk, rest) = remaining.split_at(take);
-                remaining = rest;
-
-                let y_offset = margin + u32::try_from(drawn_rows).unwrap_or(u32::MAX) * line_height;
-
-                for (col, ch) in chunk.bytes().enumerate() {
-                    let x_offset = margin + u32::try_from(col).unwrap_or(u32::MAX) * glyph_w;
-                    draw_glyph(&mut pixels, width, height, x_offset, y_offset, scale, ch, fg_color);
-                }
-
-                drawn_rows += 1;
-            }
-
-            // Empty line handling: if the original line was empty, advance one row.
-            if line.is_empty() && drawn_rows < rows {
-                drawn_rows += 1;
-            }
-        }
-
-        pixels
-    }
-}
-
-/// Convert an `f64` to `u32` with saturation (clamps negative to 0, overflow to `u32::MAX`).
-#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-fn f64_to_u32(value: f64) -> u32 {
-    if value.is_sign_negative() {
-        0
-    } else {
-        value.round() as u32 // Cast is intentional for DPI/pixel math; negative handled above.
-    }
-}
-
-/// Draw a single glyph onto the pixel buffer.
-#[allow(clippy::too_many_arguments)]
-fn draw_glyph(
-    pixels: &mut [u8],
-    img_width: u32,
-    img_height: u32,
-    x: u32,
-    y: u32,
-    scale: u32,
-    ch: u8,
-    color: [u8; 4],
-) {
-    let glyph = glyph_for(ch);
-    for (row, &bits) in glyph.iter().enumerate() {
-        for col in 0..5 {
-            if bits & (1 << (4 - col)) != 0 {
-                // Fill the scaled pixel block.
-                for sy in 0..scale {
-                    for sx in 0..scale {
-                        let px = x + col * scale + sx;
-                        let py = y + u32::try_from(row).unwrap_or(u32::MAX) * scale + sy;
-                        if px < img_width && py < img_height {
-                            let idx = usize::try_from((py * img_width + px) * 4).unwrap_or(0);
-                            if idx + 3 < pixels.len() {
-                                pixels[idx..idx + 4].copy_from_slice(&color);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-impl PdfRenderer for TextRenderer {
-    fn render_page(&self, page_index: usize, config: &RenderConfig) -> Result<RenderedImage> {
-        if page_index >= self.page_count {
-            return Err(RenderError::InvalidPage {
-                index: page_index,
-                total: self.page_count,
-            });
-        }
-
-        if config.dpi > self.max_dpi() {
-            return Err(RenderError::DpiExceeded {
-                requested: config.dpi,
-                max: self.max_dpi(),
-            });
-        }
-
-        let (mut width, mut height) = Self::page_pixels(config.dpi);
-
-        // Apply max dimension constraints.
-        if let Some(max_w) = config.max_width
-            && width > max_w
-        {
-            let ratio = f64::from(max_w) / f64::from(width);
-            width = max_w;
-            height = f64_to_u32(f64::from(height) * ratio).max(1);
-        }
-        if let Some(max_h) = config.max_height
-            && height > max_h
-        {
-            let ratio = f64::from(max_h) / f64::from(height);
-            height = max_h;
-            width = f64_to_u32(f64::from(width) * ratio).max(1);
-        }
-
-        // Extract text for this page.
-        let text = self.extract_page_text(page_index);
-
-        let pixels = Self::render_text_to_pixels(&text, width, height, config.dpi, config.background);
-
-        Ok(RenderedImage::new(width, height, config.format, pixels, page_index))
-    }
-
-    fn name(&self) -> &'static str {
-        "text"
-    }
-
-    fn max_dpi(&self) -> u32 {
-        300
-    }
-}
+// Re-export internals for test visibility.
+#[cfg(test)]
+use glyph::glyph_for;
+#[cfg(test)]
+use renderer::{draw_glyph, f64_to_u32};
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::render::config::{Background, ImageFormat, RenderConfig};
+    use crate::render::error::RenderError;
+    use crate::render::traits::PdfRenderer;
 
     /// Helper: build a minimal valid PDF in memory with the given text content.
     fn make_test_pdf_bytes(text: &str) -> Vec<u8> {
@@ -547,7 +200,10 @@ mod tests {
         let img = renderer.render_page(0, &config).unwrap();
         let png_bytes = img.to_png_bytes().unwrap();
         // PNG magic bytes.
-        assert_eq!(&png_bytes[0..8], &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+        assert_eq!(
+            &png_bytes[0..8],
+            &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+        );
     }
 
     #[test]
@@ -697,13 +353,7 @@ mod tests {
 
     #[test]
     fn render_text_to_pixels_empty_text() {
-        let pixels = TextRenderer::render_text_to_pixels(
-            "",
-            100,
-            100,
-            72,
-            Background::White,
-        );
+        let pixels = TextRenderer::render_text_to_pixels("", 100, 100, 72, Background::White);
         assert_eq!(pixels.len(), 100 * 100 * 4);
         // All white
         assert!(pixels.chunks_exact(4).all(|px| px == [255, 255, 255, 255]));
@@ -724,25 +374,15 @@ mod tests {
     #[test]
     fn render_text_to_pixels_long_line_wraps() {
         let long_text = "A".repeat(200);
-        let pixels = TextRenderer::render_text_to_pixels(
-            &long_text,
-            100,
-            100,
-            72,
-            Background::White,
-        );
+        let pixels =
+            TextRenderer::render_text_to_pixels(&long_text, 100, 100, 72, Background::White);
         assert_eq!(pixels.len(), 100 * 100 * 4);
     }
 
     #[test]
     fn render_text_to_pixels_transparent_bg() {
-        let pixels = TextRenderer::render_text_to_pixels(
-            "test",
-            50,
-            50,
-            72,
-            Background::Transparent,
-        );
+        let pixels =
+            TextRenderer::render_text_to_pixels("test", 50, 50, 72, Background::Transparent);
         assert_eq!(pixels.len(), 50 * 50 * 4);
         // Background should be transparent (0,0,0,0)
         assert_eq!(pixels[0], 0);

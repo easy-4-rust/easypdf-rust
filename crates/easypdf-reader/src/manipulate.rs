@@ -2,9 +2,9 @@
 //!
 //! Backed by the `lopdf` crate for low-level page operations.
 
+use easypdf_core::AtomicFileOutput;
 use easypdf_core::Rotation;
 use easypdf_core::error::{PdfError, Result};
-use easypdf_core::AtomicFileOutput;
 use std::path::Path;
 
 /// A manipulator for performing operations on existing PDF documents.
@@ -639,10 +639,7 @@ mod tests {
         let path1 = dir.join("easypdf_merge_ok.pdf");
         make_test_pdf(&path1);
         let bad_path = std::path::PathBuf::from("/nonexistent/file.pdf");
-        let result = PdfManipulator::merge_files(
-            &[&path1, &bad_path],
-            "out.pdf",
-        );
+        let result = PdfManipulator::merge_files(&[&path1, &bad_path], "out.pdf");
         assert!(result.is_err());
         let _ = std::fs::remove_file(&path1);
     }

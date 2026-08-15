@@ -66,7 +66,10 @@ fn with_metadata_pdf_has_nonempty_title() {
     // The exact values are verified by the golden comparison test above;
     // this test only checks that the title field is populated (non-None).
     let pdf_path = samples_dir().join("with-metadata.pdf");
-    assert!(pdf_path.exists(), "sample PDF not found. Run generate_samples first.");
+    assert!(
+        pdf_path.exists(),
+        "sample PDF not found. Run generate_samples first."
+    );
 
     let meta = EasyPdf::read(&pdf_path)
         .metadata()

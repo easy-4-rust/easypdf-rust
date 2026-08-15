@@ -244,7 +244,8 @@ pub fn sign_tencent_cloud_request(
         hasher.update(canonical_request.as_bytes());
         hex::encode(hasher.finalize())
     };
-    let string_to_sign = format!("{algorithm}\n{timestamp}\n{credential_scope}\n{hashed_canonical_request}");
+    let string_to_sign =
+        format!("{algorithm}\n{timestamp}\n{credential_scope}\n{hashed_canonical_request}");
 
     // Step 3: Signature.
     let secret_date = {
@@ -254,20 +255,20 @@ pub fn sign_tencent_cloud_request(
         mac.finalize().into_bytes()
     };
     let secret_service = {
-        let mut mac = HmacSha256::new_from_slice(&secret_date)
-            .expect("HMAC accepts any key length");
+        let mut mac =
+            HmacSha256::new_from_slice(&secret_date).expect("HMAC accepts any key length");
         mac.update(service.as_bytes());
         mac.finalize().into_bytes()
     };
     let secret_signing = {
-        let mut mac = HmacSha256::new_from_slice(&secret_service)
-            .expect("HMAC accepts any key length");
+        let mut mac =
+            HmacSha256::new_from_slice(&secret_service).expect("HMAC accepts any key length");
         mac.update(b"tc3_request");
         mac.finalize().into_bytes()
     };
     let signature = {
-        let mut mac = HmacSha256::new_from_slice(&secret_signing)
-            .expect("HMAC accepts any key length");
+        let mut mac =
+            HmacSha256::new_from_slice(&secret_signing).expect("HMAC accepts any key length");
         mac.update(string_to_sign.as_bytes());
         hex::encode(mac.finalize().into_bytes())
     };
@@ -406,10 +407,7 @@ mod tests {
             version: "2023-09-01".to_owned(),
         };
         let headers = apply_auth(&auth).unwrap();
-        assert_eq!(
-            headers.get("Host").unwrap(),
-            "hunyuan.tencentcloudapi.com"
-        );
+        assert_eq!(headers.get("Host").unwrap(), "hunyuan.tencentcloudapi.com");
         assert_eq!(headers.get("X-TC-Version").unwrap(), "2023-09-01");
         assert_eq!(headers.get("X-TC-Region").unwrap(), "ap-guangzhou");
         assert_eq!(headers.get("X-TC-Service").unwrap(), "hunyuan");
@@ -430,10 +428,24 @@ mod tests {
     fn test_tc3_signature_deterministic() {
         // Same inputs should produce the same signature.
         let (auth1, ts1) = sign_tencent_cloud_request(
-            "id", "key", "hunyuan", "host.example.com", "Action", "2023-09-01", "ap-guangzhou", "{}",
+            "id",
+            "key",
+            "hunyuan",
+            "host.example.com",
+            "Action",
+            "2023-09-01",
+            "ap-guangzhou",
+            "{}",
         );
         let (auth2, ts2) = sign_tencent_cloud_request(
-            "id", "key", "hunyuan", "host.example.com", "Action", "2023-09-01", "ap-guangzhou", "{}",
+            "id",
+            "key",
+            "hunyuan",
+            "host.example.com",
+            "Action",
+            "2023-09-01",
+            "ap-guangzhou",
+            "{}",
         );
         // Timestamps may differ by 1 second, but signatures should be valid.
         assert!(auth1.starts_with("TC3-HMAC-SHA256"));

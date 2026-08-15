@@ -103,7 +103,6 @@ impl RenderedImage {
             .map_err(|e| super::RenderError::ImageEncode(e.to_string()))?;
         Ok(buf)
     }
-
 }
 
 /// PDF page renderer abstraction.
@@ -198,8 +197,8 @@ pub trait PdfRenderer: Send + Sync {
 #[cfg(test)]
 #[allow(clippy::uninlined_format_args, clippy::float_cmp)]
 mod tests {
-    use super::*;
     use super::super::config::{ImageFormat, RenderConfig};
+    use super::*;
 
     #[test]
     fn rendered_image_new() {
@@ -265,10 +264,18 @@ mod tests {
     impl PdfRenderer for MockRenderer {
         fn render_page(&self, page_index: usize, config: &RenderConfig) -> Result<RenderedImage> {
             let pixels = vec![255u8; 4 * 10 * 10];
-            Ok(RenderedImage::new(10, 10, config.format, pixels, page_index))
+            Ok(RenderedImage::new(
+                10,
+                10,
+                config.format,
+                pixels,
+                page_index,
+            ))
         }
 
-        fn name(&self) -> &'static str { "mock" }
+        fn name(&self) -> &'static str {
+            "mock"
+        }
     }
 
     #[test]

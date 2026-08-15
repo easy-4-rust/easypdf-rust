@@ -169,8 +169,7 @@ mod tests {
 
     #[test]
     fn pages_sets_range() {
-        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
-            .pages(2..5);
+        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md").pages(2..5);
         assert!(builder.pages.is_some());
         assert_eq!(builder.pages.unwrap(), 2..5);
     }
@@ -198,16 +197,16 @@ mod tests {
 
     #[test]
     fn ocr_sets_policy() {
-        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
-            .ocr(OcrPolicy::Auto);
+        let builder =
+            PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md").ocr(OcrPolicy::Auto);
         assert_eq!(builder.ocr_policy, OcrPolicy::Auto);
     }
 
     #[test]
     fn resource_limits_sets_limits() {
         let limits = ResourceLimits::strict();
-        let builder = PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md")
-            .resource_limits(limits);
+        let builder =
+            PdfMarkdownExportBuilder::new("/tmp/in.pdf", "/tmp/out.md").resource_limits(limits);
         assert_eq!(builder.limits.max_input_bytes(), limits.max_input_bytes());
     }
 

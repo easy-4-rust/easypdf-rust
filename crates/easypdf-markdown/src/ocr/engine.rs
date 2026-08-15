@@ -1,7 +1,7 @@
 //! OCR engine abstraction and result types.
 
-use easypdf_core::CapabilityLevel;
 use crate::render::RenderedImage;
+use easypdf_core::CapabilityLevel;
 
 /// Input image for OCR recognition.
 ///

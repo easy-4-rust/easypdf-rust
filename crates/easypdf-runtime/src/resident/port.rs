@@ -45,9 +45,8 @@ pub fn write_port_file(port: u16) -> Result<()> {
 /// - [`ResidentError::Protocol`] if the file contents are not a valid port number.
 pub fn read_port_file() -> Result<u16> {
     let path = port_file_path();
-    let content = std::fs::read_to_string(&path).map_err(|_| {
-        ResidentError::ServerNotRunning(path.clone())
-    })?;
+    let content = std::fs::read_to_string(&path)
+        .map_err(|_| ResidentError::ServerNotRunning(path.clone()))?;
     let port: u16 = content.trim().parse().map_err(|_| {
         ResidentError::Protocol(format!(
             "invalid port number in {}: {:?}",

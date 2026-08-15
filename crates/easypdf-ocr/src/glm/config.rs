@@ -105,7 +105,10 @@ mod tests {
     #[test]
     fn test_default_endpoint() {
         let config = GlmConfig::default();
-        assert_eq!(config.endpoint, "https://open.bigmodel.cn/api/paas/v4/layout_parsing");
+        assert_eq!(
+            config.endpoint,
+            "https://open.bigmodel.cn/api/paas/v4/layout_parsing"
+        );
     }
 
     #[test]
@@ -129,7 +132,10 @@ mod tests {
     #[test]
     fn test_output_format_display() {
         assert_eq!(GlmOutputFormat::Text.to_string(), "text");
-        assert_eq!(GlmOutputFormat::TextWithBoxes.to_string(), "text_with_boxes");
+        assert_eq!(
+            GlmOutputFormat::TextWithBoxes.to_string(),
+            "text_with_boxes"
+        );
     }
 
     #[test]
@@ -151,8 +157,14 @@ mod tests {
             ..GlmConfig::default()
         };
         let debug = format!("{config:?}");
-        assert!(!debug.contains("super-secret-key-12345"), "API key must not appear in Debug output");
-        assert!(debug.contains("redacted"), "Debug output should contain 'redacted'");
+        assert!(
+            !debug.contains("super-secret-key-12345"),
+            "API key must not appear in Debug output"
+        );
+        assert!(
+            debug.contains("redacted"),
+            "Debug output should contain 'redacted'"
+        );
         assert!(debug.contains("GlmConfig"));
     }
 }

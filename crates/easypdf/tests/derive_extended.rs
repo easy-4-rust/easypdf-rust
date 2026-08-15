@@ -190,7 +190,10 @@ fn nested_attribute_renders_inner_elements() {
     assert_eq!(elements.len(), 2); // name + address.city
 
     let descriptors = model.field_descriptors();
-    let addr_desc = descriptors.iter().find(|d| d.field_name == "address").unwrap();
+    let addr_desc = descriptors
+        .iter()
+        .find(|d| d.field_name == "address")
+        .unwrap();
     assert!(addr_desc.nested);
 }
 

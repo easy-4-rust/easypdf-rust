@@ -3,19 +3,20 @@
 #![allow(unused_imports)]
 
 use easypdf::{
-    AtomicFileOutput, EasyPdf, ImageData, ImageFormat, ListItem,
-    PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel, PdfInput,
-    PdfManipulator, PdfModel, PdfReader, PdfTemplateFiller, PdfWriter,
-    PdfWriterBuilder, ReadStrategy, ResourceLimits, SourceLocation,
-    WriteBackend, LayoutDirection,
+    AtomicFileOutput, EasyPdf, ImageData, ImageFormat, LayoutDirection, ListItem, PdfBlock,
+    PdfBlockType, PdfDocumentModel, PdfInput, PdfManipulator, PdfModel, PdfPageModel, PdfReader,
+    PdfTemplateFiller, PdfWriter, PdfWriterBuilder, ReadStrategy, ResourceLimits, SourceLocation,
+    WriteBackend,
 };
 
 // Verify re-exports from easypdf_core::io
-use easypdf::{attempt_repair, guard_decompression_bomb, guard_element_explosion,
-              is_likely_corrupt, validate_io_url, RepairOptions};
+use easypdf::{
+    RepairOptions, attempt_repair, guard_decompression_bomb, guard_element_explosion,
+    is_likely_corrupt, validate_io_url,
+};
 
 // Verify core re-exports
-use easypdf::{PdfError, PdfFont, PdfMetadata, PdfText, PageSize, Orientation, Rotation};
+use easypdf::{Orientation, PageSize, PdfError, PdfFont, PdfMetadata, PdfText, Rotation};
 
 // --- Facade method existence ---
 
@@ -118,8 +119,13 @@ fn facade_table_detector_returns_processor() {
 fn facade_render_page_signature_exists() {
     // Just verify the function signature compiles; actual rendering
     // requires a valid PDF file.
-    let _ = EasyPdf::render_page as fn(&std::path::Path, usize, &std::path::Path, u32)
-        -> std::result::Result<(), easypdf::RenderError>;
+    let _ = EasyPdf::render_page
+        as fn(
+            &std::path::Path,
+            usize,
+            &std::path::Path,
+            u32,
+        ) -> std::result::Result<(), easypdf::RenderError>;
 }
 
 // --- Resident facade methods (feature-gated) ---

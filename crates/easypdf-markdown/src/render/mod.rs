@@ -37,8 +37,8 @@
 //! # Ok::<(), easypdf_markdown::render::RenderError>(())
 //! ```
 
-pub mod backends;
 pub mod backend;
+pub mod backends;
 pub mod config;
 pub mod error;
 pub mod traits;

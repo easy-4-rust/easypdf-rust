@@ -84,7 +84,7 @@ mod tests {
             base_ms: 500,
             max_ms: 8000,
         };
-        assert_eq!(strategy.delay_for(0), Duration::from_millis(500));  // 500 * 2^0 = 500
+        assert_eq!(strategy.delay_for(0), Duration::from_millis(500)); // 500 * 2^0 = 500
         assert_eq!(strategy.delay_for(1), Duration::from_secs(1)); // 500 * 2^1 = 1000
         assert_eq!(strategy.delay_for(2), Duration::from_secs(2)); // 500 * 2^2 = 2000
         assert_eq!(strategy.delay_for(3), Duration::from_secs(4)); // 500 * 2^3 = 4000

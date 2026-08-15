@@ -6,11 +6,11 @@
 
 use std::collections::HashMap;
 
-use easypdf_markdown::ocr::OcrImage;
 use crate::http::auth::AuthMethod;
 use crate::http::error::Result;
-use crate::http::image::{encode_for_request, ImageEncoding};
+use crate::http::image::{ImageEncoding, encode_for_request};
 use crate::http::request::{OcrRequest, RequestConfig};
+use easypdf_markdown::ocr::OcrImage;
 
 use super::config::{HunyuanConfig, HunyuanMode};
 

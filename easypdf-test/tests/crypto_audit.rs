@@ -10,9 +10,7 @@
 //! - The encrypted output is a standard encrypted PDF (not a custom container)
 
 use easypdf::EasyPdf;
-use easypdf_core::crypto::{
-    self, CryptoError, PdfEncryption, PdfSigner,
-};
+use easypdf_core::crypto::{self, CryptoError, PdfEncryption, PdfSigner};
 
 // ============================================================================
 // DER encoding helpers (for building self-signed X.509 test certificates)
@@ -61,10 +59,7 @@ fn der_int(value: &[u8]) -> Vec<u8> {
         content.extend(value);
     } else {
         let mut start = 0;
-        while start < value.len() - 1
-            && value[start] == 0
-            && value[start + 1] & 0x80 == 0
-        {
+        while start < value.len() - 1 && value[start] == 0 && value[start + 1] & 0x80 == 0 {
             start += 1;
         }
         content.extend(&value[start..]);
@@ -118,10 +113,12 @@ fn concat(parts: &[&[u8]]) -> Vec<u8> {
 }
 
 // OID value constants (pre-DER-encoded: tag 0x06 + length + value).
-const OID_RSA_ENCRYPTION_DER: &[u8] =
-    &[0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01];
-const OID_SHA256_WITH_RSA_DER: &[u8] =
-    &[0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x0B];
+const OID_RSA_ENCRYPTION_DER: &[u8] = &[
+    0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01,
+];
+const OID_SHA256_WITH_RSA_DER: &[u8] = &[
+    0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x0B,
+];
 const OID_CN_DER: &[u8] = &[0x06, 0x03, 0x55, 0x04, 0x03];
 
 // ============================================================================
@@ -134,8 +131,8 @@ const OID_CN_DER: &[u8] = &[0x06, 0x03, 0x55, 0x04, 0x03];
 /// is a valid DER-encoded X.509 v3 certificate with CN=easypdf-test.
 fn generate_test_cert_and_key() -> (Vec<u8>, Vec<u8>) {
     use rand::rngs::OsRng;
-    use rsa::pkcs1::EncodeRsaPrivateKey;
     use rsa::RsaPrivateKey;
+    use rsa::pkcs1::EncodeRsaPrivateKey;
 
     let mut rng = OsRng;
     let private_key = RsaPrivateKey::new(&mut rng, 2048).expect("generate RSA key");
@@ -155,12 +152,9 @@ fn generate_test_cert_and_key() -> (Vec<u8>, Vec<u8>) {
 /// Build a minimal self-signed X.509 v3 certificate in DER format.
 ///
 /// Uses ring for constant-time RSA PKCS#1 v1.5 + SHA-256 signing.
-fn build_self_signed_cert(
-    priv_der: &[u8],
-    public_key: &rsa::RsaPublicKey,
-) -> Vec<u8> {
+fn build_self_signed_cert(priv_der: &[u8], public_key: &rsa::RsaPublicKey) -> Vec<u8> {
     use ring::rand::SystemRandom;
-    use ring::signature::{RsaKeyPair, RSA_PKCS1_SHA256};
+    use ring::signature::{RSA_PKCS1_SHA256, RsaKeyPair};
     use rsa::traits::PublicKeyParts;
 
     // Subject/issuer Name: SEQUENCE { SET { SEQUENCE { OID CN, UTF8String } } }
@@ -185,12 +179,12 @@ fn build_self_signed_cert(
     // TBSCertificate SEQUENCE
     let tbs = der_seq(&concat(&[
         &der_ctx(0, true, &der_int(&[2u8])), // version v3
-        &der_int(&[0x01u8]),                   // serial = 1
-        &der_seq(OID_SHA256_WITH_RSA_DER),     // signature algorithm
-        &name,                                  // issuer
-        &validity,                              // validity
-        &name,                                  // subject (same as issuer)
-        &spki,                                  // subjectPublicKeyInfo
+        &der_int(&[0x01u8]),                 // serial = 1
+        &der_seq(OID_SHA256_WITH_RSA_DER),   // signature algorithm
+        &name,                               // issuer
+        &validity,                           // validity
+        &name,                               // subject (same as issuer)
+        &spki,                               // subjectPublicKeyInfo
     ]));
 
     // Sign the TBS certificate with ring (constant-time RSA).
@@ -216,7 +210,7 @@ fn build_self_signed_cert(
 /// Create a minimal valid PDF in memory using the `PdfWriter` facade.
 fn create_test_pdf_bytes() -> Vec<u8> {
     use easypdf::PdfWriter;
-    use easypdf::{PageSize, Orientation, PdfText};
+    use easypdf::{Orientation, PageSize, PdfText};
 
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("test.pdf");
@@ -369,7 +363,10 @@ fn encrypt_decrypt_roundtrip_preserves_content() {
     assert!(encrypted.starts_with(b"%PDF-"));
     // Encrypted output contains the /Encrypt dictionary.
     let s = String::from_utf8_lossy(&encrypted);
-    assert!(s.contains("/Encrypt"), "encrypted PDF must contain /Encrypt dictionary");
+    assert!(
+        s.contains("/Encrypt"),
+        "encrypted PDF must contain /Encrypt dictionary"
+    );
 
     // Decrypt with the owner password.
     let decrypted = crypto::decrypt_pdf(&encrypted, "ownerpass").expect("decrypt");

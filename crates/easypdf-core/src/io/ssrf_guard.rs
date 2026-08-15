@@ -84,9 +84,7 @@ pub fn validate_url(url: &str) -> Result<()> {
         .ok_or_else(|| PdfError::SecurityViolation(format!("URL has no authority: {url}")))?;
 
     // Host is up to the first `/`, `?`, or `#`.
-    let host_end = authority
-        .find(['/', '?', '#'])
-        .unwrap_or(authority.len());
+    let host_end = authority.find(['/', '?', '#']).unwrap_or(authority.len());
     let host_with_port = &authority[..host_end];
 
     // Strip port if present.
@@ -290,16 +288,12 @@ mod tests {
 
     #[test]
     fn metadata_endpoint_rejected() {
-        assert!(
-            validate_url("http://169.254.169.254/latest/meta-data").is_err()
-        );
+        assert!(validate_url("http://169.254.169.254/latest/meta-data").is_err());
     }
 
     #[test]
     fn metadata_hostname_rejected() {
-        assert!(
-            validate_url("http://metadata.google.internal/computeMetadata/v1/").is_err()
-        );
+        assert!(validate_url("http://metadata.google.internal/computeMetadata/v1/").is_err());
     }
 
     // --- Private IP ranges ---
@@ -385,9 +379,7 @@ mod tests {
 
     #[test]
     fn ipv4_mapped_metadata_rejected() {
-        assert!(
-            validate_url("http://[::ffff:169.254.169.254]/latest/meta-data/").is_err()
-        );
+        assert!(validate_url("http://[::ffff:169.254.169.254]/latest/meta-data/").is_err());
     }
 
     #[test]

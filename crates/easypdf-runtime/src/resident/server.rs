@@ -14,7 +14,7 @@ use tracing::{debug, error, info, warn};
 
 use super::config::{AutosaveMode, ResidentConfig};
 use super::error::{ResidentError, Result};
-use super::protocol::{Request, Response, ResponseData, SessionId, MAX_MESSAGE_BYTES};
+use super::protocol::{MAX_MESSAGE_BYTES, Request, Response, ResponseData, SessionId};
 use super::session::DocumentSession;
 use super::transport::Transport;
 
@@ -84,18 +84,17 @@ impl ResidentServer {
     /// # Errors
     ///
     /// Returns `ResidentError::Io` if binding fails.
-    pub fn bind_with_config(
-        socket_path: impl AsRef<Path>,
-        config: ResidentConfig,
-    ) -> Result<Self> {
+    pub fn bind_with_config(socket_path: impl AsRef<Path>, config: ResidentConfig) -> Result<Self> {
         #[cfg(unix)]
         {
             let socket_path = socket_path.as_ref().to_path_buf();
-            let transport = super::unix::UnixTransport::bind_with_mode(
-                &socket_path,
-                config.socket_mode,
-            )?;
-            Ok(Self::with_transport_and_path(Box::new(transport), socket_path, config))
+            let transport =
+                super::unix::UnixTransport::bind_with_mode(&socket_path, config.socket_mode)?;
+            Ok(Self::with_transport_and_path(
+                Box::new(transport),
+                socket_path,
+                config,
+            ))
         }
         #[cfg(not(unix))]
         {
@@ -133,7 +132,11 @@ impl ResidentServer {
     /// Returns `ResidentError::Io` if binding fails.
     pub fn bind_tcp_with_config(config: ResidentConfig) -> Result<Self> {
         let transport = super::tcp::TcpTransport::bind_localhost()?;
-        Ok(Self::with_transport_and_path(Box::new(transport), PathBuf::new(), config))
+        Ok(Self::with_transport_and_path(
+            Box::new(transport),
+            PathBuf::new(),
+            config,
+        ))
     }
 
     /// Bind to a specific TCP port on localhost with explicit configuration.
@@ -143,7 +146,11 @@ impl ResidentServer {
     /// Returns `ResidentError::Io` if binding fails.
     pub fn bind_tcp_port_with_config(port: u16, config: ResidentConfig) -> Result<Self> {
         let transport = super::tcp::TcpTransport::bind_port(port)?;
-        Ok(Self::with_transport_and_path(Box::new(transport), PathBuf::new(), config))
+        Ok(Self::with_transport_and_path(
+            Box::new(transport),
+            PathBuf::new(),
+            config,
+        ))
     }
 
     /// Create a server with an explicit [`Transport`] implementation.
@@ -156,7 +163,11 @@ impl ResidentServer {
     /// Returns `ResidentError::Io` if the transport fails
     /// to initialize.
     pub fn with_transport(transport: Box<dyn Transport>) -> Result<Self> {
-        Ok(Self::with_transport_and_path(transport, PathBuf::new(), ResidentConfig::default()))
+        Ok(Self::with_transport_and_path(
+            transport,
+            PathBuf::new(),
+            ResidentConfig::default(),
+        ))
     }
 
     fn with_transport_and_path(
@@ -212,8 +223,7 @@ impl ResidentServer {
                         Self::handle_connection(conn, &state, &next_id, &running);
                     }));
                 }
-                Err(ResidentError::Io(ref e))
-                    if e.kind() == std::io::ErrorKind::WouldBlock => {
+                Err(ResidentError::Io(ref e)) if e.kind() == std::io::ErrorKind::WouldBlock => {
                     // No connection pending; sleep briefly to avoid busy-spin
                     std::thread::sleep(std::time::Duration::from_millis(50));
                 }
@@ -254,9 +264,7 @@ impl ResidentServer {
     /// Number of active sessions.
     #[must_use]
     pub fn session_count(&self) -> usize {
-        self.state
-            .lock()
-            .map_or(0, |state| state.sessions.len())
+        self.state.lock().map_or(0, |state| state.sessions.len())
     }
 
     /// The socket path this server is listening on (Unix only).
@@ -421,10 +429,9 @@ impl ResidentServer {
                     );
                 };
                 match session.extract_text(pages.as_ref()) {
-                    Ok(text) => Response::ok_data(
-                        Some(session_id),
-                        ResponseData::Text { content: text },
-                    ),
+                    Ok(text) => {
+                        Response::ok_data(Some(session_id), ResponseData::Text { content: text })
+                    }
                     Err(e) => Response::error("EXTRACT_FAILED", e.to_string()),
                 }
             }
@@ -461,10 +468,9 @@ impl ResidentServer {
                     );
                 };
                 match session.page_count() {
-                    Ok(count) => Response::ok_data(
-                        Some(session_id),
-                        ResponseData::PageCount { count },
-                    ),
+                    Ok(count) => {
+                        Response::ok_data(Some(session_id), ResponseData::PageCount { count })
+                    }
                     Err(e) => Response::error("PAGE_COUNT_FAILED", e.to_string()),
                 }
             }
@@ -529,13 +535,9 @@ impl ResidentServer {
         }
     }
 
-    fn write_response(
-        writer: &mut impl Write,
-        response: &Response,
-    ) -> std::io::Result<()> {
-        let mut json = serde_json::to_string(response).map_err(|e| {
-            std::io::Error::new(std::io::ErrorKind::InvalidData, e.to_string())
-        })?;
+    fn write_response(writer: &mut impl Write, response: &Response) -> std::io::Result<()> {
+        let mut json = serde_json::to_string(response)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e.to_string()))?;
         json.push('\n');
         writer.write_all(json.as_bytes())?;
         writer.flush()
@@ -553,9 +555,9 @@ impl ResidentServer {
                     break;
                 }
 
-                let should_shutdown = state.lock().is_ok_and(|s| {
-                    s.last_activity.elapsed() >= s.config.idle_timeout
-                });
+                let should_shutdown = state
+                    .lock()
+                    .is_ok_and(|s| s.last_activity.elapsed() >= s.config.idle_timeout);
 
                 if should_shutdown {
                     info!("idle timeout reached, shutting down");

@@ -33,7 +33,11 @@ pub(crate) fn detect_table_region(
         ColumnSeparator::Pipe => &[ColumnSeparator::Pipe][..],
         ColumnSeparator::Tab => &[ColumnSeparator::Tab][..],
         ColumnSeparator::Whitespace => &[ColumnSeparator::Whitespace][..],
-        ColumnSeparator::Auto => &[ColumnSeparator::Pipe, ColumnSeparator::Tab, ColumnSeparator::Whitespace][..],
+        ColumnSeparator::Auto => &[
+            ColumnSeparator::Pipe,
+            ColumnSeparator::Tab,
+            ColumnSeparator::Whitespace,
+        ][..],
     };
 
     for &strategy in strategies {
@@ -209,20 +213,14 @@ mod tests {
     #[test]
     fn below_min_columns_rejected() {
         let config = TableDetectionConfig::new().with_min_columns(3);
-        let blocks = vec![
-            para("| A | B |"),
-            para("| 1 | 2 |"),
-        ];
+        let blocks = vec![para("| A | B |"), para("| 1 | 2 |")];
         assert!(detect_table_region(&blocks, 0, &config).is_none());
     }
 
     #[test]
     fn below_min_rows_rejected() {
         let config = TableDetectionConfig::new().with_min_rows(3);
-        let blocks = vec![
-            para("| A | B |"),
-            para("| 1 | 2 |"),
-        ];
+        let blocks = vec![para("| A | B |"), para("| 1 | 2 |")];
         // Only 2 rows (header + 1 data), config requires 3.
         assert!(detect_table_region(&blocks, 0, &config).is_none());
     }
@@ -233,7 +231,7 @@ mod tests {
     fn irregular_table_rejected_by_default() {
         let blocks = vec![
             para("| A | B | C |"),
-            para("| 1 | 2 |"),       // 2 columns vs 3 — breaks scan
+            para("| 1 | 2 |"), // 2 columns vs 3 — breaks scan
             para("| 4 | 5 | 6 |"),
         ];
         // Default config has allow_irregular = false.
@@ -286,10 +284,7 @@ mod tests {
     #[test]
     fn pipe_only_config() {
         let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Pipe);
-        let blocks = vec![
-            para("Name\tAge"),
-            para("Alice\t30"),
-        ];
+        let blocks = vec![para("Name\tAge"), para("Alice\t30")];
         // Tab-separated, but config says Pipe only.
         assert!(detect_table_region(&blocks, 0, &config).is_none());
     }
@@ -297,10 +292,7 @@ mod tests {
     #[test]
     fn tab_only_config() {
         let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Tab);
-        let blocks = vec![
-            para("Name\tAge"),
-            para("Alice\t30"),
-        ];
+        let blocks = vec![para("Name\tAge"), para("Alice\t30")];
         let region = detect_table_region(&blocks, 0, &config).unwrap();
         assert_eq!(region.headers, vec!["Name", "Age"]);
     }

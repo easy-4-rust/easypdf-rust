@@ -157,7 +157,10 @@ fn strip_dangling_refs(document: &mut lopdf::Document) {
 }
 
 /// Recursively replace dangling references in an object with `Null`.
-fn nullify_dangling(object: &mut lopdf::Object, valid_ids: &std::collections::HashSet<lopdf::ObjectId>) {
+fn nullify_dangling(
+    object: &mut lopdf::Object,
+    valid_ids: &std::collections::HashSet<lopdf::ObjectId>,
+) {
     match object {
         lopdf::Object::Reference(id) => {
             if !valid_ids.contains(id) {

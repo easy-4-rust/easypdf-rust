@@ -9,10 +9,10 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-use super::auth::{apply_auth, AuthMethod};
+use super::auth::{AuthMethod, apply_auth};
 use super::error::{OcrHttpError, Result};
 use super::rate_limit::{RateLimitConfig, TokenBucket};
-use super::retry::{is_retryable, BackoffStrategy};
+use super::retry::{BackoffStrategy, is_retryable};
 
 #[cfg(test)]
 mod tests;
@@ -105,10 +105,7 @@ impl OcrHttpClient {
         auth: AuthMethod,
         config: HttpClientConfig,
     ) -> Result<Self> {
-        let rate_limiter = config
-            .rate_limit
-            .as_ref()
-            .map(TokenBucket::new);
+        let rate_limiter = config.rate_limit.as_ref().map(TokenBucket::new);
 
         let client = reqwest::blocking::Client::builder()
             .timeout(config.timeout)

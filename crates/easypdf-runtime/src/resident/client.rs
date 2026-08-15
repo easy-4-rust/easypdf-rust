@@ -10,8 +10,8 @@ use std::path::{Path, PathBuf};
 
 use super::error::{ResidentError, Result};
 use super::protocol::{
-    OpenMode, PageRange, PdfMetadataDto, Request, Response, ResponseData, SessionId,
-    MAX_MESSAGE_BYTES,
+    MAX_MESSAGE_BYTES, OpenMode, PageRange, PdfMetadataDto, Request, Response, ResponseData,
+    SessionId,
 };
 
 /// Address of the server to connect to.
@@ -86,11 +86,8 @@ impl ResidentClient {
     /// Returns [`ResidentError::ServerNotRunning`] if the connection fails.
     pub fn connect_tcp(addr: SocketAddr) -> Result<Self> {
         // Verify the server is reachable
-        let _ = std::net::TcpStream::connect_timeout(
-            &addr,
-            std::time::Duration::from_secs(3),
-        )
-        .map_err(|_| ResidentError::ServerNotRunning(PathBuf::from(addr.to_string())))?;
+        let _ = std::net::TcpStream::connect_timeout(&addr, std::time::Duration::from_secs(3))
+            .map_err(|_| ResidentError::ServerNotRunning(PathBuf::from(addr.to_string())))?;
         Ok(Self {
             addr: TransportAddr::Tcp(addr),
         })
@@ -163,11 +160,7 @@ impl ResidentClient {
     /// # Errors
     ///
     /// Returns [`ResidentError`] if the request fails.
-    pub fn extract_text(
-        &self,
-        session: SessionId,
-        pages: Option<PageRange>,
-    ) -> Result<String> {
+    pub fn extract_text(&self, session: SessionId, pages: Option<PageRange>) -> Result<String> {
         let response = self.send(&Request::ExtractText {
             session_id: session,
             pages,
@@ -219,12 +212,7 @@ impl ResidentClient {
     /// # Errors
     ///
     /// Returns [`ResidentError`] if the request fails.
-    pub fn rotate_page(
-        &self,
-        session: SessionId,
-        page: usize,
-        rotation: u16,
-    ) -> Result<()> {
+    pub fn rotate_page(&self, session: SessionId, page: usize, rotation: u16) -> Result<()> {
         let response = self.send(&Request::RotatePage {
             session_id: session,
             page,
@@ -312,9 +300,7 @@ impl ResidentClient {
 
         if !response.ok {
             return Err(ResidentError::Server {
-                code: response
-                    .error_code
-                    .unwrap_or_else(|| "UNKNOWN".to_string()),
+                code: response.error_code.unwrap_or_else(|| "UNKNOWN".to_string()),
                 message: response
                     .error_message
                     .unwrap_or_else(|| "unknown error".to_string()),
@@ -344,9 +330,7 @@ fn check_ok(response: Response) -> Result<()> {
         Ok(())
     } else {
         Err(ResidentError::Server {
-            code: response
-                .error_code
-                .unwrap_or_else(|| "UNKNOWN".to_string()),
+            code: response.error_code.unwrap_or_else(|| "UNKNOWN".to_string()),
             message: response
                 .error_message
                 .unwrap_or_else(|| "unknown error".to_string()),

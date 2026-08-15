@@ -81,13 +81,20 @@ impl OcrEngine for OcrsEngine {
             Ok(rects) => rects
                 .iter()
                 .map(|r| {
-                    let center = r.center();
+                    // ocrs 的坐标是 f32 像素值，转 u32 时截断/去符号是可接受的精度损失。
+                    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+                    let (cx, cy, rw, rh) = (
+                        r.center().x as u32,
+                        r.center().y as u32,
+                        r.width() as u32,
+                        r.height() as u32,
+                    );
                     WordBox {
                         text: String::new(), // ocrs doesn't provide per-word text
-                        x: center.x as u32,
-                        y: center.y as u32,
-                        width: r.width() as u32,
-                        height: r.height() as u32,
+                        x: cx,
+                        y: cy,
+                        width: rw,
+                        height: rh,
                         confidence: None,
                     }
                 })

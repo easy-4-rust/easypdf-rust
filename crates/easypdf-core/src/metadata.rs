@@ -200,8 +200,7 @@ mod tests {
 
     #[test]
     fn bookmark_with_child() {
-        let bm = PdfBookmark::new("Root", 1)
-            .child(PdfBookmark::new("Child", 2));
+        let bm = PdfBookmark::new("Root", 1).child(PdfBookmark::new("Child", 2));
         assert_eq!(bm.children.len(), 1);
         assert_eq!(bm.children[0].title, "Child");
     }
@@ -209,10 +208,7 @@ mod tests {
     #[test]
     fn bookmark_nested_children() {
         let bm = PdfBookmark::new("Root", 1)
-            .child(
-                PdfBookmark::new("L1", 2)
-                    .child(PdfBookmark::new("L2", 3)),
-            );
+            .child(PdfBookmark::new("L1", 2).child(PdfBookmark::new("L2", 3)));
         assert_eq!(bm.children.len(), 1);
         assert_eq!(bm.children[0].children.len(), 1);
     }

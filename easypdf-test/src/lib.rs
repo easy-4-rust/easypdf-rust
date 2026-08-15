@@ -6,8 +6,8 @@
 
 use std::path::Path;
 
-use easypdf::prelude::*;
 use easypdf::PdfWriter;
+use easypdf::prelude::*;
 use serde::{Deserialize, Serialize};
 
 /// Normalized comparison for text extraction.
@@ -146,8 +146,10 @@ pub fn create_large_100page_pdf(path: &Path) -> easypdf::Result<()> {
     for i in 1..=100 {
         writer.add_page(PageSize::A4, Orientation::Portrait)?;
         writer.write_text(
-            &PdfText::new(format!("Page {i} of 100 — Stress test document for performance benchmarking."))
-                .font(PdfFont::helvetica(12.0)),
+            &PdfText::new(format!(
+                "Page {i} of 100 — Stress test document for performance benchmarking."
+            ))
+            .font(PdfFont::helvetica(12.0)),
             72.0,
             780.0,
         )?;
@@ -183,11 +185,7 @@ pub fn create_with_table_text_pdf(path: &Path) -> easypdf::Result<()> {
 
     let mut y = 780.0;
     for line in &table_lines {
-        writer.write_text(
-            &PdfText::new(*line).font(PdfFont::courier(10.0)),
-            72.0,
-            y,
-        )?;
+        writer.write_text(&PdfText::new(*line).font(PdfFont::courier(10.0)), 72.0, y)?;
         y -= 16.0;
     }
 
@@ -231,11 +229,7 @@ pub fn create_multi_column_heuristic_pdf(path: &Path) -> easypdf::Result<()> {
     // Write left column
     let mut y = 780.0;
     for text in &left_paragraphs {
-        writer.write_text(
-            &PdfText::new(*text).font(PdfFont::helvetica(11.0)),
-            72.0,
-            y,
-        )?;
+        writer.write_text(&PdfText::new(*text).font(PdfFont::helvetica(11.0)), 72.0, y)?;
         y -= 18.0;
     }
 

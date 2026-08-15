@@ -1,8 +1,8 @@
 //! Integration-level tests for the table detection processor.
 
-use easypdf_core::{PageIndex, PdfMetadata};
-use easypdf_core::PdfInput;
 use crate::{PdfMarkdownProcessor, ProcessorPipeline};
+use easypdf_core::PdfInput;
+use easypdf_core::{PageIndex, PdfMetadata};
 use easypdf_core::{PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel, SourceLocation};
 
 use super::config::{ColumnSeparator, TableDetectionConfig};
@@ -182,10 +182,7 @@ fn empty_document() {
 fn below_min_columns_rejected() {
     let config = TableDetectionConfig::new().with_min_columns(3);
     let proc = TableDetectorProcessor::with_config(config);
-    let doc = make_doc(vec![
-        para("| A | B |"),
-        para("| 1 | 2 |"),
-    ]);
+    let doc = make_doc(vec![para("| A | B |"), para("| 1 | 2 |")]);
     let (result, _) = proc.process(&empty_input(), doc).unwrap();
     assert_eq!(count_tables(&result), 0);
 }
@@ -225,7 +222,7 @@ fn exact_min_rows_accepted() {
 fn irregular_table_rejected_by_default() {
     let doc = make_doc(vec![
         para("| A | B | C |"),
-        para("| 1 | 2 |"),       // 2 cols vs 3 — breaks scan, only header remains
+        para("| 1 | 2 |"), // 2 cols vs 3 — breaks scan, only header remains
         para("| 4 | 5 | 6 |"),
     ]);
     let result = run_process(doc);
@@ -300,10 +297,7 @@ fn integrates_into_pipeline() {
     pipeline.register(Box::new(TableDetectorProcessor::new()));
     assert_eq!(pipeline.len(), 1);
 
-    let doc = make_doc(vec![
-        para("| A | B |"),
-        para("| 1 | 2 |"),
-    ]);
+    let doc = make_doc(vec![para("| A | B |"), para("| 1 | 2 |")]);
     let (result, warnings) = pipeline.run(&empty_input(), doc).unwrap();
     assert!(warnings.is_empty());
     assert_eq!(count_tables(&result), 1);
@@ -376,10 +370,7 @@ fn source_location_from_first_row() {
 fn pipe_only_config_ignores_tabs() {
     let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Pipe);
     let proc = TableDetectorProcessor::with_config(config);
-    let doc = make_doc(vec![
-        para("Name\tAge"),
-        para("Alice\t30"),
-    ]);
+    let doc = make_doc(vec![para("Name\tAge"), para("Alice\t30")]);
     let (result, _) = proc.process(&empty_input(), doc).unwrap();
     assert_eq!(count_tables(&result), 0);
 }
@@ -388,10 +379,7 @@ fn pipe_only_config_ignores_tabs() {
 fn tab_only_config_ignores_pipes() {
     let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Tab);
     let proc = TableDetectorProcessor::with_config(config);
-    let doc = make_doc(vec![
-        para("| Name | Age |"),
-        para("| Alice | 30 |"),
-    ]);
+    let doc = make_doc(vec![para("| Name | Age |"), para("| Alice | 30 |")]);
     let (result, _) = proc.process(&empty_input(), doc).unwrap();
     assert_eq!(count_tables(&result), 0);
 }
@@ -400,10 +388,7 @@ fn tab_only_config_ignores_pipes() {
 fn whitespace_only_config_ignores_pipes() {
     let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Whitespace);
     let proc = TableDetectorProcessor::with_config(config);
-    let doc = make_doc(vec![
-        para("| Name | Age |"),
-        para("| Alice | 30 |"),
-    ]);
+    let doc = make_doc(vec![para("| Name | Age |"), para("| Alice | 30 |")]);
     let (result, _) = proc.process(&empty_input(), doc).unwrap();
     assert_eq!(count_tables(&result), 0);
 }

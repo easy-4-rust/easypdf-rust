@@ -1,25 +1,3 @@
-   Compiling num-traits v0.2.19
-    Checking bytemuck v1.25.2
-    Checking chrono v0.4.45
-    Checking moxcms v0.8.1
-    Checking lopdf v0.44.0
-    Checking image v0.25.10
-    Checking easypdf-core v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-core)
-    Checking easypdf-reader v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-reader)
- Documenting easypdf-markdown v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-markdown)
-warning: redundant explicit link target
-  |
-  = note: when a link's destination is not specified,
-          the label is used to resolve intra-doc links
-  = note: `#[warn(rustdoc::redundant_explicit_links)]` on by default
-
-warning: redundant explicit link target
-  |
-  = note: when a link's destination is not specified,
-          the label is used to resolve intra-doc links
-
-warning: `easypdf-markdown` (lib doc) generated 4 warnings (2 duplicates)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.30s
 pub mod easypdf_markdown
 pub mod easypdf_markdown::ocr
 pub mod easypdf_markdown::ocr::config
@@ -45,6 +23,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrTrigger::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::Into<T>
@@ -79,6 +61,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrTr
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrTrigger
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrTrigger
 pub type easypdf_markdown::ocr::config::OcrTrigger::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrTrigger where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrTrigger where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrTrigger::vzip(self) -> V
 pub struct easypdf_markdown::ocr::config::OcrConfig
 pub easypdf_markdown::ocr::config::OcrConfig::min_confidence: f32
 pub easypdf_markdown::ocr::config::OcrConfig::min_text_length: usize
@@ -97,6 +82,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::Into<T>
@@ -131,6 +120,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrCo
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrConfig
 pub type easypdf_markdown::ocr::config::OcrConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrConfig::vzip(self) -> V
 pub mod easypdf_markdown::ocr::engine
 pub struct easypdf_markdown::ocr::engine::OcrImage
 pub easypdf_markdown::ocr::engine::OcrImage::height: u32
@@ -151,6 +143,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::Into<T>
@@ -185,6 +181,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrIm
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrImage
 pub type easypdf_markdown::ocr::engine::OcrImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrImage::vzip(self) -> V
 pub struct easypdf_markdown::ocr::engine::OcrResult
 pub easypdf_markdown::ocr::engine::OcrResult::confidence: core::option::Option<f32>
 pub easypdf_markdown::ocr::engine::OcrResult::text: alloc::string::String
@@ -200,6 +199,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrResult
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrResult::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::Into<T>
@@ -234,6 +237,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrRe
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrResult
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrResult
 pub type easypdf_markdown::ocr::engine::OcrResult::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrResult where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrResult where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrResult::vzip(self) -> V
 pub struct easypdf_markdown::ocr::engine::WordBox
 pub easypdf_markdown::ocr::engine::WordBox::confidence: core::option::Option<f32>
 pub easypdf_markdown::ocr::engine::WordBox::height: u32
@@ -252,6 +258,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::WordBox
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::WordBox
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::WordBox::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::Into<T>
@@ -286,6 +296,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::WordB
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::WordBox
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::WordBox
 pub type easypdf_markdown::ocr::engine::WordBox::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::WordBox where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::WordBox where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::WordBox::vzip(self) -> V
 pub trait easypdf_markdown::ocr::engine::OcrEngine: core::marker::Send + core::marker::Sync
 pub fn easypdf_markdown::ocr::engine::OcrEngine::languages(&self) -> &[&str]
 pub fn easypdf_markdown::ocr::engine::OcrEngine::level(&self) -> easypdf_core::traits::CapabilityLevel
@@ -320,6 +333,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engines::MockOcrEngine
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engines::MockOcrEngine
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engines::MockOcrEngine
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engines::MockOcrEngine
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engines::MockOcrEngine where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engines::MockOcrEngine where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engines::MockOcrEngine where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engines::MockOcrEngine where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engines::MockOcrEngine where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engines::MockOcrEngine::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engines::MockOcrEngine where U: core::convert::Into<T>
@@ -354,53 +371,63 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engines::Mock
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engines::MockOcrEngine
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engines::MockOcrEngine
 pub type easypdf_markdown::ocr::engines::MockOcrEngine::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engines::MockOcrEngine where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engines::MockOcrEngine where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engines::MockOcrEngine::vzip(self) -> V
 pub mod easypdf_markdown::ocr::processor
 pub struct easypdf_markdown::ocr::processor::OcrProcessor
-impl easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_mock_engine() -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
-impl core::fmt::Debug for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
-impl core::marker::Freeze for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Send for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Sync for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Unpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::From<T>
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::Into<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = core::convert::Infallible
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::TryFrom<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> core::any::Any for easypdf_markdown::ocr::processor::OcrProcessor where T: 'static + ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow_mut(&mut self) -> &mut T
-impl<T> core::convert::From<T> for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Init = T
-pub const easypdf_markdown::ocr::processor::OcrProcessor::ALIGN: usize
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::drop(usize)
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Output = T
+impl easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_mock_engine() -> Self
+pub fn easypdf_markdown::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
+impl core::fmt::Debug for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
+pub fn easypdf_markdown::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
+impl core::marker::Freeze for easypdf_markdown::OcrProcessor
+impl core::marker::Send for easypdf_markdown::OcrProcessor
+impl core::marker::Sync for easypdf_markdown::OcrProcessor
+impl core::marker::Unpin for easypdf_markdown::OcrProcessor
+impl core::marker::UnsafeUnpin for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::OcrProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_markdown::OcrProcessor where U: core::convert::From<T>
+pub fn easypdf_markdown::OcrProcessor::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::OcrProcessor where U: core::convert::Into<T>
+pub type easypdf_markdown::OcrProcessor::Error = core::convert::Infallible
+pub fn easypdf_markdown::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_markdown::OcrProcessor where U: core::convert::TryFrom<T>
+pub type easypdf_markdown::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_markdown::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_markdown::OcrProcessor where T: 'static + ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Init = T
+pub const easypdf_markdown::OcrProcessor::ALIGN: usize
+pub unsafe fn easypdf_markdown::OcrProcessor::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_markdown::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_markdown::OcrProcessor::drop(usize)
+pub unsafe fn easypdf_markdown::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::Instrument for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::OcrProcessor
+impl<T> typenum::type_operators::Same for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::OcrProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::OcrProcessor::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::ocr::OcrTrigger
 pub easypdf_markdown::ocr::OcrTrigger::Always
 pub easypdf_markdown::ocr::OcrTrigger::OnEmptyPage
@@ -423,6 +450,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrTrigger::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::Into<T>
@@ -457,6 +488,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrTr
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrTrigger
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrTrigger
 pub type easypdf_markdown::ocr::config::OcrTrigger::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrTrigger where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrTrigger where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrTrigger::vzip(self) -> V
 pub struct easypdf_markdown::ocr::OcrConfig
 pub easypdf_markdown::ocr::OcrConfig::min_confidence: f32
 pub easypdf_markdown::ocr::OcrConfig::min_text_length: usize
@@ -475,6 +509,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::Into<T>
@@ -509,6 +547,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrCo
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrConfig
 pub type easypdf_markdown::ocr::config::OcrConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrConfig::vzip(self) -> V
 pub struct easypdf_markdown::ocr::OcrImage
 pub easypdf_markdown::ocr::OcrImage::height: u32
 pub easypdf_markdown::ocr::OcrImage::pixels: alloc::vec::Vec<u8>
@@ -528,6 +569,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::Into<T>
@@ -562,52 +607,62 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrIm
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrImage
 pub type easypdf_markdown::ocr::engine::OcrImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrImage::vzip(self) -> V
 pub struct easypdf_markdown::ocr::OcrProcessor
-impl easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_mock_engine() -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
-impl core::fmt::Debug for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
-impl core::marker::Freeze for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Send for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Sync for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Unpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::From<T>
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::Into<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = core::convert::Infallible
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::TryFrom<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> core::any::Any for easypdf_markdown::ocr::processor::OcrProcessor where T: 'static + ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow_mut(&mut self) -> &mut T
-impl<T> core::convert::From<T> for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Init = T
-pub const easypdf_markdown::ocr::processor::OcrProcessor::ALIGN: usize
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::drop(usize)
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Output = T
+impl easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_mock_engine() -> Self
+pub fn easypdf_markdown::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
+impl core::fmt::Debug for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
+pub fn easypdf_markdown::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
+impl core::marker::Freeze for easypdf_markdown::OcrProcessor
+impl core::marker::Send for easypdf_markdown::OcrProcessor
+impl core::marker::Sync for easypdf_markdown::OcrProcessor
+impl core::marker::Unpin for easypdf_markdown::OcrProcessor
+impl core::marker::UnsafeUnpin for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::OcrProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_markdown::OcrProcessor where U: core::convert::From<T>
+pub fn easypdf_markdown::OcrProcessor::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::OcrProcessor where U: core::convert::Into<T>
+pub type easypdf_markdown::OcrProcessor::Error = core::convert::Infallible
+pub fn easypdf_markdown::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_markdown::OcrProcessor where U: core::convert::TryFrom<T>
+pub type easypdf_markdown::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_markdown::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_markdown::OcrProcessor where T: 'static + ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Init = T
+pub const easypdf_markdown::OcrProcessor::ALIGN: usize
+pub unsafe fn easypdf_markdown::OcrProcessor::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_markdown::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_markdown::OcrProcessor::drop(usize)
+pub unsafe fn easypdf_markdown::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::Instrument for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::OcrProcessor
+impl<T> typenum::type_operators::Same for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::OcrProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::OcrProcessor::vzip(self) -> V
 pub struct easypdf_markdown::ocr::OcrResult
 pub easypdf_markdown::ocr::OcrResult::confidence: core::option::Option<f32>
 pub easypdf_markdown::ocr::OcrResult::text: alloc::string::String
@@ -623,6 +678,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrResult
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrResult::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::Into<T>
@@ -657,6 +716,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrRe
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrResult
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrResult
 pub type easypdf_markdown::ocr::engine::OcrResult::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrResult where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrResult where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrResult::vzip(self) -> V
 pub struct easypdf_markdown::ocr::WordBox
 pub easypdf_markdown::ocr::WordBox::confidence: core::option::Option<f32>
 pub easypdf_markdown::ocr::WordBox::height: u32
@@ -675,6 +737,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::WordBox
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::WordBox
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::WordBox::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::Into<T>
@@ -709,6 +775,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::WordB
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::WordBox
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::WordBox
 pub type easypdf_markdown::ocr::engine::WordBox::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::WordBox where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::WordBox where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::WordBox::vzip(self) -> V
 pub trait easypdf_markdown::ocr::OcrEngine: core::marker::Send + core::marker::Sync
 pub fn easypdf_markdown::ocr::OcrEngine::languages(&self) -> &[&str]
 pub fn easypdf_markdown::ocr::OcrEngine::level(&self) -> easypdf_core::traits::CapabilityLevel
@@ -741,6 +810,10 @@ impl core::marker::Unpin for easypdf_markdown::processors::HeadingDetectorProces
 impl core::marker::UnsafeUnpin for easypdf_markdown::processors::HeadingDetectorProcessor
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::processors::HeadingDetectorProcessor
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::processors::HeadingDetectorProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::processors::HeadingDetectorProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::processors::HeadingDetectorProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::processors::HeadingDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::processors::HeadingDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::processors::HeadingDetectorProcessor where U: core::convert::From<T>
 pub fn easypdf_markdown::processors::HeadingDetectorProcessor::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::processors::HeadingDetectorProcessor where U: core::convert::Into<T>
@@ -775,6 +848,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::processors::Headin
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::processors::HeadingDetectorProcessor
 impl<T> typenum::type_operators::Same for easypdf_markdown::processors::HeadingDetectorProcessor
 pub type easypdf_markdown::processors::HeadingDetectorProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::processors::HeadingDetectorProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::processors::HeadingDetectorProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::processors::HeadingDetectorProcessor::vzip(self) -> V
 pub struct easypdf_markdown::processors::LinkExtractorProcessor
 impl core::clone::Clone for easypdf_markdown::processors::LinkExtractorProcessor
 pub fn easypdf_markdown::processors::LinkExtractorProcessor::clone(&self) -> easypdf_markdown::processors::LinkExtractorProcessor
@@ -793,6 +869,10 @@ impl core::marker::Unpin for easypdf_markdown::processors::LinkExtractorProcesso
 impl core::marker::UnsafeUnpin for easypdf_markdown::processors::LinkExtractorProcessor
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::processors::LinkExtractorProcessor
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::processors::LinkExtractorProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::processors::LinkExtractorProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::processors::LinkExtractorProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::processors::LinkExtractorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::processors::LinkExtractorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::processors::LinkExtractorProcessor where U: core::convert::From<T>
 pub fn easypdf_markdown::processors::LinkExtractorProcessor::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::processors::LinkExtractorProcessor where U: core::convert::Into<T>
@@ -827,6 +907,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::processors::LinkEx
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::processors::LinkExtractorProcessor
 impl<T> typenum::type_operators::Same for easypdf_markdown::processors::LinkExtractorProcessor
 pub type easypdf_markdown::processors::LinkExtractorProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::processors::LinkExtractorProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::processors::LinkExtractorProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::processors::LinkExtractorProcessor::vzip(self) -> V
 pub struct easypdf_markdown::processors::ReadingOrderProcessor
 impl core::clone::Clone for easypdf_markdown::processors::ReadingOrderProcessor
 pub fn easypdf_markdown::processors::ReadingOrderProcessor::clone(&self) -> easypdf_markdown::processors::ReadingOrderProcessor
@@ -845,6 +928,10 @@ impl core::marker::Unpin for easypdf_markdown::processors::ReadingOrderProcessor
 impl core::marker::UnsafeUnpin for easypdf_markdown::processors::ReadingOrderProcessor
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::processors::ReadingOrderProcessor
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::processors::ReadingOrderProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::processors::ReadingOrderProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::processors::ReadingOrderProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::processors::ReadingOrderProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::processors::ReadingOrderProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::processors::ReadingOrderProcessor where U: core::convert::From<T>
 pub fn easypdf_markdown::processors::ReadingOrderProcessor::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::processors::ReadingOrderProcessor where U: core::convert::Into<T>
@@ -879,6 +966,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::processors::Readin
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::processors::ReadingOrderProcessor
 impl<T> typenum::type_operators::Same for easypdf_markdown::processors::ReadingOrderProcessor
 pub type easypdf_markdown::processors::ReadingOrderProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::processors::ReadingOrderProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::processors::ReadingOrderProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::processors::ReadingOrderProcessor::vzip(self) -> V
 pub mod easypdf_markdown::render
 pub mod easypdf_markdown::render::backend
 #[non_exhaustive] pub enum easypdf_markdown::render::backend::RenderBackend
@@ -908,10 +998,14 @@ impl core::marker::Unpin for easypdf_markdown::render::backend::RenderBackend
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::backend::RenderBackend
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::From<T>
 pub fn easypdf_markdown::render::backend::RenderBackend::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::Into<T>
@@ -948,6 +1042,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::backend::R
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::backend::RenderBackend
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::backend::RenderBackend
 pub type easypdf_markdown::render::backend::RenderBackend::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::backend::RenderBackend where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::backend::RenderBackend where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::backend::RenderBackend::vzip(self) -> V
 pub mod easypdf_markdown::render::backends
 pub mod easypdf_markdown::render::backends::text_backend
 pub struct easypdf_markdown::render::backends::text_backend::TextRenderer
@@ -968,6 +1065,10 @@ impl core::marker::Unpin for easypdf_markdown::render::backends::text_backend::T
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::backends::text_backend::TextRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::backends::text_backend::TextRenderer
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::backends::text_backend::TextRenderer
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::backends::text_backend::TextRenderer where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::backends::text_backend::TextRenderer where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::backends::text_backend::TextRenderer where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::backends::text_backend::TextRenderer where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::backends::text_backend::TextRenderer where U: core::convert::From<T>
 pub fn easypdf_markdown::render::backends::text_backend::TextRenderer::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::backends::text_backend::TextRenderer where U: core::convert::Into<T>
@@ -996,6 +1097,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::backends::
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::backends::text_backend::TextRenderer
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::backends::text_backend::TextRenderer
 pub type easypdf_markdown::render::backends::text_backend::TextRenderer::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::backends::text_backend::TextRenderer where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::backends::text_backend::TextRenderer where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::backends::text_backend::TextRenderer::vzip(self) -> V
 pub mod easypdf_markdown::render::config
 #[non_exhaustive] pub enum easypdf_markdown::render::config::Background
 pub easypdf_markdown::render::config::Background::Transparent
@@ -1018,10 +1122,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::Background
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::Background
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::Background where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::Background::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::Background where U: core::convert::Into<T>
@@ -1056,6 +1164,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Ba
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::Background
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::Background
 pub type easypdf_markdown::render::config::Background::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::Background where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::Background where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::Background::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::render::config::ImageFormat
 pub easypdf_markdown::render::config::ImageFormat::Jpeg
 pub easypdf_markdown::render::config::ImageFormat::Png
@@ -1077,10 +1188,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::ImageFormat
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::ImageFormat
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::ImageFormat::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::Into<T>
@@ -1115,6 +1230,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Im
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::ImageFormat
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::ImageFormat
 pub type easypdf_markdown::render::config::ImageFormat::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::ImageFormat where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::ImageFormat where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::ImageFormat::vzip(self) -> V
 pub struct easypdf_markdown::render::config::RenderConfig
 pub easypdf_markdown::render::config::RenderConfig::background: easypdf_markdown::render::config::Background
 pub easypdf_markdown::render::config::RenderConfig::dpi: u32
@@ -1134,6 +1252,10 @@ impl core::marker::Unpin for easypdf_markdown::render::config::RenderConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::RenderConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::RenderConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::Into<T>
@@ -1168,6 +1290,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::RenderConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::RenderConfig
 pub type easypdf_markdown::render::config::RenderConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::RenderConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::RenderConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::RenderConfig::vzip(self) -> V
 pub mod easypdf_markdown::render::error
 #[non_exhaustive] pub enum easypdf_markdown::render::error::RenderError
 pub easypdf_markdown::render::error::RenderError::BackendUnavailable
@@ -1199,6 +1324,10 @@ impl core::marker::Unpin for easypdf_markdown::render::error::RenderError
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::error::RenderError
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::error::RenderError where U: core::convert::From<T>
 pub fn easypdf_markdown::render::error::RenderError::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::error::RenderError where U: core::convert::Into<T>
@@ -1229,6 +1358,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::error::Ren
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::error::RenderError
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::error::RenderError
 pub type easypdf_markdown::render::error::RenderError::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::error::RenderError where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::error::RenderError where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::error::RenderError::vzip(self) -> V
 pub type easypdf_markdown::render::error::Result<T, E> = core::result::Result<T, E>
 pub mod easypdf_markdown::render::traits
 pub struct easypdf_markdown::render::traits::RenderedImage
@@ -1253,6 +1385,10 @@ impl core::marker::Unpin for easypdf_markdown::render::traits::RenderedImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::traits::RenderedImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::From<T>
 pub fn easypdf_markdown::render::traits::RenderedImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::Into<T>
@@ -1287,6 +1423,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::traits::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::traits::RenderedImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::traits::RenderedImage
 pub type easypdf_markdown::render::traits::RenderedImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::traits::RenderedImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::traits::RenderedImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::traits::RenderedImage::vzip(self) -> V
 pub trait easypdf_markdown::render::traits::PdfRenderer: core::marker::Send + core::marker::Sync
 pub fn easypdf_markdown::render::traits::PdfRenderer::max_dpi(&self) -> u32
 pub fn easypdf_markdown::render::traits::PdfRenderer::name(&self) -> &'static str
@@ -1322,10 +1461,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::Background
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::Background
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::Background where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::Background::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::Background where U: core::convert::Into<T>
@@ -1360,6 +1503,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Ba
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::Background
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::Background
 pub type easypdf_markdown::render::config::Background::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::Background where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::Background where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::Background::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::render::ImageFormat
 pub easypdf_markdown::render::ImageFormat::Jpeg
 pub easypdf_markdown::render::ImageFormat::Png
@@ -1381,10 +1527,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::ImageFormat
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::ImageFormat
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::ImageFormat::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::Into<T>
@@ -1419,6 +1569,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Im
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::ImageFormat
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::ImageFormat
 pub type easypdf_markdown::render::config::ImageFormat::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::ImageFormat where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::ImageFormat where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::ImageFormat::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::render::RenderBackend
 pub easypdf_markdown::render::RenderBackend::Pdfium
 pub easypdf_markdown::render::RenderBackend::Text
@@ -1446,10 +1599,14 @@ impl core::marker::Unpin for easypdf_markdown::render::backend::RenderBackend
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::backend::RenderBackend
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::From<T>
 pub fn easypdf_markdown::render::backend::RenderBackend::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::Into<T>
@@ -1486,6 +1643,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::backend::R
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::backend::RenderBackend
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::backend::RenderBackend
 pub type easypdf_markdown::render::backend::RenderBackend::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::backend::RenderBackend where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::backend::RenderBackend where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::backend::RenderBackend::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::render::RenderError
 pub easypdf_markdown::render::RenderError::BackendUnavailable
 pub easypdf_markdown::render::RenderError::BackendUnavailable::name: &'static str
@@ -1516,6 +1676,10 @@ impl core::marker::Unpin for easypdf_markdown::render::error::RenderError
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::error::RenderError
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::error::RenderError where U: core::convert::From<T>
 pub fn easypdf_markdown::render::error::RenderError::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::error::RenderError where U: core::convert::Into<T>
@@ -1546,6 +1710,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::error::Ren
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::error::RenderError
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::error::RenderError
 pub type easypdf_markdown::render::error::RenderError::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::error::RenderError where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::error::RenderError where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::error::RenderError::vzip(self) -> V
 pub struct easypdf_markdown::render::RenderConfig
 pub easypdf_markdown::render::RenderConfig::background: easypdf_markdown::render::config::Background
 pub easypdf_markdown::render::RenderConfig::dpi: u32
@@ -1565,6 +1732,10 @@ impl core::marker::Unpin for easypdf_markdown::render::config::RenderConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::RenderConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::RenderConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::Into<T>
@@ -1599,6 +1770,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::RenderConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::RenderConfig
 pub type easypdf_markdown::render::config::RenderConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::RenderConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::RenderConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::RenderConfig::vzip(self) -> V
 pub struct easypdf_markdown::render::RenderedImage
 pub easypdf_markdown::render::RenderedImage::format: easypdf_markdown::render::config::ImageFormat
 pub easypdf_markdown::render::RenderedImage::height: u32
@@ -1621,6 +1795,10 @@ impl core::marker::Unpin for easypdf_markdown::render::traits::RenderedImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::traits::RenderedImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::From<T>
 pub fn easypdf_markdown::render::traits::RenderedImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::Into<T>
@@ -1655,6 +1833,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::traits::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::traits::RenderedImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::traits::RenderedImage
 pub type easypdf_markdown::render::traits::RenderedImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::traits::RenderedImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::traits::RenderedImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::traits::RenderedImage::vzip(self) -> V
 pub trait easypdf_markdown::render::PdfRenderer: core::marker::Send + core::marker::Sync
 pub fn easypdf_markdown::render::PdfRenderer::max_dpi(&self) -> u32
 pub fn easypdf_markdown::render::PdfRenderer::name(&self) -> &'static str
@@ -1698,10 +1879,14 @@ impl core::marker::Unpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::ColumnSeparator
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::ColumnSeparator::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::Into<T>
@@ -1736,6 +1921,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Col
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::ColumnSeparator
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::ColumnSeparator
 pub type easypdf_markdown::table::config::ColumnSeparator::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::ColumnSeparator where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::ColumnSeparator where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::ColumnSeparator::vzip(self) -> V
 pub struct easypdf_markdown::table::config::TableDetectionConfig
 pub easypdf_markdown::table::config::TableDetectionConfig::allow_irregular: bool
 pub easypdf_markdown::table::config::TableDetectionConfig::min_columns: usize
@@ -1760,6 +1948,10 @@ impl core::marker::Unpin for easypdf_markdown::table::config::TableDetectionConf
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::TableDetectionConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::Into<T>
@@ -1794,6 +1986,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Tab
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::TableDetectionConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::TableDetectionConfig
 pub type easypdf_markdown::table::config::TableDetectionConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::TableDetectionConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::TableDetectionConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::TableDetectionConfig::vzip(self) -> V
 pub enum easypdf_markdown::table::ColumnSeparator
 pub easypdf_markdown::table::ColumnSeparator::Auto
 pub easypdf_markdown::table::ColumnSeparator::Pipe
@@ -1817,10 +2012,14 @@ impl core::marker::Unpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::ColumnSeparator
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::ColumnSeparator::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::Into<T>
@@ -1855,6 +2054,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Col
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::ColumnSeparator
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::ColumnSeparator
 pub type easypdf_markdown::table::config::ColumnSeparator::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::ColumnSeparator where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::ColumnSeparator where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::ColumnSeparator::vzip(self) -> V
 pub struct easypdf_markdown::table::TableDetectionConfig
 pub easypdf_markdown::table::TableDetectionConfig::allow_irregular: bool
 pub easypdf_markdown::table::TableDetectionConfig::min_columns: usize
@@ -1879,6 +2081,10 @@ impl core::marker::Unpin for easypdf_markdown::table::config::TableDetectionConf
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::TableDetectionConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::Into<T>
@@ -1913,6 +2119,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Tab
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::TableDetectionConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::TableDetectionConfig
 pub type easypdf_markdown::table::config::TableDetectionConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::TableDetectionConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::TableDetectionConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::TableDetectionConfig::vzip(self) -> V
 pub struct easypdf_markdown::table::TableDetectorProcessor
 impl easypdf_markdown::TableDetectorProcessor
 pub fn easypdf_markdown::TableDetectorProcessor::new() -> Self
@@ -1933,6 +2142,10 @@ impl core::marker::Unpin for easypdf_markdown::TableDetectorProcessor
 impl core::marker::UnsafeUnpin for easypdf_markdown::TableDetectorProcessor
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::TableDetectorProcessor
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::TableDetectorProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::TableDetectorProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::TableDetectorProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::TableDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::TableDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::TableDetectorProcessor where U: core::convert::From<T>
 pub fn easypdf_markdown::TableDetectorProcessor::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::TableDetectorProcessor where U: core::convert::Into<T>
@@ -1967,6 +2180,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::TableDetectorProce
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::TableDetectorProcessor
 impl<T> typenum::type_operators::Same for easypdf_markdown::TableDetectorProcessor
 pub type easypdf_markdown::TableDetectorProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::TableDetectorProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::TableDetectorProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::TableDetectorProcessor::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::Background
 pub easypdf_markdown::Background::Transparent
 pub easypdf_markdown::Background::White
@@ -1988,10 +2204,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::Background
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::Background
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::Background
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::Background where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::Background where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::Background::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::Background where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::Background where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::Background::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::Background where U: core::convert::Into<T>
@@ -2026,6 +2246,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Ba
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::Background
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::Background
 pub type easypdf_markdown::render::config::Background::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::Background where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::Background where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::Background::vzip(self) -> V
 pub enum easypdf_markdown::ColumnSeparator
 pub easypdf_markdown::ColumnSeparator::Auto
 pub easypdf_markdown::ColumnSeparator::Pipe
@@ -2049,10 +2272,14 @@ impl core::marker::Unpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::ColumnSeparator
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::ColumnSeparator
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::ColumnSeparator where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::table::config::ColumnSeparator where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::table::config::ColumnSeparator::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::ColumnSeparator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::ColumnSeparator::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::ColumnSeparator where U: core::convert::Into<T>
@@ -2087,6 +2314,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Col
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::ColumnSeparator
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::ColumnSeparator
 pub type easypdf_markdown::table::config::ColumnSeparator::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::ColumnSeparator where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::ColumnSeparator where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::ColumnSeparator::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::ImageFormat
 pub easypdf_markdown::ImageFormat::Jpeg
 pub easypdf_markdown::ImageFormat::Png
@@ -2108,10 +2338,14 @@ impl core::marker::Unpin for easypdf_markdown::render::config::ImageFormat
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::ImageFormat
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::ImageFormat
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::ImageFormat where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::config::ImageFormat where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::config::ImageFormat::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::ImageFormat where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::ImageFormat::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::ImageFormat where U: core::convert::Into<T>
@@ -2146,6 +2380,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Im
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::ImageFormat
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::ImageFormat
 pub type easypdf_markdown::render::config::ImageFormat::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::ImageFormat where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::ImageFormat where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::ImageFormat::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::ImagePolicy
 pub easypdf_markdown::ImagePolicy::ExtractTo(std::path::PathBuf)
 pub easypdf_markdown::ImagePolicy::Ignore
@@ -2167,10 +2404,14 @@ impl core::marker::Unpin for easypdf_markdown::ImagePolicy
 impl core::marker::UnsafeUnpin for easypdf_markdown::ImagePolicy
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ImagePolicy
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ImagePolicy
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ImagePolicy where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ImagePolicy where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::ImagePolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::ImagePolicy::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::ImagePolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::ImagePolicy::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ImagePolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ImagePolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ImagePolicy where U: core::convert::From<T>
 pub fn easypdf_markdown::ImagePolicy::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ImagePolicy where U: core::convert::Into<T>
@@ -2205,6 +2446,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ImagePolicy
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ImagePolicy
 impl<T> typenum::type_operators::Same for easypdf_markdown::ImagePolicy
 pub type easypdf_markdown::ImagePolicy::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ImagePolicy where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ImagePolicy where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ImagePolicy::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::MarkdownProfile
 pub easypdf_markdown::MarkdownProfile::Gfm
 pub easypdf_markdown::MarkdownProfile::Llm
@@ -2232,10 +2476,14 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownProfile
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownProfile
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownProfile
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownProfile
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownProfile where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownProfile where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::MarkdownProfile where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownProfile::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::MarkdownProfile where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownProfile::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownProfile where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownProfile where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownProfile where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownProfile::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownProfile where U: core::convert::Into<T>
@@ -2270,6 +2518,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownProfile
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownProfile
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownProfile
 pub type easypdf_markdown::MarkdownProfile::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownProfile where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownProfile where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownProfile::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::MarkdownWarning
 pub easypdf_markdown::MarkdownWarning::EmptyPage
 pub easypdf_markdown::MarkdownWarning::EmptyPage::page_index: easypdf_core::page_index::PageIndex
@@ -2294,10 +2545,14 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownWarning
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownWarning
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownWarning
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownWarning
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownWarning where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownWarning where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::MarkdownWarning where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownWarning::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::MarkdownWarning where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownWarning::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownWarning where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownWarning where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownWarning where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownWarning::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownWarning where U: core::convert::Into<T>
@@ -2332,6 +2587,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownWarning
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownWarning
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownWarning
 pub type easypdf_markdown::MarkdownWarning::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownWarning where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownWarning where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownWarning::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::OcrPolicy
 pub easypdf_markdown::OcrPolicy::Auto
 pub easypdf_markdown::OcrPolicy::Disabled
@@ -2353,10 +2611,14 @@ impl core::marker::Unpin for easypdf_markdown::OcrPolicy
 impl core::marker::UnsafeUnpin for easypdf_markdown::OcrPolicy
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::OcrPolicy
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::OcrPolicy
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::OcrPolicy where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::OcrPolicy where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::OcrPolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::OcrPolicy::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::OcrPolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::OcrPolicy::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::OcrPolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::OcrPolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::OcrPolicy where U: core::convert::From<T>
 pub fn easypdf_markdown::OcrPolicy::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::OcrPolicy where U: core::convert::Into<T>
@@ -2391,6 +2653,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::OcrPolicy
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::OcrPolicy
 impl<T> typenum::type_operators::Same for easypdf_markdown::OcrPolicy
 pub type easypdf_markdown::OcrPolicy::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::OcrPolicy where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::OcrPolicy where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::OcrPolicy::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::OcrTrigger
 pub easypdf_markdown::OcrTrigger::Always
 pub easypdf_markdown::OcrTrigger::OnEmptyPage
@@ -2413,6 +2678,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrTrigger
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrTrigger where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrTrigger where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrTrigger::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrTrigger where U: core::convert::Into<T>
@@ -2447,6 +2716,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrTr
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrTrigger
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrTrigger
 pub type easypdf_markdown::ocr::config::OcrTrigger::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrTrigger where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrTrigger where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrTrigger::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::ProcessorCapability
 pub easypdf_markdown::ProcessorCapability::Formula
 pub easypdf_markdown::ProcessorCapability::ImageExtraction
@@ -2472,10 +2744,14 @@ impl core::marker::Unpin for easypdf_markdown::ProcessorCapability
 impl core::marker::UnsafeUnpin for easypdf_markdown::ProcessorCapability
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ProcessorCapability
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ProcessorCapability
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ProcessorCapability where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ProcessorCapability where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::ProcessorCapability where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::ProcessorCapability::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::ProcessorCapability where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::ProcessorCapability::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ProcessorCapability where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ProcessorCapability where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ProcessorCapability where U: core::convert::From<T>
 pub fn easypdf_markdown::ProcessorCapability::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ProcessorCapability where U: core::convert::Into<T>
@@ -2510,6 +2786,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ProcessorCapabilit
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ProcessorCapability
 impl<T> typenum::type_operators::Same for easypdf_markdown::ProcessorCapability
 pub type easypdf_markdown::ProcessorCapability::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ProcessorCapability where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ProcessorCapability where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ProcessorCapability::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::RenderBackend
 pub easypdf_markdown::RenderBackend::Pdfium
 pub easypdf_markdown::RenderBackend::Text
@@ -2537,10 +2816,14 @@ impl core::marker::Unpin for easypdf_markdown::render::backend::RenderBackend
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::backend::RenderBackend
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::backend::RenderBackend
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::backend::RenderBackend where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::render::backend::RenderBackend where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::render::backend::RenderBackend::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::backend::RenderBackend where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::From<T>
 pub fn easypdf_markdown::render::backend::RenderBackend::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::backend::RenderBackend where U: core::convert::Into<T>
@@ -2577,6 +2860,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::backend::R
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::backend::RenderBackend
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::backend::RenderBackend
 pub type easypdf_markdown::render::backend::RenderBackend::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::backend::RenderBackend where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::backend::RenderBackend where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::backend::RenderBackend::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::RenderError
 pub easypdf_markdown::RenderError::BackendUnavailable
 pub easypdf_markdown::RenderError::BackendUnavailable::name: &'static str
@@ -2607,6 +2893,10 @@ impl core::marker::Unpin for easypdf_markdown::render::error::RenderError
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::error::RenderError
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::error::RenderError
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::error::RenderError where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::error::RenderError where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::error::RenderError where U: core::convert::From<T>
 pub fn easypdf_markdown::render::error::RenderError::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::error::RenderError where U: core::convert::Into<T>
@@ -2637,6 +2927,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::error::Ren
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::error::RenderError
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::error::RenderError
 pub type easypdf_markdown::render::error::RenderError::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::error::RenderError where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::error::RenderError where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::error::RenderError::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_markdown::TablePolicy
 pub easypdf_markdown::TablePolicy::Detect
 pub easypdf_markdown::TablePolicy::Ignore
@@ -2659,10 +2952,14 @@ impl core::marker::Unpin for easypdf_markdown::TablePolicy
 impl core::marker::UnsafeUnpin for easypdf_markdown::TablePolicy
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::TablePolicy
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::TablePolicy
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::TablePolicy where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::TablePolicy where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::TablePolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::TablePolicy::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::TablePolicy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::TablePolicy::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::TablePolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::TablePolicy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::TablePolicy where U: core::convert::From<T>
 pub fn easypdf_markdown::TablePolicy::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::TablePolicy where U: core::convert::Into<T>
@@ -2697,6 +2994,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::TablePolicy
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::TablePolicy
 impl<T> typenum::type_operators::Same for easypdf_markdown::TablePolicy
 pub type easypdf_markdown::TablePolicy::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::TablePolicy where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::TablePolicy where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::TablePolicy::vzip(self) -> V
 pub struct easypdf_markdown::BuildPolicies
 pub easypdf_markdown::BuildPolicies::fail_fast: bool
 pub easypdf_markdown::BuildPolicies::image_policy: easypdf_markdown::ImagePolicy
@@ -2713,6 +3013,10 @@ impl core::marker::Unpin for easypdf_markdown::BuildPolicies
 impl core::marker::UnsafeUnpin for easypdf_markdown::BuildPolicies
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::BuildPolicies
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::BuildPolicies
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::BuildPolicies where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::BuildPolicies where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::BuildPolicies where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::BuildPolicies where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::BuildPolicies where U: core::convert::From<T>
 pub fn easypdf_markdown::BuildPolicies::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::BuildPolicies where U: core::convert::Into<T>
@@ -2747,6 +3051,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::BuildPolicies
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::BuildPolicies
 impl<T> typenum::type_operators::Same for easypdf_markdown::BuildPolicies
 pub type easypdf_markdown::BuildPolicies::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::BuildPolicies where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::BuildPolicies where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::BuildPolicies::vzip(self) -> V
 #[non_exhaustive] pub struct easypdf_markdown::DetailedProcessorCapabilities
 pub easypdf_markdown::DetailedProcessorCapabilities::formula_recognition: easypdf_core::traits::CapabilityLevel
 pub easypdf_markdown::DetailedProcessorCapabilities::image_extraction: easypdf_core::traits::CapabilityLevel
@@ -2780,10 +3087,14 @@ impl core::marker::Unpin for easypdf_markdown::DetailedProcessorCapabilities
 impl core::marker::UnsafeUnpin for easypdf_markdown::DetailedProcessorCapabilities
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::DetailedProcessorCapabilities
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::DetailedProcessorCapabilities
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::DetailedProcessorCapabilities where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::DetailedProcessorCapabilities where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::DetailedProcessorCapabilities where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::DetailedProcessorCapabilities::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::DetailedProcessorCapabilities where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::DetailedProcessorCapabilities::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::DetailedProcessorCapabilities where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::DetailedProcessorCapabilities where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::DetailedProcessorCapabilities where U: core::convert::From<T>
 pub fn easypdf_markdown::DetailedProcessorCapabilities::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::DetailedProcessorCapabilities where U: core::convert::Into<T>
@@ -2818,6 +3129,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::DetailedProcessorC
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::DetailedProcessorCapabilities
 impl<T> typenum::type_operators::Same for easypdf_markdown::DetailedProcessorCapabilities
 pub type easypdf_markdown::DetailedProcessorCapabilities::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::DetailedProcessorCapabilities where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::DetailedProcessorCapabilities where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::DetailedProcessorCapabilities::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownConversionResult
 impl easypdf_markdown::MarkdownConversionResult
 pub fn easypdf_markdown::MarkdownConversionResult::into_markdown(self) -> alloc::string::String
@@ -2836,6 +3150,10 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownConversionResult
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownConversionResult
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownConversionResult
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownConversionResult
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownConversionResult where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownConversionResult where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownConversionResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownConversionResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownConversionResult where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownConversionResult::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownConversionResult where U: core::convert::Into<T>
@@ -2872,6 +3190,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownConversion
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownConversionResult
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownConversionResult
 pub type easypdf_markdown::MarkdownConversionResult::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownConversionResult where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownConversionResult where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownConversionResult::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownExportReport
 impl easypdf_markdown::MarkdownExportReport
 pub const fn easypdf_markdown::MarkdownExportReport::blocks_written(&self) -> usize
@@ -2895,10 +3216,14 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownExportReport
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownExportReport
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownExportReport
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownExportReport
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownExportReport where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownExportReport where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::MarkdownExportReport where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownExportReport::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::MarkdownExportReport where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownExportReport::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownExportReport where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownExportReport where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownExportReport where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownExportReport::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownExportReport where U: core::convert::Into<T>
@@ -2933,6 +3258,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownExportRepo
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownExportReport
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownExportReport
 pub type easypdf_markdown::MarkdownExportReport::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownExportReport where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownExportReport where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownExportReport::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownExportResult
 impl easypdf_markdown::MarkdownExportResult
 pub fn easypdf_markdown::MarkdownExportResult::output(&self) -> &std::path::Path
@@ -2948,6 +3276,10 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownExportResult
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownExportResult
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownExportResult
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownExportResult
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownExportResult where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownExportResult where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownExportResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownExportResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownExportResult where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownExportResult::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownExportResult where U: core::convert::Into<T>
@@ -2982,6 +3314,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownExportResu
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownExportResult
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownExportResult
 pub type easypdf_markdown::MarkdownExportResult::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownExportResult where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownExportResult where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownExportResult::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownProcessorCapabilities
 impl easypdf_markdown::MarkdownProcessorCapabilities
 pub const fn easypdf_markdown::MarkdownProcessorCapabilities::formula(self) -> bool
@@ -3017,10 +3352,14 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownProcessorCapabilities
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownProcessorCapabilities
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownProcessorCapabilities
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownProcessorCapabilities
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownProcessorCapabilities where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownProcessorCapabilities where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_markdown::MarkdownProcessorCapabilities where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownProcessorCapabilities::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_markdown::MarkdownProcessorCapabilities where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_markdown::MarkdownProcessorCapabilities::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownProcessorCapabilities where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownProcessorCapabilities where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownProcessorCapabilities where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownProcessorCapabilities::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownProcessorCapabilities where U: core::convert::Into<T>
@@ -3055,6 +3394,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownProcessorC
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownProcessorCapabilities
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownProcessorCapabilities
 pub type easypdf_markdown::MarkdownProcessorCapabilities::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownProcessorCapabilities where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownProcessorCapabilities where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownProcessorCapabilities::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownProfileBuilder
 impl easypdf_markdown::MarkdownProfileBuilder
 pub fn easypdf_markdown::MarkdownProfileBuilder::build(self) -> (easypdf_markdown::MarkdownProfile, easypdf_markdown::ProcessorPipeline, easypdf_markdown::BuildPolicies)
@@ -3083,6 +3425,10 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownProfileBuilder
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownProfileBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownProfileBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownProfileBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownProfileBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownProfileBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownProfileBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownProfileBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownProfileBuilder where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownProfileBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownProfileBuilder where U: core::convert::Into<T>
@@ -3111,6 +3457,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownProfileBui
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownProfileBuilder
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownProfileBuilder
 pub type easypdf_markdown::MarkdownProfileBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownProfileBuilder where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownProfileBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownProfileBuilder::vzip(self) -> V
 pub struct easypdf_markdown::MarkdownRenderer
 impl easypdf_markdown::MarkdownRenderer
 pub fn easypdf_markdown::MarkdownRenderer::new(easypdf_markdown::MarkdownProfile) -> Self
@@ -3130,6 +3479,10 @@ impl core::marker::Unpin for easypdf_markdown::MarkdownRenderer
 impl core::marker::UnsafeUnpin for easypdf_markdown::MarkdownRenderer
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::MarkdownRenderer
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::MarkdownRenderer
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::MarkdownRenderer where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::MarkdownRenderer where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::MarkdownRenderer where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::MarkdownRenderer where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::MarkdownRenderer where U: core::convert::From<T>
 pub fn easypdf_markdown::MarkdownRenderer::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::MarkdownRenderer where U: core::convert::Into<T>
@@ -3164,6 +3517,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::MarkdownRenderer
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::MarkdownRenderer
 impl<T> typenum::type_operators::Same for easypdf_markdown::MarkdownRenderer
 pub type easypdf_markdown::MarkdownRenderer::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::MarkdownRenderer where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::MarkdownRenderer where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::MarkdownRenderer::vzip(self) -> V
 pub struct easypdf_markdown::OcrConfig
 pub easypdf_markdown::OcrConfig::min_confidence: f32
 pub easypdf_markdown::OcrConfig::min_text_length: usize
@@ -3182,6 +3538,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::config::OcrConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::config::OcrConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::config::OcrConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::config::OcrConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::config::OcrConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::config::OcrConfig where U: core::convert::Into<T>
@@ -3216,6 +3576,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::config::OcrCo
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::config::OcrConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::config::OcrConfig
 pub type easypdf_markdown::ocr::config::OcrConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::config::OcrConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::config::OcrConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::config::OcrConfig::vzip(self) -> V
 pub struct easypdf_markdown::OcrImage
 pub easypdf_markdown::OcrImage::height: u32
 pub easypdf_markdown::OcrImage::pixels: alloc::vec::Vec<u8>
@@ -3235,6 +3598,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrImage where U: core::convert::Into<T>
@@ -3269,52 +3636,62 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrIm
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrImage
 pub type easypdf_markdown::ocr::engine::OcrImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrImage::vzip(self) -> V
 pub struct easypdf_markdown::OcrProcessor
-impl easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_mock_engine() -> Self
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
-impl core::fmt::Debug for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
-impl core::marker::Freeze for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Send for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Sync for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::Unpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::From<T>
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::Into<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = core::convert::Infallible
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_markdown::ocr::processor::OcrProcessor where U: core::convert::TryFrom<T>
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> core::any::Any for easypdf_markdown::ocr::processor::OcrProcessor where T: 'static + ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::ocr::processor::OcrProcessor where T: ?core::marker::Sized
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::borrow_mut(&mut self) -> &mut T
-impl<T> core::convert::From<T> for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Init = T
-pub const easypdf_markdown::ocr::processor::OcrProcessor::ALIGN: usize
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::drop(usize)
-pub unsafe fn easypdf_markdown::ocr::processor::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::processor::OcrProcessor
-impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::processor::OcrProcessor
-pub type easypdf_markdown::ocr::processor::OcrProcessor::Output = T
+impl easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::new(alloc::boxed::Box<dyn easypdf_markdown::ocr::engine::OcrEngine>, easypdf_markdown::render::backend::RenderBackend) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_config(self, easypdf_markdown::ocr::config::OcrConfig) -> Self
+pub fn easypdf_markdown::OcrProcessor::with_mock_engine() -> Self
+pub fn easypdf_markdown::OcrProcessor::with_renderer(self, alloc::boxed::Box<dyn easypdf_markdown::render::traits::PdfRenderer>) -> Self
+impl core::fmt::Debug for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
+pub fn easypdf_markdown::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
+impl core::marker::Freeze for easypdf_markdown::OcrProcessor
+impl core::marker::Send for easypdf_markdown::OcrProcessor
+impl core::marker::Sync for easypdf_markdown::OcrProcessor
+impl core::marker::Unpin for easypdf_markdown::OcrProcessor
+impl core::marker::UnsafeUnpin for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::OcrProcessor
+impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::OcrProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::OcrProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::OcrProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_markdown::OcrProcessor where U: core::convert::From<T>
+pub fn easypdf_markdown::OcrProcessor::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::OcrProcessor where U: core::convert::Into<T>
+pub type easypdf_markdown::OcrProcessor::Error = core::convert::Infallible
+pub fn easypdf_markdown::OcrProcessor::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_markdown::OcrProcessor where U: core::convert::TryFrom<T>
+pub type easypdf_markdown::OcrProcessor::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_markdown::OcrProcessor::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_markdown::OcrProcessor where T: 'static + ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+pub fn easypdf_markdown::OcrProcessor::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Init = T
+pub const easypdf_markdown::OcrProcessor::ALIGN: usize
+pub unsafe fn easypdf_markdown::OcrProcessor::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_markdown::OcrProcessor::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_markdown::OcrProcessor::drop(usize)
+pub unsafe fn easypdf_markdown::OcrProcessor::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::Instrument for easypdf_markdown::OcrProcessor
+impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::OcrProcessor
+impl<T> typenum::type_operators::Same for easypdf_markdown::OcrProcessor
+pub type easypdf_markdown::OcrProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::OcrProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::OcrProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::OcrProcessor::vzip(self) -> V
 pub struct easypdf_markdown::OcrResult
 pub easypdf_markdown::OcrResult::confidence: core::option::Option<f32>
 pub easypdf_markdown::OcrResult::text: alloc::string::String
@@ -3330,6 +3707,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::OcrResult
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::OcrResult
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::OcrResult where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::OcrResult where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::OcrResult::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::OcrResult where U: core::convert::Into<T>
@@ -3364,6 +3745,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::OcrRe
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::OcrResult
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::OcrResult
 pub type easypdf_markdown::ocr::engine::OcrResult::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::OcrResult where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::OcrResult where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::OcrResult::vzip(self) -> V
 pub struct easypdf_markdown::PdfMarkdownBuilder
 impl easypdf_markdown::PdfMarkdownBuilder
 pub fn easypdf_markdown::PdfMarkdownBuilder::do_convert(self) -> easypdf_core::error::Result<easypdf_markdown::MarkdownConversionResult>
@@ -3388,6 +3772,10 @@ impl core::marker::Unpin for easypdf_markdown::PdfMarkdownBuilder
 impl core::marker::UnsafeUnpin for easypdf_markdown::PdfMarkdownBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::PdfMarkdownBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::PdfMarkdownBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::PdfMarkdownBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::PdfMarkdownBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::PdfMarkdownBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::PdfMarkdownBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::PdfMarkdownBuilder where U: core::convert::From<T>
 pub fn easypdf_markdown::PdfMarkdownBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::PdfMarkdownBuilder where U: core::convert::Into<T>
@@ -3422,6 +3810,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::PdfMarkdownBuilder
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::PdfMarkdownBuilder
 impl<T> typenum::type_operators::Same for easypdf_markdown::PdfMarkdownBuilder
 pub type easypdf_markdown::PdfMarkdownBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::PdfMarkdownBuilder where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::PdfMarkdownBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::PdfMarkdownBuilder::vzip(self) -> V
 pub struct easypdf_markdown::PdfMarkdownExportBuilder
 impl easypdf_markdown::PdfMarkdownExportBuilder
 pub fn easypdf_markdown::PdfMarkdownExportBuilder::do_export(self) -> easypdf_core::error::Result<easypdf_markdown::MarkdownExportResult>
@@ -3446,6 +3837,10 @@ impl core::marker::Unpin for easypdf_markdown::PdfMarkdownExportBuilder
 impl core::marker::UnsafeUnpin for easypdf_markdown::PdfMarkdownExportBuilder
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::PdfMarkdownExportBuilder
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::PdfMarkdownExportBuilder
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::PdfMarkdownExportBuilder where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::PdfMarkdownExportBuilder where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::PdfMarkdownExportBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::PdfMarkdownExportBuilder where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::PdfMarkdownExportBuilder where U: core::convert::From<T>
 pub fn easypdf_markdown::PdfMarkdownExportBuilder::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::PdfMarkdownExportBuilder where U: core::convert::Into<T>
@@ -3480,6 +3875,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::PdfMarkdownExportB
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::PdfMarkdownExportBuilder
 impl<T> typenum::type_operators::Same for easypdf_markdown::PdfMarkdownExportBuilder
 pub type easypdf_markdown::PdfMarkdownExportBuilder::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::PdfMarkdownExportBuilder where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::PdfMarkdownExportBuilder where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::PdfMarkdownExportBuilder::vzip(self) -> V
 pub struct easypdf_markdown::ProcessorPipeline
 impl easypdf_markdown::ProcessorPipeline
 pub fn easypdf_markdown::ProcessorPipeline::aggregate_bool_capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
@@ -3504,6 +3902,10 @@ impl core::marker::Unpin for easypdf_markdown::ProcessorPipeline
 impl core::marker::UnsafeUnpin for easypdf_markdown::ProcessorPipeline
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ProcessorPipeline
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ProcessorPipeline
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ProcessorPipeline where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ProcessorPipeline where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ProcessorPipeline where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ProcessorPipeline where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ProcessorPipeline where U: core::convert::From<T>
 pub fn easypdf_markdown::ProcessorPipeline::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ProcessorPipeline where U: core::convert::Into<T>
@@ -3532,6 +3934,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ProcessorPipeline
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ProcessorPipeline
 impl<T> typenum::type_operators::Same for easypdf_markdown::ProcessorPipeline
 pub type easypdf_markdown::ProcessorPipeline::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ProcessorPipeline where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ProcessorPipeline where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ProcessorPipeline::vzip(self) -> V
 pub struct easypdf_markdown::RenderConfig
 pub easypdf_markdown::RenderConfig::background: easypdf_markdown::render::config::Background
 pub easypdf_markdown::RenderConfig::dpi: u32
@@ -3551,6 +3956,10 @@ impl core::marker::Unpin for easypdf_markdown::render::config::RenderConfig
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::config::RenderConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::config::RenderConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::config::RenderConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::config::RenderConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::render::config::RenderConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::config::RenderConfig where U: core::convert::Into<T>
@@ -3585,6 +3994,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::config::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::config::RenderConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::config::RenderConfig
 pub type easypdf_markdown::render::config::RenderConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::config::RenderConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::config::RenderConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::config::RenderConfig::vzip(self) -> V
 pub struct easypdf_markdown::RenderedImage
 pub easypdf_markdown::RenderedImage::format: easypdf_markdown::render::config::ImageFormat
 pub easypdf_markdown::RenderedImage::height: u32
@@ -3607,6 +4019,10 @@ impl core::marker::Unpin for easypdf_markdown::render::traits::RenderedImage
 impl core::marker::UnsafeUnpin for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::render::traits::RenderedImage
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::render::traits::RenderedImage
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::render::traits::RenderedImage where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::render::traits::RenderedImage where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::From<T>
 pub fn easypdf_markdown::render::traits::RenderedImage::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::render::traits::RenderedImage where U: core::convert::Into<T>
@@ -3641,6 +4057,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::render::traits::Re
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::render::traits::RenderedImage
 impl<T> typenum::type_operators::Same for easypdf_markdown::render::traits::RenderedImage
 pub type easypdf_markdown::render::traits::RenderedImage::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::render::traits::RenderedImage where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::render::traits::RenderedImage where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::render::traits::RenderedImage::vzip(self) -> V
 pub struct easypdf_markdown::TableDetectionConfig
 pub easypdf_markdown::TableDetectionConfig::allow_irregular: bool
 pub easypdf_markdown::TableDetectionConfig::min_columns: usize
@@ -3665,6 +4084,10 @@ impl core::marker::Unpin for easypdf_markdown::table::config::TableDetectionConf
 impl core::marker::UnsafeUnpin for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::table::config::TableDetectionConfig
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::table::config::TableDetectionConfig where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::table::config::TableDetectionConfig where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::From<T>
 pub fn easypdf_markdown::table::config::TableDetectionConfig::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::table::config::TableDetectionConfig where U: core::convert::Into<T>
@@ -3699,6 +4122,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::table::config::Tab
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::table::config::TableDetectionConfig
 impl<T> typenum::type_operators::Same for easypdf_markdown::table::config::TableDetectionConfig
 pub type easypdf_markdown::table::config::TableDetectionConfig::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::table::config::TableDetectionConfig where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::table::config::TableDetectionConfig where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::table::config::TableDetectionConfig::vzip(self) -> V
 pub struct easypdf_markdown::TableDetectorProcessor
 impl easypdf_markdown::TableDetectorProcessor
 pub fn easypdf_markdown::TableDetectorProcessor::new() -> Self
@@ -3719,6 +4145,10 @@ impl core::marker::Unpin for easypdf_markdown::TableDetectorProcessor
 impl core::marker::UnsafeUnpin for easypdf_markdown::TableDetectorProcessor
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::TableDetectorProcessor
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::TableDetectorProcessor
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::TableDetectorProcessor where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::TableDetectorProcessor where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::TableDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::TableDetectorProcessor where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::TableDetectorProcessor where U: core::convert::From<T>
 pub fn easypdf_markdown::TableDetectorProcessor::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::TableDetectorProcessor where U: core::convert::Into<T>
@@ -3753,6 +4183,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::TableDetectorProce
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::TableDetectorProcessor
 impl<T> typenum::type_operators::Same for easypdf_markdown::TableDetectorProcessor
 pub type easypdf_markdown::TableDetectorProcessor::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::TableDetectorProcessor where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::TableDetectorProcessor where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::TableDetectorProcessor::vzip(self) -> V
 pub struct easypdf_markdown::WordBox
 pub easypdf_markdown::WordBox::confidence: core::option::Option<f32>
 pub easypdf_markdown::WordBox::height: u32
@@ -3771,6 +4204,10 @@ impl core::marker::Unpin for easypdf_markdown::ocr::engine::WordBox
 impl core::marker::UnsafeUnpin for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_markdown::ocr::engine::WordBox
 impl core::panic::unwind_safe::UnwindSafe for easypdf_markdown::ocr::engine::WordBox
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_markdown::ocr::engine::WordBox where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_markdown::ocr::engine::WordBox where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::From<T>
 pub fn easypdf_markdown::ocr::engine::WordBox::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_markdown::ocr::engine::WordBox where U: core::convert::Into<T>
@@ -3805,6 +4242,9 @@ impl<T> tracing::instrument::Instrument for easypdf_markdown::ocr::engine::WordB
 impl<T> tracing::instrument::WithSubscriber for easypdf_markdown::ocr::engine::WordBox
 impl<T> typenum::type_operators::Same for easypdf_markdown::ocr::engine::WordBox
 pub type easypdf_markdown::ocr::engine::WordBox::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_markdown::ocr::engine::WordBox where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_markdown::ocr::engine::WordBox where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_markdown::ocr::engine::WordBox::vzip(self) -> V
 pub const easypdf_markdown::PRIORITY_GENERIC: f64
 pub const easypdf_markdown::PRIORITY_SPECIFIC: f64
 pub trait easypdf_markdown::OcrEngine: core::marker::Send + core::marker::Sync
@@ -3820,12 +4260,12 @@ pub fn easypdf_markdown::ocr::engines::MockOcrEngine::recognize(&self, &easypdf_
 pub trait easypdf_markdown::PdfMarkdownProcessor: core::marker::Send + core::marker::Sync
 pub fn easypdf_markdown::PdfMarkdownProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
 pub fn easypdf_markdown::PdfMarkdownProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
+impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::OcrProcessor
+pub fn easypdf_markdown::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
+pub fn easypdf_markdown::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
 impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::TableDetectorProcessor
 pub fn easypdf_markdown::TableDetectorProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
 pub fn easypdf_markdown::TableDetectorProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
-impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::ocr::processor::OcrProcessor
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
-pub fn easypdf_markdown::ocr::processor::OcrProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>
 impl easypdf_markdown::PdfMarkdownProcessor for easypdf_markdown::processors::HeadingDetectorProcessor
 pub fn easypdf_markdown::processors::HeadingDetectorProcessor::capabilities(&self) -> easypdf_markdown::MarkdownProcessorCapabilities
 pub fn easypdf_markdown::processors::HeadingDetectorProcessor::process(&self, &easypdf_core::io::pdf_input::PdfInput, easypdf_core::model::pdf_document_model::PdfDocumentModel) -> easypdf_core::error::Result<(easypdf_core::model::pdf_document_model::PdfDocumentModel, alloc::vec::Vec<easypdf_markdown::MarkdownWarning>)>

@@ -20,8 +20,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut writer = EasyPdf::writer("Multi-Page Document").build()?;
         for i in 1..=5 {
             writer.add_page(PageSize::A4, Orientation::Portrait)?;
-            let text = PdfText::new(format!("This is page {i} of 5."))
-                .font(PdfFont::helvetica(16.0));
+            let text =
+                PdfText::new(format!("This is page {i} of 5.")).font(PdfFont::helvetica(16.0));
             writer.write_text(&text, 100.0, 700.0)?;
         }
         writer.finish(&source_path)?;

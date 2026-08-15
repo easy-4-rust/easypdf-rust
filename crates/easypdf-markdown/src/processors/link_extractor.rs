@@ -1,7 +1,7 @@
 //! 链接提取处理器。
 
-use easypdf_core::Result;
 use easypdf_core::PdfInput;
+use easypdf_core::Result;
 use easypdf_core::{PdfBlock, PdfDocumentModel, SourceLocation};
 
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning, PdfMarkdownProcessor};
@@ -123,8 +123,8 @@ fn find_url_end(text: &str) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use easypdf_core::{PageIndex, PdfMetadata};
     use easypdf_core::PdfPageModel;
+    use easypdf_core::{PageIndex, PdfMetadata};
 
     #[test]
     fn capabilities_include_link() {
@@ -147,7 +147,9 @@ mod tests {
         // Should have: paragraph "Visit", link "https://example.com", paragraph "for more"
         assert!(blocks.len() >= 2);
         // Check that a Link block exists
-        let has_link = blocks.iter().any(|(_, b)| matches!(b, PdfBlock::Link { .. }));
+        let has_link = blocks
+            .iter()
+            .any(|(_, b)| matches!(b, PdfBlock::Link { .. }));
         assert!(has_link, "expected at least one Link block");
     }
 

@@ -9,9 +9,9 @@
 
 use std::path::PathBuf;
 
-use easypdf::prelude::*;
-use easypdf::{attempt_repair, is_likely_corrupt, RepairOptions};
 use easypdf::PdfInput;
+use easypdf::prelude::*;
+use easypdf::{RepairOptions, attempt_repair, is_likely_corrupt};
 
 fn manifest_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -121,8 +121,11 @@ fn encrypted_pdf_detected() {
             let msg = format!("{e}");
             // Accept any error: Encryption, Parse, or other
             assert!(
-                msg.contains("encrypt") || msg.contains("Encrypt") || msg.contains("parse")
-                    || msg.contains("Parse") || msg.contains("Encrypted"),
+                msg.contains("encrypt")
+                    || msg.contains("Encrypt")
+                    || msg.contains("parse")
+                    || msg.contains("Parse")
+                    || msg.contains("Encrypted"),
                 "expected encryption-related or parse error, got: {msg}"
             );
         }
@@ -198,18 +201,15 @@ fn corrupted_xref_handled() {
         let repair_result = attempt_repair(&input, &RepairOptions::default());
         if let Ok(repaired_bytes) = repair_result {
             // Repaired bytes should be parseable
-            let reader = PdfReader::from_bytes(repaired_bytes)
-                .expect("repaired PDF should be parseable");
+            let reader =
+                PdfReader::from_bytes(repaired_bytes).expect("repaired PDF should be parseable");
             let _text = reader
                 .extract_text()
                 .expect("text extraction from repaired PDF should succeed");
         } else {
             // Repair failed -- this is also a valid outcome for
             // severely corrupted PDFs. Just log it.
-            eprintln!(
-                "repair failed (acceptable): {}",
-                repair_result.unwrap_err()
-            );
+            eprintln!("repair failed (acceptable): {}", repair_result.unwrap_err());
         }
     }
 }
@@ -242,10 +242,7 @@ fn all_sample_pdfs_present() {
         let size = std::fs::metadata(&path)
             .unwrap_or_else(|e| panic!("failed to stat {name}: {e}"))
             .len();
-        assert!(
-            size > 0,
-            "sample PDF '{name}' is empty (0 bytes)"
-        );
+        assert!(size > 0, "sample PDF '{name}' is empty (0 bytes)");
         assert!(
             size < 1_000_000,
             "sample PDF '{name}' is {size} bytes, exceeds 1 MB limit"

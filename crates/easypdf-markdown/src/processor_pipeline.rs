@@ -1,8 +1,8 @@
 //! 语义处理器管道调度器。
 
-use easypdf_core::Result;
-use easypdf_core::PdfInput;
 use easypdf_core::PdfDocumentModel;
+use easypdf_core::PdfInput;
+use easypdf_core::Result;
 
 use crate::{
     DetailedProcessorCapabilities, MarkdownProcessorCapabilities, MarkdownWarning,
@@ -144,8 +144,7 @@ impl ProcessorPipeline {
         for entry in &self.entries {
             if self.fail_fast {
                 // fail_fast 模式：直接传播错误。
-                let (processed, mut warnings) =
-                    entry.processor.process(input, current_doc)?;
+                let (processed, mut warnings) = entry.processor.process(input, current_doc)?;
                 current_doc = processed;
                 all_warnings.append(&mut warnings);
             } else {
@@ -332,9 +331,7 @@ mod tests {
         let mut pipeline = ProcessorPipeline::new();
         assert!(pipeline.is_empty());
         assert_eq!(pipeline.len(), 0);
-        pipeline.register(Box::new(AppendProcessor {
-            text: "x".into(),
-        }));
+        pipeline.register(Box::new(AppendProcessor { text: "x".into() }));
         assert!(!pipeline.is_empty());
         assert_eq!(pipeline.len(), 1);
     }
@@ -342,9 +339,7 @@ mod tests {
     #[test]
     fn aggregate_capabilities_merges() {
         let mut pipeline = ProcessorPipeline::new();
-        pipeline.register(Box::new(AppendProcessor {
-            text: "x".into(),
-        }));
+        pipeline.register(Box::new(AppendProcessor { text: "x".into() }));
         let caps = pipeline.aggregate_capabilities();
         // AppendProcessor 的 capabilities() 返回默认（全 None）
         assert!(!caps.supports(crate::ProcessorCapability::TableDetection));
@@ -382,8 +377,12 @@ mod tests {
     fn multiple_processors_execute() {
         let mut pipeline = ProcessorPipeline::new();
         // Both at same priority (10.0), execution order is stable
-        pipeline.register(Box::new(AppendProcessor { text: "first".into() }));
-        pipeline.register(Box::new(AppendProcessor { text: "second".into() }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "first".into(),
+        }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "second".into(),
+        }));
         let doc = empty_doc();
         let (result, warnings) = pipeline.run(&empty_input(), doc).unwrap();
         // Last processor wins since AppendProcessor replaces doc
@@ -396,7 +395,9 @@ mod tests {
     fn fail_fast_stops_on_first_error() {
         let mut pipeline = ProcessorPipeline::new().fail_fast(true);
         pipeline.register(Box::new(FailProcessor));
-        pipeline.register(Box::new(AppendProcessor { text: "never".into() }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "never".into(),
+        }));
         let doc = empty_doc();
         let result = pipeline.run(&empty_input(), doc);
         assert!(result.is_err());
@@ -406,7 +407,9 @@ mod tests {
     fn no_fail_fast_continues_after_error() {
         let mut pipeline = ProcessorPipeline::new().fail_fast(false);
         pipeline.register(Box::new(FailProcessor));
-        pipeline.register(Box::new(AppendProcessor { text: "continued".into() }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "continued".into(),
+        }));
         let doc = empty_doc();
         let (result, warnings) = pipeline.run(&empty_input(), doc).unwrap();
         // Second processor still runs
@@ -433,9 +436,7 @@ mod tests {
     #[test]
     fn aggregate_bool_capabilities_merges() {
         let mut pipeline = ProcessorPipeline::new();
-        pipeline.register(Box::new(AppendProcessor {
-            text: "x".into(),
-        }));
+        pipeline.register(Box::new(AppendProcessor { text: "x".into() }));
         let caps = pipeline.aggregate_bool_capabilities();
         // AppendProcessor returns default capabilities
         assert!(!caps.ocr());
@@ -450,8 +451,12 @@ mod tests {
     #[test]
     fn same_priority_preserves_registration_order() {
         let mut pipeline = ProcessorPipeline::new();
-        pipeline.register(Box::new(AppendProcessor { text: "first".into() }));
-        pipeline.register(Box::new(AppendProcessor { text: "second".into() }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "first".into(),
+        }));
+        pipeline.register(Box::new(AppendProcessor {
+            text: "second".into(),
+        }));
         // Both at PRIORITY_GENERIC (10.0), second should run last
         let doc = empty_doc();
         let (result, _) = pipeline.run(&empty_input(), doc).unwrap();

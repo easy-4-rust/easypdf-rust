@@ -90,12 +90,10 @@ impl PdfDocumentModel {
     /// assert_eq!(blocks[0].0, 1); // 1-based page number
     /// ```
     pub fn iter_all_blocks(&self) -> impl Iterator<Item = (usize, &PdfBlock)> {
-        self.pages
-            .iter()
-            .flat_map(|page| {
-                let num = page.page_number();
-                page.blocks().iter().map(move |block| (num, block))
-            })
+        self.pages.iter().flat_map(|page| {
+            let num = page.page_number();
+            page.blocks().iter().map(move |block| (num, block))
+        })
     }
 
     /// 统计每种 [`PdfBlockType`] 的出现次数。
@@ -130,8 +128,8 @@ impl PdfDocumentModel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::SourceLocation;
     use crate::PageIndex;
+    use crate::SourceLocation;
 
     fn loc(page: usize) -> SourceLocation {
         SourceLocation::new(PageIndex::new(page), 1.0)

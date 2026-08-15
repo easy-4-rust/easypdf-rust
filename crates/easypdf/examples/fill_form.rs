@@ -74,8 +74,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Append more fields on a second pass (for demonstration).
     // In practice, use PdfWriter for multi-line content.
-    let mut writer = EasyPdf::writer("Invoice Details")
-        .build()?;
+    let mut writer = EasyPdf::writer("Invoice Details").build()?;
     writer.add_page(PageSize::A4, Orientation::Portrait)?;
 
     let lines = [

@@ -91,7 +91,8 @@ fn pdf_read_text() -> ToolDefinition {
 fn pdf_to_markdown() -> ToolDefinition {
     ToolDefinition {
         name: "pdf_to_markdown".to_string(),
-        description: "Convert a PDF to Markdown with table detection and structure preservation".to_string(),
+        description: "Convert a PDF to Markdown with table detection and structure preservation"
+            .to_string(),
         input_schema: serde_json::json!({
             "type": "object",
             "properties": {
@@ -288,12 +289,13 @@ fn execute_pdf_read_text(args: &serde_json::Value) -> Result<ToolResult> {
     let mut reader = easypdf_reader::PdfReader::open(&path)?;
 
     if let Some(start) = args["start_page"].as_u64() {
-        let start = usize::try_from(start).map_err(|_| {
-            McpError::invalid_params("start_page is too large")
-        })?;
+        let start = usize::try_from(start)
+            .map_err(|_| McpError::invalid_params("start_page is too large"))?;
         let end = args["end_page"]
             .as_u64()
-            .map(|e| usize::try_from(e).map_err(|_| McpError::invalid_params("end_page is too large")))
+            .map(|e| {
+                usize::try_from(e).map_err(|_| McpError::invalid_params("end_page is too large"))
+            })
             .transpose()?
             .unwrap_or(usize::MAX);
         reader = reader.pages(start..end);
@@ -324,9 +326,7 @@ fn execute_pdf_create_text(args: &serde_json::Value) -> Result<ToolResult> {
     validate_absolute_path(&path, "output")?;
     let text = require_string(args, "text")?;
 
-    let title = args["title"]
-        .as_str()
-        .unwrap_or("Untitled");
+    let title = args["title"].as_str().unwrap_or("Untitled");
 
     let mut writer = easypdf_writer::PdfWriter::new(title);
     writer.add_page(

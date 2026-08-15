@@ -1,8 +1,8 @@
 //! Table detector processor implementing [`PdfMarkdownProcessor`].
 
-use easypdf_core::Result;
-use easypdf_core::PdfInput;
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning, PdfMarkdownProcessor};
+use easypdf_core::PdfInput;
+use easypdf_core::Result;
 use easypdf_core::{PdfBlock, PdfDocumentModel, PdfPageModel};
 
 use super::config::TableDetectionConfig;

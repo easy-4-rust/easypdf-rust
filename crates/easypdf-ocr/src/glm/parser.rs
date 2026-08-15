@@ -1,8 +1,8 @@
 //! Response parser for the Zhipu GLM-OCR API.
 
-use easypdf_markdown::ocr::OcrResult;
 use crate::http::error::{OcrHttpError, Result};
 use crate::http::response::OcrResponseParser;
+use easypdf_markdown::ocr::OcrResult;
 
 /// Response parser for the Zhipu GLM-OCR layout parsing API.
 ///
@@ -53,12 +53,7 @@ impl OcrResponseParser for GlmOcrParser {
                 .get("code")
                 .and_then(serde_json::Value::as_i64)
                 .map(|c| c.to_string())
-                .or_else(|| {
-                    error
-                        .get("code")
-                        .and_then(|v| v.as_str())
-                        .map(String::from)
-                })
+                .or_else(|| error.get("code").and_then(|v| v.as_str()).map(String::from))
                 .unwrap_or_else(|| "unknown".to_owned());
             return Err(OcrHttpError::Engine(format!(
                 "GLM-OCR error (code: {code}): {message}"

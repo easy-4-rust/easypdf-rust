@@ -7,9 +7,9 @@
 //! - **Document extraction** (`SmartStructuralOCR`):
 //!   `Response.WordList[].Text`
 
-use easypdf_markdown::ocr::{OcrResult, WordBox};
 use crate::http::error::{OcrHttpError, Result};
 use crate::http::response::OcrResponseParser;
+use easypdf_markdown::ocr::{OcrResult, WordBox};
 
 use super::config::HunyuanMode;
 
@@ -62,13 +62,11 @@ impl HunyuanOcrParser {
 impl OcrResponseParser for HunyuanOcrParser {
     fn parse_response(&self, raw: &serde_json::Value) -> Result<OcrResult> {
         // Tencent Cloud wraps all responses in a "Response" object.
-        let response = raw
-            .get("Response")
-            .ok_or_else(|| {
-                OcrHttpError::InvalidResponse(
-                    "missing top-level 'Response' field in Tencent Cloud OCR response".to_owned(),
-                )
-            })?;
+        let response = raw.get("Response").ok_or_else(|| {
+            OcrHttpError::InvalidResponse(
+                "missing top-level 'Response' field in Tencent Cloud OCR response".to_owned(),
+            )
+        })?;
 
         // Check for error response.
         if let Some(error) = response.get("Error") {
@@ -122,7 +120,10 @@ fn parse_text_detections(response: &serde_json::Value) -> Result<OcrResult> {
         texts.push(text.to_owned());
 
         // Collect confidence scores.
-        if let Some(conf) = detection.get("Confidence").and_then(serde_json::Value::as_f64) {
+        if let Some(conf) = detection
+            .get("Confidence")
+            .and_then(serde_json::Value::as_f64)
+        {
             total_confidence += conf;
             confidence_count += 1;
         }
@@ -187,10 +188,7 @@ fn parse_word_list(response: &serde_json::Value) -> Result<OcrResult> {
     let mut texts = Vec::with_capacity(word_list.len());
 
     for item in word_list {
-        let text = item
-            .get("Text")
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
+        let text = item.get("Text").and_then(|v| v.as_str()).unwrap_or("");
         texts.push(text.to_owned());
     }
 

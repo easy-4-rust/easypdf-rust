@@ -150,9 +150,7 @@ impl TokenManager {
                 .get("error_description")
                 .and_then(|v| v.as_str())
                 .unwrap_or("unknown error");
-            return Err(BaiduError::Auth(format!(
-                "OAuth error: {err_code}: {desc}"
-            )));
+            return Err(BaiduError::Auth(format!("OAuth error: {err_code}: {desc}")));
         }
 
         body.get("access_token")
@@ -191,9 +189,7 @@ mod tests {
                 listener.set_nonblocking(false).ok();
                 for _ in 0..10 {
                     if let Ok((mut stream, _)) = listener.accept() {
-                        stream
-                            .set_read_timeout(Some(Duration::from_secs(2)))
-                            .ok();
+                        stream.set_read_timeout(Some(Duration::from_secs(2))).ok();
                         // Read request.
                         let mut reader = BufReader::new(&stream);
                         let mut content_length = 0usize;
@@ -254,7 +250,9 @@ mod tests {
     fn test_cached_token_is_valid_expired() {
         let cached = CachedToken {
             token: "test".to_owned(),
-            obtained_at: Instant::now().checked_sub(Duration::from_secs(DEFAULT_TOKEN_LIFETIME_SECS)).unwrap(),
+            obtained_at: Instant::now()
+                .checked_sub(Duration::from_secs(DEFAULT_TOKEN_LIFETIME_SECS))
+                .unwrap(),
             lifetime_secs: DEFAULT_TOKEN_LIFETIME_SECS,
         };
         assert!(!cached.is_valid());
@@ -265,7 +263,11 @@ mod tests {
         // Token with 1 second left (within refresh margin).
         let cached = CachedToken {
             token: "test".to_owned(),
-            obtained_at: Instant::now().checked_sub(Duration::from_secs(DEFAULT_TOKEN_LIFETIME_SECS - REFRESH_MARGIN_SECS - 1)).unwrap(),
+            obtained_at: Instant::now()
+                .checked_sub(Duration::from_secs(
+                    DEFAULT_TOKEN_LIFETIME_SECS - REFRESH_MARGIN_SECS - 1,
+                ))
+                .unwrap(),
             lifetime_secs: DEFAULT_TOKEN_LIFETIME_SECS,
         };
         // Should still be valid (just outside the margin).
@@ -273,7 +275,11 @@ mod tests {
 
         let cached2 = CachedToken {
             token: "test".to_owned(),
-            obtained_at: Instant::now().checked_sub(Duration::from_secs(DEFAULT_TOKEN_LIFETIME_SECS - REFRESH_MARGIN_SECS + 1)).unwrap(),
+            obtained_at: Instant::now()
+                .checked_sub(Duration::from_secs(
+                    DEFAULT_TOKEN_LIFETIME_SECS - REFRESH_MARGIN_SECS + 1,
+                ))
+                .unwrap(),
             lifetime_secs: DEFAULT_TOKEN_LIFETIME_SECS,
         };
         // Should be invalid (within the margin).
@@ -396,11 +402,7 @@ mod tests {
             200,
             r#"{"error":"invalid_client","error_description":"The client identifier is invalid"}"#,
         );
-        let mgr = TokenManager::new(
-            server.url(),
-            "bad-key".to_owned(),
-            "bad-secret".to_owned(),
-        );
+        let mgr = TokenManager::new(server.url(), "bad-key".to_owned(), "bad-secret".to_owned());
 
         let result = mgr.get_token();
         assert!(result.is_err());

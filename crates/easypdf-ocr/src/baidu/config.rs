@@ -327,10 +327,7 @@ mod tests {
     fn test_baidu_api_path() {
         assert_eq!(BaiduApi::GeneralBasic.path(), "general_basic");
         assert_eq!(BaiduApi::GeneralAccurate.path(), "accurate_basic");
-        assert_eq!(
-            BaiduApi::GeneralBasicWithLocation.path(),
-            "general_basic"
-        );
+        assert_eq!(BaiduApi::GeneralBasicWithLocation.path(), "general_basic");
         assert_eq!(
             BaiduApi::GeneralAccurateWithLocation.path(),
             "accurate_basic"
@@ -356,10 +353,7 @@ mod tests {
             BaiduApi::GeneralAccurate.engine_name(),
             "baidu-general-accurate"
         );
-        assert_eq!(
-            BaiduApi::TableRecognitionV2.engine_name(),
-            "baidu-table-v2"
-        );
+        assert_eq!(BaiduApi::TableRecognitionV2.engine_name(), "baidu-table-v2");
         assert_eq!(BaiduApi::QianfanOcr.engine_name(), "baidu-qianfan-ocr");
     }
 
@@ -428,9 +422,18 @@ mod tests {
             ..BaiduConfig::default()
         };
         let debug = format!("{config:?}");
-        assert!(!debug.contains("AK-abcdefghijklmnop"), "api_key must not appear in Debug");
-        assert!(!debug.contains("SK-extremely-secret-value"), "secret_key must not appear in Debug");
-        assert!(debug.contains("redacted"), "Debug output should contain 'redacted'");
+        assert!(
+            !debug.contains("AK-abcdefghijklmnop"),
+            "api_key must not appear in Debug"
+        );
+        assert!(
+            !debug.contains("SK-extremely-secret-value"),
+            "secret_key must not appear in Debug"
+        );
+        assert!(
+            debug.contains("redacted"),
+            "Debug output should contain 'redacted'"
+        );
         assert!(debug.contains("BaiduConfig"));
     }
 }

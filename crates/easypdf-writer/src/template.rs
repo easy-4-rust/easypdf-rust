@@ -2,8 +2,8 @@
 //!
 //! Supports filling PDF form fields with typed data.
 
-use easypdf_core::error::{PdfError, Result};
 use easypdf_core::AtomicFileOutput;
+use easypdf_core::error::{PdfError, Result};
 use std::path::Path;
 
 /// A template filler for populating PDF forms and placeholders.

@@ -14,11 +14,11 @@
 
 #![allow(clippy::doc_markdown)]
 
+use easypdf::ResourceLimits;
 use easypdf::io::guards::{guard_decompression_bomb, guard_element_explosion};
 use easypdf::io::ssrf_guard::validate_url;
-use easypdf::ResourceLimits;
-use easypdf_ocr::glm::GlmConfig;
 use easypdf_ocr::baidu::BaiduConfig;
+use easypdf_ocr::glm::GlmConfig;
 
 // ==========================================================================
 // A. Decompression bomb attack vectors
@@ -32,7 +32,10 @@ fn audit_a1_high_ratio_200_to_1() {
     let result = guard_decompression_bomb(100_000, 20_000_000, &limits);
     assert!(result.is_err(), "200:1 ratio on 100KB should be rejected");
     let msg = format!("{}", result.unwrap_err());
-    assert!(msg.contains("compression ratio"), "error should mention ratio: {msg}");
+    assert!(
+        msg.contains("compression ratio"),
+        "error should mention ratio: {msg}"
+    );
 }
 
 /// Extreme ratio: 1 MB compressed, 10 GB decompressed (10,000:1).
@@ -58,7 +61,10 @@ fn audit_a3_nested_compression_3_layers() {
 fn audit_a4_strict_limits_reject_smaller_bombs() {
     let strict = ResourceLimits::strict();
     let result = guard_decompression_bomb(100_000, 6_000_000, &strict);
-    assert!(result.is_err(), "60:1 ratio should be rejected under strict limits (max=50)");
+    assert!(
+        result.is_err(),
+        "60:1 ratio should be rejected under strict limits (max=50)"
+    );
 }
 
 /// Boundary: exactly at the default decompressed size limit should pass.
@@ -123,7 +129,10 @@ fn audit_a10_small_zip_bomb_ratio_now_blocked() {
         "Small zip bomb (1 KB -> 1 GB, ratio ~1,000,000:1) should be rejected"
     );
     let msg = format!("{}", result.unwrap_err());
-    assert!(msg.contains("compression ratio"), "error should mention ratio: {msg}");
+    assert!(
+        msg.contains("compression ratio"),
+        "error should mention ratio: {msg}"
+    );
 }
 
 // ==========================================================================
@@ -135,9 +144,15 @@ fn audit_a10_small_zip_bomb_ratio_now_blocked() {
 fn audit_b1_ten_million_elements_rejected() {
     let limits = ResourceLimits::default();
     let result = guard_element_explosion(10_000_000, &limits);
-    assert!(result.is_err(), "10M elements should exceed default limit of 5M");
+    assert!(
+        result.is_err(),
+        "10M elements should exceed default limit of 5M"
+    );
     let msg = format!("{}", result.unwrap_err());
-    assert!(msg.contains("element count"), "error should mention element count: {msg}");
+    assert!(
+        msg.contains("element count"),
+        "error should mention element count: {msg}"
+    );
 }
 
 /// 100,000 elements is well under default limit, should pass.
@@ -153,7 +168,10 @@ fn audit_b2_hundred_thousand_elements_passes() {
 fn audit_b3_strict_limits_reject_2m_elements() {
     let strict = ResourceLimits::strict();
     let result = guard_element_explosion(2_000_000, &strict);
-    assert!(result.is_err(), "2M elements should exceed strict limit of 1M");
+    assert!(
+        result.is_err(),
+        "2M elements should exceed strict limit of 1M"
+    );
 }
 
 /// Strict limits are tighter than default on all fields.
@@ -316,7 +334,10 @@ fn audit_c3_ipv6_loopback_now_blocked() {
 #[test]
 fn audit_c4_ipv4_mapped_ipv6_now_blocked() {
     let result = validate_url("http://[::ffff:127.0.0.1]/");
-    assert!(result.is_err(), "IPv4-mapped loopback [::ffff:127.0.0.1] should be blocked");
+    assert!(
+        result.is_err(),
+        "IPv4-mapped loopback [::ffff:127.0.0.1] should be blocked"
+    );
     assert_eq!(
         result.unwrap_err().code(),
         easypdf::PdfErrorCode::SecurityViolation,
@@ -345,14 +366,20 @@ fn audit_c6_ipv6_ula_blocked() {
 #[test]
 fn audit_c7_ipv6_link_local_blocked() {
     let result = validate_url("http://[fe80::1]/");
-    assert!(result.is_err(), "IPv6 link-local [fe80::1] should be blocked");
+    assert!(
+        result.is_err(),
+        "IPv6 link-local [fe80::1] should be blocked"
+    );
 }
 
 /// IPv4-mapped AWS metadata endpoint must be blocked.
 #[test]
 fn audit_c8_ipv4_mapped_metadata_blocked() {
     let result = validate_url("http://[::ffff:169.254.169.254]/latest/meta-data/");
-    assert!(result.is_err(), "IPv4-mapped metadata endpoint should be blocked");
+    assert!(
+        result.is_err(),
+        "IPv4-mapped metadata endpoint should be blocked"
+    );
 }
 
 // ==========================================================================

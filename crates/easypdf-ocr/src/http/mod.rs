@@ -113,9 +113,7 @@ impl<R: OcrRequest, P: OcrResponseParser> OcrEngine for HttpOcrEngine<R, P> {
         let raw: serde_json::Value = self.client.post_json(&body, extra_ref)?;
 
         // Check for engine-level errors in the response.
-        self.parser
-            .parse_response(&raw)
-            .map_err(Into::into)
+        self.parser.parse_response(&raw).map_err(Into::into)
     }
 
     fn name(&self) -> &'static str {
@@ -166,8 +164,8 @@ where
 #[cfg(test)]
 mod tests {
     #![allow(clippy::similar_names, clippy::float_cmp)]
-    use super::*;
     use super::auth::AuthMethod;
+    use super::*;
 
     /// A mock request builder for testing.
     struct MockRequest {

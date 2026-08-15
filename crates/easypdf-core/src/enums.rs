@@ -189,8 +189,16 @@ mod tests {
 
     #[test]
     fn page_size_all_sizes() {
-        let sizes = [PageSize::A0, PageSize::A1, PageSize::A2, PageSize::A3,
-                     PageSize::A4, PageSize::A5, PageSize::Letter, PageSize::Legal];
+        let sizes = [
+            PageSize::A0,
+            PageSize::A1,
+            PageSize::A2,
+            PageSize::A3,
+            PageSize::A4,
+            PageSize::A5,
+            PageSize::Letter,
+            PageSize::Legal,
+        ];
         for s in sizes {
             let (w, h) = s.dimensions();
             assert!(w > 0.0);

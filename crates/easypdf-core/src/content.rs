@@ -237,15 +237,13 @@ mod tests {
 
     #[test]
     fn pdf_table_row() {
-        let t = PdfTable::new(vec!["A".into()])
-            .row(vec!["1".into()]);
+        let t = PdfTable::new(vec!["A".into()]).row(vec!["1".into()]);
         assert_eq!(t.rows.len(), 1);
     }
 
     #[test]
     fn pdf_table_rows() {
-        let t = PdfTable::new(vec!["A".into()])
-            .rows(vec![vec!["1".into()], vec!["2".into()]]);
+        let t = PdfTable::new(vec!["A".into()]).rows(vec![vec!["1".into()], vec!["2".into()]]);
         assert_eq!(t.rows.len(), 2);
     }
 
@@ -287,7 +285,10 @@ mod tests {
 
     #[test]
     fn pdf_table_cell_debug_clone() {
-        let cell = PdfTableCell { content: "x".into(), ..Default::default() };
+        let cell = PdfTableCell {
+            content: "x".into(),
+            ..Default::default()
+        };
         let cloned = cell.clone();
         assert_eq!(cell.content, cloned.content);
         let _ = format!("{:?}", cell);
@@ -295,7 +296,14 @@ mod tests {
 
     #[test]
     fn pdf_line_debug_copy() {
-        let line = PdfLine { x1: 0.0, y1: 0.0, x2: 100.0, y2: 100.0, width: 1.0, color: PdfColor::default() };
+        let line = PdfLine {
+            x1: 0.0,
+            y1: 0.0,
+            x2: 100.0,
+            y2: 100.0,
+            width: 1.0,
+            color: PdfColor::default(),
+        };
         let copied = line;
         assert_eq!(line.x2, copied.x2);
         let _ = format!("{:?}", line);
@@ -303,7 +311,15 @@ mod tests {
 
     #[test]
     fn pdf_rect_debug_copy() {
-        let rect = PdfRect { x: 0.0, y: 0.0, w: 100.0, h: 50.0, border_width: 1.0, border_color: PdfColor::default(), fill_color: None };
+        let rect = PdfRect {
+            x: 0.0,
+            y: 0.0,
+            w: 100.0,
+            h: 50.0,
+            border_width: 1.0,
+            border_color: PdfColor::default(),
+            fill_color: None,
+        };
         let copied = rect;
         assert_eq!(rect.w, copied.w);
         let _ = format!("{:?}", rect);

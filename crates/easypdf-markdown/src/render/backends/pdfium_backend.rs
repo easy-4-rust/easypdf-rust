@@ -8,13 +8,22 @@
 
 use std::path::Path;
 
-use pdfium_render::prelude::{Pdfium, PdfiumError};
+use pdfium_render::prelude::{PdfRenderConfig, Pdfium, PdfiumError};
 
-use crate::render::config::{ImageFormat, RenderConfig};
+use crate::render::config::RenderConfig;
 use crate::render::error::{RenderError, Result};
 use crate::render::traits::{PdfRenderer, RenderedImage};
 
-/// High-quality PDF renderer backed by Google PDFium.
+/// Bind to the pdfium dynamic library, trying the directory of the PDF first,
+/// then falling back to system library paths.
+fn bind_pdfium(
+    pdf_dir: &Path,
+) -> std::result::Result<Box<dyn pdfium_render::prelude::PdfiumLibraryBindings>, PdfiumError> {
+    Pdfium::bind_to_library(Pdfium::pdfium_platform_library_name_at_path(pdf_dir))
+        .or_else(|_| Pdfium::bind_to_system_library())
+}
+
+/// High-quality PDF renderer backed by Google `PDFium`.
 ///
 /// Requires the `pdfium` Cargo feature and the `libpdfium` shared library
 /// to be present at runtime.
@@ -22,16 +31,17 @@ use crate::render::traits::{PdfRenderer, RenderedImage};
 /// # Examples
 ///
 /// ```no_run
+/// use std::path::Path;
+///
 /// use easypdf_markdown::render::backends::pdfium_backend::PdfiumRenderer;
 /// use easypdf_markdown::render::{PdfRenderer, RenderConfig};
 ///
-/// let renderer = PdfiumRenderer::open("document.pdf")?;
+/// let renderer = PdfiumRenderer::open(Path::new("document.pdf"))?;
 /// let image = renderer.render_page(0, &RenderConfig::default())?;
 /// image.save("page_0.png".as_ref())?;
 /// # Ok::<(), easypdf_markdown::render::RenderError>(())
 /// ```
 pub struct PdfiumRenderer {
-    pdfium: Pdfium,
     document_path: std::path::PathBuf,
     page_count: usize,
 }
@@ -43,8 +53,7 @@ impl PdfiumRenderer {
     ///
     /// Returns a [`PdfiumError`] if the library cannot be found or loaded.
     pub fn probe() -> std::result::Result<(), PdfiumError> {
-        let _bind = Pdfium::bind_to_library(Pdfium::pdfium_platform_library_name_at_path("./"))
-            .or_else(|_| Pdfium::bind_to_system_library())?;
+        bind_pdfium(Path::new("."))?;
         Ok(())
     }
 
@@ -55,14 +64,11 @@ impl PdfiumRenderer {
     /// Returns [`RenderError::BackendUnavailable`] if the pdfium library
     /// cannot be loaded, or [`RenderError::Parse`] if the PDF cannot be opened.
     pub fn open(path: &Path) -> Result<Self> {
-        let bind_result = Pdfium::bind_to_library(Pdfium::pdfium_platform_library_name_at_path(
-            path.parent().unwrap_or(Path::new(".")),
-        ))
-        .or_else(|_| Pdfium::bind_to_system_library());
-
-        let pdfium_bind = bind_result.map_err(|e| RenderError::BackendUnavailable {
-            name: "pdfium",
-            reason: e.to_string(),
+        let pdfium_bind = bind_pdfium(path.parent().unwrap_or(Path::new("."))).map_err(|e| {
+            RenderError::BackendUnavailable {
+                name: "pdfium",
+                reason: e.to_string(),
+            }
         })?;
 
         let pdfium = Pdfium::new(pdfium_bind);
@@ -74,9 +80,8 @@ impl PdfiumRenderer {
         let page_count = document.pages().len();
 
         Ok(Self {
-            pdfium,
             document_path: path.to_path_buf(),
-            page_count,
+            page_count: usize::from(page_count),
         })
     }
 
@@ -84,6 +89,7 @@ impl PdfiumRenderer {
     fn target_width(config: &RenderConfig) -> i32 {
         // A4 width at 72 DPI is 595 points.
         let scale = f64::from(config.dpi) / 72.0;
+        #[allow(clippy::cast_possible_truncation)] // A4 宽度有限，round 后不会截断
         let w = (595.0 * scale).round() as i32;
         if let Some(max_w) = config.max_width {
             w.min(i32::try_from(max_w).unwrap_or(i32::MAX))
@@ -102,8 +108,18 @@ impl PdfRenderer for PdfiumRenderer {
             });
         }
 
-        let document = self
-            .pdfium
+        // Bind per call: `Pdfium` holds `Box<dyn PdfiumLibraryBindings>` which is
+        // neither `Send` nor `Sync`, so it cannot be stored in this (Send + Sync)
+        // renderer. The OS caches the already-loaded dynamic library, so repeated
+        // binding is cheap after the first call.
+        let pdfium_bind = bind_pdfium(self.document_path.parent().unwrap_or(Path::new(".")))
+            .map_err(|e| RenderError::BackendUnavailable {
+                name: "pdfium",
+                reason: e.to_string(),
+            })?;
+        let pdfium = Pdfium::new(pdfium_bind);
+
+        let document = pdfium
             .load_pdf_from_file(self.document_path.to_str().unwrap_or(""), None)
             .map_err(|e| RenderError::Parse(e.to_string()))?;
 
@@ -117,16 +133,16 @@ impl PdfRenderer for PdfiumRenderer {
             .max_height
             .map_or(i32::MAX, |h| i32::try_from(h).unwrap_or(i32::MAX));
 
-        let render_config = PdfiumRenderConfig::new()
+        let render_config = PdfRenderConfig::new()
             .set_target_width(target_width)
-            .maximum_height(max_height);
+            .set_maximum_height(max_height);
 
         let bitmap = page
             .render_with_config(&render_config)
             .map_err(|e| RenderError::Pdfium(e.to_string()))?;
 
-        let width = bitmap.width() as u32;
-        let height = bitmap.height() as u32;
+        let width = bitmap.width().cast_unsigned();
+        let height = bitmap.height().cast_unsigned();
         let raw = bitmap.as_raw_bytes();
         // pdfium produces BGRA; convert to RGBA.
         let mut rgba = Vec::with_capacity(raw.len());
@@ -137,7 +153,13 @@ impl PdfRenderer for PdfiumRenderer {
             rgba.push(chunk[3]); // A
         }
 
-        Ok(RenderedImage::new(width, height, config.format, rgba, page_index))
+        Ok(RenderedImage::new(
+            width,
+            height,
+            config.format,
+            rgba,
+            page_index,
+        ))
     }
 
     fn name(&self) -> &'static str {
@@ -148,9 +170,6 @@ impl PdfRenderer for PdfiumRenderer {
         2400
     }
 }
-
-/// Re-export the pdfium render config type for internal use.
-use pdfium_render::prelude::PdfRenderConfig as PdfiumRenderConfig;
 
 #[cfg(test)]
 mod tests {

@@ -9,9 +9,9 @@
 
 use base64::Engine;
 use easypdf_core::CapabilityLevel;
+use rig::OneOrMany;
 use rig::completion::Prompt;
 use rig::message::{ContentFormat, ImageMediaType, Message, UserContent};
-use rig::OneOrMany;
 
 use crate::ocr::engine::{OcrEngine, OcrImage, OcrResult};
 
@@ -285,8 +285,8 @@ impl DeepSeekOcrEngine {
     /// Panics if `DEEPSEEK_API_KEY` is not set.
     #[must_use]
     pub fn from_env() -> Self {
-        let api_key =
-            std::env::var("DEEPSEEK_API_KEY").expect("DEEPSEEK_API_KEY environment variable not set");
+        let api_key = std::env::var("DEEPSEEK_API_KEY")
+            .expect("DEEPSEEK_API_KEY environment variable not set");
         let base_url = std::env::var("DEEPSEEK_BASE_URL").ok();
         Self {
             api_key,
@@ -339,10 +339,7 @@ impl DeepSeekOcrEngine {
             image::ImageFormat::Png,
         )?;
 
-        let b64 = base64::Engine::encode(
-            &base64::engine::general_purpose::STANDARD,
-            &png_buf,
-        );
+        let b64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &png_buf);
 
         let mut content_items = OneOrMany::one(UserContent::image(
             b64,

@@ -5,16 +5,16 @@ use std::path::Path;
 
 use crate::EasyPdf;
 
-#[cfg(feature = "markdown")]
-use crate::{MarkdownProfile, ProcessorPipeline};
-#[cfg(feature = "markdown-table")]
-use crate::TableDetectorProcessor;
-#[cfg(feature = "render")]
-use crate::RenderError;
 #[cfg(feature = "mcp")]
 use crate::McpServer;
+#[cfg(feature = "render")]
+use crate::RenderError;
 #[cfg(feature = "resident")]
 use crate::ResidentClient;
+#[cfg(feature = "markdown-table")]
+use crate::TableDetectorProcessor;
+#[cfg(feature = "markdown")]
+use crate::{MarkdownProfile, ProcessorPipeline};
 
 impl EasyPdf {
     /// Create a PDF Writer with backend selection.
@@ -140,7 +140,9 @@ impl EasyPdf {
     /// EasyPdf::serve(None)?;
     /// ```
     #[cfg(feature = "resident")]
-    pub fn serve(socket: Option<&Path>) -> std::result::Result<(), easypdf_runtime::resident::ResidentError> {
+    pub fn serve(
+        socket: Option<&Path>,
+    ) -> std::result::Result<(), easypdf_runtime::resident::ResidentError> {
         easypdf_runtime::resident::serve(socket)
     }
 

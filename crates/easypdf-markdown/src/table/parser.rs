@@ -46,10 +46,7 @@ pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
         return None;
     }
 
-    let cells: Vec<String> = segments[start..end]
-        .iter()
-        .map(|s| clean_cell(s))
-        .collect();
+    let cells: Vec<String> = segments[start..end].iter().map(|s| clean_cell(s)).collect();
 
     // Skip separator rows like `|---|---|` or `| --- | --- |`.
     if cells.iter().all(|c| is_separator_cell(c)) {

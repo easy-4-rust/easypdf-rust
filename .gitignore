@@ -13,6 +13,9 @@
 .springBeans
 bin/
 codes/
+# 注意：上面的 bin/ 只想忽略构建产物目录（如 gradle 的 bin/），
+# 但它也误伤了 easypdf-test/src/bin/ 等源码目录。用反向规则恢复。
+!**/src/bin/
 
 ### IntelliJ IDEA ###
 .idea

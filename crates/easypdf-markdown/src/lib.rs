@@ -73,7 +73,7 @@ pub use pdf_markdown_builder::PdfMarkdownBuilder;
 pub use pdf_markdown_export_builder::PdfMarkdownExportBuilder;
 pub use pdf_markdown_processor::PdfMarkdownProcessor;
 pub use processor_capability::{DetailedProcessorCapabilities, ProcessorCapability};
-pub use processor_pipeline::{ProcessorPipeline, PRIORITY_GENERIC, PRIORITY_SPECIFIC};
+pub use processor_pipeline::{PRIORITY_GENERIC, PRIORITY_SPECIFIC, ProcessorPipeline};
 pub use table_policy::TablePolicy;
 
 // --- Flat re-exports from render submodule (backward compatibility) ---

@@ -119,8 +119,11 @@ impl WriteHandlerChain {
     /// Ensure registrations are sorted by priority (ascending, stable).
     fn ensure_sorted(&mut self) {
         if !self.sorted {
-            self.registrations
-                .sort_by(|a, b| a.priority.partial_cmp(&b.priority).unwrap_or(std::cmp::Ordering::Equal));
+            self.registrations.sort_by(|a, b| {
+                a.priority
+                    .partial_cmp(&b.priority)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
             self.sorted = true;
         }
     }

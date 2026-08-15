@@ -55,8 +55,8 @@ impl EasyPdf {
         let pdf_bytes = std::fs::read(input)?;
         let private_key = std::fs::read(private_key_path)?;
         let certificate = std::fs::read(cert_path)?;
-        let signer = easypdf_core::crypto::PdfSigner::new(certificate, private_key)
-            .with_reason(reason);
+        let signer =
+            easypdf_core::crypto::PdfSigner::new(certificate, private_key).with_reason(reason);
         let signed_bytes = easypdf_core::crypto::sign_pdf(&pdf_bytes, &signer)
             .map_err(|e| PdfError::Signature(e.to_string()))?;
         std::fs::write(output, signed_bytes)?;

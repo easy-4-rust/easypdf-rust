@@ -1,7 +1,7 @@
 //! 标题检测处理器。
 
-use easypdf_core::Result;
 use easypdf_core::PdfInput;
+use easypdf_core::Result;
 use easypdf_core::{PdfBlock, PdfDocumentModel, PdfPageModel};
 
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning, PdfMarkdownProcessor};
@@ -59,10 +59,7 @@ impl HeadingDetectorProcessor {
             return false;
         }
         // 首字母大写或全大写
-        trimmed
-            .chars()
-            .next()
-            .is_some_and(char::is_uppercase)
+        trimmed.chars().next().is_some_and(char::is_uppercase)
     }
 }
 
@@ -159,8 +156,8 @@ mod tests {
     fn long_text_stays_paragraph() {
         let proc = HeadingDetectorProcessor::new();
         let long_text = "A".repeat(100);
-        let page = PdfPageModel::new(PageIndex::new(0))
-            .with_block(PdfBlock::paragraph(&long_text, loc()));
+        let page =
+            PdfPageModel::new(PageIndex::new(0)).with_block(PdfBlock::paragraph(&long_text, loc()));
         let doc = PdfDocumentModel::new(PdfMetadata::default(), vec![page]);
         let (result, _) = proc.process(&PdfInput::from_bytes(vec![]), doc).unwrap();
         let blocks: Vec<_> = result.iter_all_blocks().collect();
@@ -170,8 +167,7 @@ mod tests {
     #[test]
     fn empty_text_stays_paragraph() {
         let proc = HeadingDetectorProcessor::new();
-        let page = PdfPageModel::new(PageIndex::new(0))
-            .with_block(PdfBlock::paragraph("", loc()));
+        let page = PdfPageModel::new(PageIndex::new(0)).with_block(PdfBlock::paragraph("", loc()));
         let doc = PdfDocumentModel::new(PdfMetadata::default(), vec![page]);
         let (result, _) = proc.process(&PdfInput::from_bytes(vec![]), doc).unwrap();
         let blocks: Vec<_> = result.iter_all_blocks().collect();

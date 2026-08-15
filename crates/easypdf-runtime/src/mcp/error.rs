@@ -57,9 +57,7 @@ impl McpError {
             Self::InvalidRequest(_) => super::protocol::ERROR_INVALID_REQUEST,
             Self::MethodNotFound(_) => super::protocol::ERROR_METHOD_NOT_FOUND,
             Self::InvalidParams(_) => super::protocol::ERROR_INVALID_PARAMS,
-            Self::Internal(_)
-            | Self::Pdf(_)
-            | Self::Io(_) => super::protocol::ERROR_INTERNAL,
+            Self::Internal(_) | Self::Pdf(_) | Self::Io(_) => super::protocol::ERROR_INTERNAL,
         }
     }
 }

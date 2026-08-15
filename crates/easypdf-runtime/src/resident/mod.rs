@@ -101,8 +101,8 @@ pub fn try_attach() -> Option<ResidentClient> {
 #[cfg(test)]
 mod tests {
     #![allow(clippy::similar_names, clippy::items_after_statements)]
-    use super::*;
     use super::protocol::{OpenMode, PageRange, Request, Response, ResponseData};
+    use super::*;
     use std::time::Duration;
 
     // --- Helper: create a minimal valid PDF file ---
@@ -301,14 +301,20 @@ mod tests {
     #[test]
     fn test_autosave_disabled_no_interval() {
         let mode = AutosaveMode::Disabled;
-        assert!(mode.next_adaptive_interval(None, Duration::from_secs(1)).is_none());
+        assert!(
+            mode.next_adaptive_interval(None, Duration::from_secs(1))
+                .is_none()
+        );
         assert!(mode.initial_interval().is_none());
     }
 
     #[test]
     fn test_autosave_fixed_interval() {
         let mode = AutosaveMode::Fixed(Duration::from_secs(30));
-        assert!(mode.next_adaptive_interval(None, Duration::from_secs(1)).is_none());
+        assert!(
+            mode.next_adaptive_interval(None, Duration::from_secs(1))
+                .is_none()
+        );
         assert_eq!(mode.initial_interval(), Some(Duration::from_secs(30)));
     }
 
@@ -401,8 +407,12 @@ mod tests {
             let client = ResidentClient::connect(&socket_clone).unwrap();
 
             // Open two sessions
-            let s1 = client.open(pdf1_clone.to_str().unwrap(), OpenMode::ReadOnly).unwrap();
-            let s2 = client.open(pdf2_clone.to_str().unwrap(), OpenMode::ReadOnly).unwrap();
+            let s1 = client
+                .open(pdf1_clone.to_str().unwrap(), OpenMode::ReadOnly)
+                .unwrap();
+            let s2 = client
+                .open(pdf2_clone.to_str().unwrap(), OpenMode::ReadOnly)
+                .unwrap();
             assert_ne!(s1, s2);
 
             // Both should return page count
@@ -515,8 +525,12 @@ mod tests {
 
             let client = ResidentClient::connect(&socket_clone).unwrap();
 
-            let s1 = client.open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly).unwrap();
-            let s2 = client.open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly).unwrap();
+            let s1 = client
+                .open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly)
+                .unwrap();
+            let s2 = client
+                .open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly)
+                .unwrap();
             assert_ne!(s1, s2);
 
             // Third should fail
@@ -551,7 +565,9 @@ mod tests {
             std::thread::sleep(Duration::from_millis(100));
 
             let client = ResidentClient::connect(&socket_clone).unwrap();
-            let session = client.open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly).unwrap();
+            let session = client
+                .open(pdf_clone.to_str().unwrap(), OpenMode::ReadOnly)
+                .unwrap();
 
             // Extract with page range
             let text = client

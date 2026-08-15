@@ -87,10 +87,7 @@ impl DetailedProcessorCapabilities {
                 self.reading_order_detection,
                 other.reading_order_detection,
             ),
-            formula_recognition: max_level(
-                self.formula_recognition,
-                other.formula_recognition,
-            ),
+            formula_recognition: max_level(self.formula_recognition, other.formula_recognition),
             link_extraction: max_level(self.link_extraction, other.link_extraction),
         }
     }
@@ -160,11 +157,7 @@ const fn bool_to_level(b: bool) -> CapabilityLevel {
 }
 
 const fn max_level(a: CapabilityLevel, b: CapabilityLevel) -> CapabilityLevel {
-    if a as u8 >= b as u8 {
-        a
-    } else {
-        b
-    }
+    if a as u8 >= b as u8 { a } else { b }
 }
 
 #[cfg(test)]
@@ -274,12 +267,30 @@ mod tests {
             formula_recognition: CapabilityLevel::Structural,
             link_extraction: CapabilityLevel::Cloud,
         };
-        assert_eq!(caps.level_of(ProcessorCapability::TableDetection), CapabilityLevel::Heuristic);
-        assert_eq!(caps.level_of(ProcessorCapability::ImageExtraction), CapabilityLevel::Structural);
-        assert_eq!(caps.level_of(ProcessorCapability::Ocr), CapabilityLevel::Cloud);
-        assert_eq!(caps.level_of(ProcessorCapability::ReadingOrder), CapabilityLevel::Heuristic);
-        assert_eq!(caps.level_of(ProcessorCapability::Formula), CapabilityLevel::Structural);
-        assert_eq!(caps.level_of(ProcessorCapability::Link), CapabilityLevel::Cloud);
+        assert_eq!(
+            caps.level_of(ProcessorCapability::TableDetection),
+            CapabilityLevel::Heuristic
+        );
+        assert_eq!(
+            caps.level_of(ProcessorCapability::ImageExtraction),
+            CapabilityLevel::Structural
+        );
+        assert_eq!(
+            caps.level_of(ProcessorCapability::Ocr),
+            CapabilityLevel::Cloud
+        );
+        assert_eq!(
+            caps.level_of(ProcessorCapability::ReadingOrder),
+            CapabilityLevel::Heuristic
+        );
+        assert_eq!(
+            caps.level_of(ProcessorCapability::Formula),
+            CapabilityLevel::Structural
+        );
+        assert_eq!(
+            caps.level_of(ProcessorCapability::Link),
+            CapabilityLevel::Cloud
+        );
     }
 
     #[test]
@@ -369,7 +380,10 @@ mod tests {
 
     #[test]
     fn processor_capability_debug() {
-        assert_eq!(format!("{:?}", ProcessorCapability::TableDetection), "TableDetection");
+        assert_eq!(
+            format!("{:?}", ProcessorCapability::TableDetection),
+            "TableDetection"
+        );
         assert_eq!(format!("{:?}", ProcessorCapability::Ocr), "Ocr");
     }
 }

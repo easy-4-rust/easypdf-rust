@@ -158,11 +158,7 @@ impl PdfBlock {
 
     /// 创建表格。
     #[must_use]
-    pub fn table(
-        headers: Vec<String>,
-        rows: Vec<Vec<String>>,
-        source: SourceLocation,
-    ) -> Self {
+    pub fn table(headers: Vec<String>, rows: Vec<Vec<String>>, source: SourceLocation) -> Self {
         Self::Table {
             headers,
             rows,
@@ -262,11 +258,7 @@ impl PdfBlock {
 
     /// 创建超链接。
     #[must_use]
-    pub fn link(
-        url: impl Into<String>,
-        text: impl Into<String>,
-        source: SourceLocation,
-    ) -> Self {
+    pub fn link(url: impl Into<String>, text: impl Into<String>, source: SourceLocation) -> Self {
         Self::Link {
             url: url.into(),
             text: text.into(),

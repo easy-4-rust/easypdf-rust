@@ -4,9 +4,9 @@
 //! yields the same content as the original input. This is the fundamental
 //! self-consistency check: easypdf must be able to read what it writes.
 
-use easypdf::prelude::*;
 use easypdf::PdfWriter;
-use easypdf_test::{assert_text_eq, MetadataSnapshot};
+use easypdf::prelude::*;
+use easypdf_test::{MetadataSnapshot, assert_text_eq};
 
 /// Write a single-page PDF with given text, read it back, and verify text matches.
 #[test]

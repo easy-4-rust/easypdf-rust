@@ -65,10 +65,10 @@ pub use easypdf_derive::PdfModel;
 pub use easypdf_reader::{PdfReader, ReadStrategy};
 
 // --- Engine-neutral model and bounded I/O ---
-pub use easypdf_core::{AtomicFileOutput, PdfInput, ResourceLimits};
 pub use easypdf_core::io::guards::{guard_decompression_bomb, guard_element_explosion};
-pub use easypdf_core::io::repair::{attempt_repair, is_likely_corrupt, RepairOptions};
+pub use easypdf_core::io::repair::{RepairOptions, attempt_repair, is_likely_corrupt};
 pub use easypdf_core::io::ssrf_guard::validate_url as validate_io_url;
+pub use easypdf_core::{AtomicFileOutput, PdfInput, ResourceLimits};
 pub use easypdf_core::{
     ImageData, ImageFormat, ListItem, PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel,
     SourceLocation,
@@ -90,14 +90,14 @@ pub use easypdf_core::layout::FlowLayout;
 // --- Markdown pipeline (optional) ---
 #[cfg(feature = "markdown")]
 pub use easypdf_markdown::{
-    ImagePolicy, MarkdownConversionResult, MarkdownExportReport, MarkdownExportResult,
-    MarkdownProcessorCapabilities, MarkdownProfile, MarkdownRenderer, MarkdownWarning, OcrPolicy,
-    PdfMarkdownBuilder, PdfMarkdownExportBuilder, PdfMarkdownProcessor, TablePolicy,
+    DetailedProcessorCapabilities, PRIORITY_GENERIC, PRIORITY_SPECIFIC, ProcessorCapability,
+    ProcessorPipeline,
 };
 #[cfg(feature = "markdown")]
 pub use easypdf_markdown::{
-    DetailedProcessorCapabilities, ProcessorCapability, ProcessorPipeline,
-    PRIORITY_GENERIC, PRIORITY_SPECIFIC,
+    ImagePolicy, MarkdownConversionResult, MarkdownExportReport, MarkdownExportResult,
+    MarkdownProcessorCapabilities, MarkdownProfile, MarkdownRenderer, MarkdownWarning, OcrPolicy,
+    PdfMarkdownBuilder, PdfMarkdownExportBuilder, PdfMarkdownProcessor, TablePolicy,
 };
 
 // --- Table detection (optional) ---
@@ -106,7 +106,9 @@ pub use easypdf_markdown::table::{ColumnSeparator, TableDetectionConfig, TableDe
 
 // --- OCR pipeline (optional) ---
 #[cfg(feature = "ocr")]
-pub use easypdf_markdown::ocr::{OcrConfig, OcrEngine, OcrImage, OcrProcessor, OcrResult, OcrTrigger, WordBox};
+pub use easypdf_markdown::ocr::{
+    OcrConfig, OcrEngine, OcrImage, OcrProcessor, OcrResult, OcrTrigger, WordBox,
+};
 
 // --- OCR engines (optional) ---
 #[cfg(feature = "ocr")]
@@ -117,21 +119,19 @@ pub use easypdf_ocr::{
 
 // --- Rendering (optional) ---
 #[cfg(feature = "render")]
+pub use easypdf_markdown::render::error::RenderError;
+#[cfg(feature = "render")]
 pub use easypdf_markdown::render::{
     Background, PdfRenderer, RenderBackend, RenderConfig, RenderedImage,
 };
-#[cfg(feature = "render")]
-pub use easypdf_markdown::render::error::RenderError;
 
 // --- Resident daemon (optional) ---
-#[cfg(feature = "resident")]
-pub use easypdf_runtime::resident::{
-    AutosaveMode, ResidentClient, ResidentConfig, ResidentServer,
-};
 #[cfg(feature = "resident")]
 pub use easypdf_runtime::resident::serve as resident_serve;
 #[cfg(feature = "resident")]
 pub use easypdf_runtime::resident::try_attach as resident_try_attach;
+#[cfg(feature = "resident")]
+pub use easypdf_runtime::resident::{AutosaveMode, ResidentClient, ResidentConfig, ResidentServer};
 
 // --- MCP server (optional) ---
 #[cfg(feature = "mcp")]
@@ -151,7 +151,7 @@ mod pdf_fill_builder;
 pub use pdf_fill_builder::PdfFillBuilder;
 
 mod writer_helpers;
-pub use writer_helpers::{write_table, PageNumberHandler};
+pub use writer_helpers::{PageNumberHandler, write_table};
 
 pub mod prelude;
 
@@ -289,5 +289,4 @@ impl EasyPdf {
     ) -> PdfFillBuilder {
         PdfFillBuilder::new(template_path, data)
     }
-
 }

@@ -119,10 +119,7 @@ impl PdfPageModel {
     /// let headings: Vec<_> = page.blocks_by_type(PdfBlockType::Heading).collect();
     /// assert_eq!(headings.len(), 1);
     /// ```
-    pub fn blocks_by_type(
-        &self,
-        filter: PdfBlockType,
-    ) -> impl Iterator<Item = &PdfBlock> {
+    pub fn blocks_by_type(&self, filter: PdfBlockType) -> impl Iterator<Item = &PdfBlock> {
         self.blocks.iter().filter(move |b| b.block_type() == filter)
     }
 }
@@ -231,8 +228,8 @@ mod tests {
 
     #[test]
     fn clone_eq() {
-        let page = PdfPageModel::new(PageIndex::new(0))
-            .with_block(PdfBlock::paragraph("X", loc(0)));
+        let page =
+            PdfPageModel::new(PageIndex::new(0)).with_block(PdfBlock::paragraph("X", loc(0)));
         let cloned = page.clone();
         assert_eq!(page, cloned);
     }

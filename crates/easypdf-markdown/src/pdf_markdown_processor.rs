@@ -1,8 +1,8 @@
 //! PDF 到 Markdown 的可插拔语义处理器。
 
-use easypdf_core::Result;
-use easypdf_core::PdfInput;
 use easypdf_core::PdfDocumentModel;
+use easypdf_core::PdfInput;
+use easypdf_core::Result;
 
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning};
 

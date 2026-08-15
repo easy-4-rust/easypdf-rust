@@ -11,12 +11,10 @@ pub mod encrypt;
 pub mod sign;
 
 pub use encrypt::{
-    EncryptionInfo, PdfEncryption, PdfEncryptionAlgorithm, PdfPermissions,
-    decrypt_pdf, encrypt_pdf, get_encryption_info,
+    EncryptionInfo, PdfEncryption, PdfEncryptionAlgorithm, PdfPermissions, decrypt_pdf,
+    encrypt_pdf, get_encryption_info,
 };
-pub use sign::{
-    PdfSigner, SignatureInfo, sign_pdf, verify_pdf_signature,
-};
+pub use sign::{PdfSigner, SignatureInfo, sign_pdf, verify_pdf_signature};
 
 // ============================================================================
 // Error type
@@ -66,4 +64,3 @@ pub enum CryptoError {
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 }
-

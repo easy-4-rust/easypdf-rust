@@ -106,7 +106,10 @@ pub const SERVER_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Build a successful JSON-RPC response.
 #[must_use]
-pub fn success_response(id: Option<serde_json::Value>, result: serde_json::Value) -> JsonRpcResponse {
+pub fn success_response(
+    id: Option<serde_json::Value>,
+    result: serde_json::Value,
+) -> JsonRpcResponse {
     JsonRpcResponse {
         jsonrpc: "2.0".to_string(),
         id,
@@ -166,7 +169,11 @@ mod tests {
 
     #[test]
     fn response_with_error() {
-        let resp = error_response(Some(serde_json::json!(1)), ERROR_METHOD_NOT_FOUND, "no such method");
+        let resp = error_response(
+            Some(serde_json::json!(1)),
+            ERROR_METHOD_NOT_FOUND,
+            "no such method",
+        );
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"error\""));
         assert!(!json.contains("\"result\""));

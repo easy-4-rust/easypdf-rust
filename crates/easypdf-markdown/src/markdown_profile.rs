@@ -1,8 +1,6 @@
 //! Markdown 输出配置档与管道预设。
 
-use crate::{
-    ImagePolicy, OcrPolicy, ProcessorPipeline, TablePolicy,
-};
+use crate::{ImagePolicy, OcrPolicy, ProcessorPipeline, TablePolicy};
 
 /// Markdown 输出配置档。
 ///
@@ -337,8 +335,7 @@ mod tests {
 
     #[test]
     fn builder_images_sets_policy() {
-        let builder = MarkdownProfile::builder()
-            .images(ImagePolicy::Reference);
+        let builder = MarkdownProfile::builder().images(ImagePolicy::Reference);
         assert_eq!(*builder.image_policy(), ImagePolicy::Reference);
     }
 

@@ -26,8 +26,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Add several pages with different content.
     let chapters = [
-        ("Chapter 1: Introduction", "Welcome to the multi-page example."),
-        ("Chapter 2: Features", "easypdf supports tables, images, and more."),
+        (
+            "Chapter 1: Introduction",
+            "Welcome to the multi-page example.",
+        ),
+        (
+            "Chapter 2: Features",
+            "easypdf supports tables, images, and more.",
+        ),
         ("Chapter 3: Conclusion", "Thank you for trying easypdf!"),
     ];
 

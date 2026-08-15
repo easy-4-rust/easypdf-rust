@@ -37,7 +37,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let metadata = EasyPdf::read(&pdf_path).metadata()?;
     println!("Title:  {}", metadata.title.as_deref().unwrap_or("(none)"));
     println!("Author: {}", metadata.author.as_deref().unwrap_or("(none)"));
-    println!("Subject: {}", metadata.subject.as_deref().unwrap_or("(none)"));
+    println!(
+        "Subject: {}",
+        metadata.subject.as_deref().unwrap_or("(none)")
+    );
 
     // Step 4: Extract text.
     let text = EasyPdf::read(&pdf_path).extract_text()?;

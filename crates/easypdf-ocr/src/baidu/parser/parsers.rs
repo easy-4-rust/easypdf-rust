@@ -1,88 +1,7 @@
-//! Response parser for Baidu Cloud OCR API.
-//!
-//! Parses the JSON response from Baidu OCR endpoints into a standardized
-//! [`OcrResult`]. Handles multiple response formats:
-//!
-//! - **Text APIs** (`words_result`): `GeneralBasic`, `GeneralAccurate`, `WebImage`,
-//!   `Handwriting`, `Digit`, etc.
-//! - **Table API** (`tables_result`): `TableRecognitionV2`
-//! - **Office Document** (`results`): `OfficeDocument`
-//! - **Seal** (`result`): `Seal` with `major`/`minor` words
-//! - **QR Code** (`codes_result`): `Qrcode` with `text` arrays
-//! - **Structured** (`words_result.struct_info.group`): `Structured` with key-value pairs
-//! - **Qianfan-OCR** (`result`): Qianfan large model response
-//!
-//! # Error Handling
-//!
-//! Baidu APIs return errors in the response body (not HTTP status codes):
-//!
-//! ```json
-//! { "error_code": 110, "error_msg": "Access token invalid" }
-//! ```
-//!
-//! The parser checks for these fields and returns [`BaiduError::Api`].
-
 use easypdf_markdown::ocr::{OcrResult, WordBox};
 
-use super::config::{BaiduApi, BaiduError, BaiduResult};
-
-/// Parser for Baidu Cloud OCR JSON responses.
-///
-/// Configured with a [`BaiduApi`] variant to select the correct parsing logic.
-#[derive(Debug, Clone)]
-pub struct BaiduOcrParser {
-    /// Which API variant is being used (determines parsing strategy).
-    api: BaiduApi,
-}
-
-impl BaiduOcrParser {
-    /// Create a new parser for the given API variant.
-    #[must_use]
-    pub const fn new(api: BaiduApi) -> Self {
-        Self { api }
-    }
-
-    /// Parse a Baidu OCR JSON response into an [`OcrResult`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`BaiduError::Api`] if the response contains a Baidu error code,
-    /// or [`BaiduError::InvalidResponse`] if the JSON structure is unexpected.
-    pub fn parse(&self, raw: &serde_json::Value) -> BaiduResult<OcrResult> {
-        // Check for Baidu-level errors first.
-        if let Some(error_code) = raw.get("error_code").and_then(serde_json::Value::as_i64) {
-            let message = raw
-                .get("error_msg")
-                .and_then(|v| v.as_str())
-                .unwrap_or("unknown error")
-                .to_owned();
-            return Err(BaiduError::Api {
-                code: error_code,
-                message,
-            });
-        }
-
-        match self.api {
-            BaiduApi::TableRecognitionV2 => parse_table_response(raw),
-            BaiduApi::OfficeDocument => parse_office_doc_response(raw),
-            BaiduApi::Seal => parse_seal_response(raw),
-            BaiduApi::Qrcode => parse_qrcode_response(raw),
-            BaiduApi::Structured => parse_structured_response(raw),
-            BaiduApi::QianfanOcr => parse_qianfan_response(raw),
-            // GeneralBasic, GeneralAccurate, WithLocation variants,
-            // WebImage, WebImageWithLocation, Handwriting, Digit
-            // all use the standard words_result format.
-            _ => parse_words_response(raw),
-        }
-    }
-}
-
-/// Extract a `u32` coordinate from a JSON value that may be `u64`.
-fn json_u32(val: Option<&serde_json::Value>) -> u32 {
-    val.and_then(serde_json::Value::as_u64)
-        .and_then(|v| u32::try_from(v).ok())
-        .unwrap_or(0)
-}
+use super::core::json_u32;
+use crate::baidu::config::{BaiduError, BaiduResult};
 
 /// Parse a standard `words_result` response.
 ///
@@ -96,7 +15,7 @@ fn json_u32(val: Option<&serde_json::Value>) -> u32 {
 ///   "words_result_num": 2
 /// }
 /// ```
-fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let words_result = raw
         .get("words_result")
         .and_then(serde_json::Value::as_array)
@@ -108,10 +27,7 @@ fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let mut word_boxes = Vec::new();
 
     for item in words_result {
-        let words = item
-            .get("words")
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
+        let words = item.get("words").and_then(|v| v.as_str()).unwrap_or("");
         lines.push(words);
 
         // Extract location if present.
@@ -152,7 +68,7 @@ fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
 ///   ]
 /// }
 /// ```
-fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let tables = raw
         .get("tables_result")
         .and_then(serde_json::Value::as_array)
@@ -207,10 +123,7 @@ fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
                 && let Some(header) = table.get("header").and_then(serde_json::Value::as_array)
             {
                 for cell in header {
-                    let words = cell
-                        .get("words")
-                        .and_then(|v| v.as_str())
-                        .unwrap_or("");
+                    let words = cell.get("words").and_then(|v| v.as_str()).unwrap_or("");
                     all_text.push(words.to_owned());
                 }
             }
@@ -234,7 +147,7 @@ fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
 ///   }
 /// }
 /// ```
-fn parse_qianfan_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_qianfan_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     // Try the "result" field first (Qianfan-OCR format).
     if let Some(result) = raw.get("result")
         && let Some(text) = result.get("text").and_then(|v| v.as_str())
@@ -266,7 +179,7 @@ fn parse_qianfan_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
 ///   "results_num": 1
 /// }
 /// ```
-fn parse_office_doc_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_office_doc_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let results = raw
         .get("results")
         .and_then(serde_json::Value::as_array)
@@ -311,7 +224,7 @@ fn parse_office_doc_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> 
 ///   "result_num": 1
 /// }
 /// ```
-fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let result = raw
         .get("result")
         .and_then(serde_json::Value::as_array)
@@ -366,7 +279,7 @@ fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
 ///   "codes_result_num": 1
 /// }
 /// ```
-fn parse_qrcode_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+pub(crate) fn parse_qrcode_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
     let codes = raw
         .get("codes_result")
         .and_then(serde_json::Value::as_array)
@@ -410,10 +323,10 @@ fn parse_qrcode_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
 ///   }
 /// }
 /// ```
-fn parse_structured_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
-    let words_result = raw.get("words_result").ok_or_else(|| {
-        BaiduError::InvalidResponse("missing `words_result` object".to_owned())
-    })?;
+pub(crate) fn parse_structured_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
+    let words_result = raw
+        .get("words_result")
+        .ok_or_else(|| BaiduError::InvalidResponse("missing `words_result` object".to_owned()))?;
 
     let mut lines = Vec::new();
 
@@ -457,124 +370,8 @@ fn extract_struct_words(value: Option<&serde_json::Value>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_parse_words_response() {
-        let raw = serde_json::json!({
-            "words_result": [
-                { "words": "Hello World" },
-                { "words": "Line 2" }
-            ],
-            "words_result_num": 2
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::GeneralBasic);
-        let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "Hello World\nLine 2");
-        assert!(result.word_boxes.is_empty());
-    }
-
-    #[test]
-    fn test_parse_words_response_with_location() {
-        let raw = serde_json::json!({
-            "words_result": [
-                {
-                    "words": "OCR Text",
-                    "location": { "left": 10, "top": 20, "width": 100, "height": 30 }
-                }
-            ],
-            "words_result_num": 1
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::GeneralBasicWithLocation);
-        let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "OCR Text");
-        assert_eq!(result.word_boxes.len(), 1);
-        assert_eq!(result.word_boxes[0].x, 10);
-        assert_eq!(result.word_boxes[0].y, 20);
-        assert_eq!(result.word_boxes[0].width, 100);
-        assert_eq!(result.word_boxes[0].height, 30);
-    }
-
-    #[test]
-    fn test_parse_table_response() {
-        let raw = serde_json::json!({
-            "tables_result": [{
-                "body": [
-                    { "words": "Name", "row_start": 0, "col_start": 0, "row_end": 0, "col_end": 0 },
-                    { "words": "Age", "row_start": 0, "col_start": 1, "row_end": 0, "col_end": 1 },
-                    { "words": "Alice", "row_start": 1, "col_start": 0, "row_end": 1, "col_end": 0 },
-                    { "words": "30", "row_start": 1, "col_start": 1, "row_end": 1, "col_end": 1 }
-                ]
-            }]
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::TableRecognitionV2);
-        let result = parser.parse(&raw).unwrap();
-        let lines: Vec<&str> = result.text.lines().collect();
-        assert_eq!(lines.len(), 2);
-        assert_eq!(lines[0], "Name\tAge");
-        assert_eq!(lines[1], "Alice\t30");
-    }
-
-    #[test]
-    fn test_parse_qianfan_response() {
-        let raw = serde_json::json!({
-            "result": {
-                "text": "Qianfan OCR result"
-            }
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::QianfanOcr);
-        let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "Qianfan OCR result");
-    }
-
-    #[test]
-    fn test_parse_error_response() {
-        let raw = serde_json::json!({
-            "error_code": 110,
-            "error_msg": "Access token invalid or expired"
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::GeneralBasic);
-        let err = parser.parse(&raw).unwrap_err();
-        match err {
-            BaiduError::Api { code, message } => {
-                assert_eq!(code, 110);
-                assert!(message.contains("Access token"));
-            }
-            other => panic!("expected BaiduError::Api, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_parse_missing_words_result() {
-        let raw = serde_json::json!({ "log_id": 123 });
-        let parser = BaiduOcrParser::new(BaiduApi::GeneralBasic);
-        let err = parser.parse(&raw).unwrap_err();
-        assert!(matches!(err, BaiduError::InvalidResponse(_)));
-    }
-
-    #[test]
-    fn test_parse_empty_words_result() {
-        let raw = serde_json::json!({
-            "words_result": [],
-            "words_result_num": 0
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::GeneralBasic);
-        let result = parser.parse(&raw).unwrap();
-        assert!(result.text.is_empty());
-    }
-
-    #[test]
-    fn test_parse_qianfan_fallback_to_words() {
-        // Qianfan response without "result.text" should fall back to `words_result`.
-        let raw = serde_json::json!({
-            "words_result": [
-                { "words": "fallback text" }
-            ],
-            "words_result_num": 1
-        });
-        let parser = BaiduOcrParser::new(BaiduApi::QianfanOcr);
-        let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "fallback text");
-    }
+    use crate::baidu::config::BaiduApi;
+    use crate::baidu::parser::BaiduOcrParser;
 
     // --- OfficeDocument tests ---
 
@@ -600,7 +397,10 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::OfficeDocument);
         let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "Invoice #12345\nDate: 2024-01-15\nSigned by Alice");
+        assert_eq!(
+            result.text,
+            "Invoice #12345\nDate: 2024-01-15\nSigned by Alice"
+        );
     }
 
     #[test]
@@ -723,7 +523,10 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::Qrcode);
         let result = parser.parse(&raw).unwrap();
-        assert_eq!(result.text, "https://example.com\nbackup-url\n4901234567890");
+        assert_eq!(
+            result.text,
+            "https://example.com\nbackup-url\n4901234567890"
+        );
     }
 
     #[test]

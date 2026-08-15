@@ -134,7 +134,9 @@ impl BaiduOcrEngine {
     fn build_url(&self, token: &str) -> String {
         format!(
             "{}/{}?access_token={}",
-            self.config.endpoint, self.config.api.path(), token
+            self.config.endpoint,
+            self.config.api.path(),
+            token
         )
     }
 
@@ -204,10 +206,7 @@ impl BaiduOcrEngine {
             .client
             .post(url)
             .header("Content-Type", "application/json; charset=utf-8")
-            .header(
-                "Authorization",
-                format!("Bearer {}", self.config.api_key),
-            )
+            .header("Authorization", format!("Bearer {}", self.config.api_key))
             .json(&body)
             .send()
             .map_err(BaiduError::Transport)?;
@@ -262,17 +261,15 @@ impl OcrEngine for BaiduOcrEngine {
 ///
 /// Returns [`BaiduError::ImageEncoding`] if the pixel data cannot be encoded.
 fn encode_to_png(image: &OcrImage) -> BaiduResult<Vec<u8>> {
-    let rgba_img =
-        image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone()).ok_or_else(
-            || {
-                BaiduError::ImageEncoding(format!(
-                    "pixel buffer length {} does not match {}x{}x4",
-                    image.pixels.len(),
-                    image.width,
-                    image.height,
-                ))
-            },
-        )?;
+    let rgba_img = image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone())
+        .ok_or_else(|| {
+            BaiduError::ImageEncoding(format!(
+                "pixel buffer length {} does not match {}x{}x4",
+                image.pixels.len(),
+                image.width,
+                image.height,
+            ))
+        })?;
 
     let dynamic = image::DynamicImage::ImageRgba8(rgba_img);
     let mut buf = Vec::new();

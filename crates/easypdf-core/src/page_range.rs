@@ -61,7 +61,11 @@ impl TryFrom<Range<usize>> for PageRange {
 }
 
 #[cfg(test)]
-#[allow(clippy::uninlined_format_args, clippy::float_cmp, clippy::reversed_empty_ranges)]
+#[allow(
+    clippy::uninlined_format_args,
+    clippy::float_cmp,
+    clippy::reversed_empty_ranges
+)]
 mod tests {
     use super::*;
 

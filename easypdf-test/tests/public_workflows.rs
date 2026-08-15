@@ -32,7 +32,11 @@ fn create_read_and_convert_in_one_public_workflow() {
         .warnings()
         .iter()
         .any(|w| matches!(w, easypdf::MarkdownWarning::ProcessorFailed { .. }));
-    assert!(!has_processor_failure, "unexpected processor failures: {:?}", markdown.report().warnings());
+    assert!(
+        !has_processor_failure,
+        "unexpected processor failures: {:?}",
+        markdown.report().warnings()
+    );
 }
 
 #[test]

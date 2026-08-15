@@ -7,11 +7,11 @@
 // --- Modules ---
 pub mod content;
 pub mod converter_registry;
-pub mod logging;
 pub mod enums;
 pub mod error;
 pub mod event;
 pub mod handler_chain;
+pub mod logging;
 pub mod metadata;
 pub mod page_index;
 pub mod page_number;
@@ -23,9 +23,9 @@ pub mod traits;
 pub mod crypto;
 
 // --- Merged sub-crates (Wave 1) ---
-pub mod model;
 pub mod io;
 pub mod layout;
+pub mod model;
 
 // --- Convenience re-exports ---
 pub use content::{PdfImage, PdfLine, PdfRect, PdfTable, PdfTableCell, PdfText};
@@ -44,7 +44,10 @@ pub use traits::{
 };
 
 // --- Re-exports from merged model crate ---
-pub use model::{ImageData, ImageFormat, ListItem, PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel, SourceLocation};
+pub use model::{
+    ImageData, ImageFormat, ListItem, PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel,
+    SourceLocation,
+};
 
 // --- Re-exports from merged io crate (flat types) ---
 pub use io::{AtomicFileOutput, PdfInput, ResourceLimits};

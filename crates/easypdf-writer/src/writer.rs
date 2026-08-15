@@ -4,14 +4,14 @@
 //! - **In-memory** (default): the entire document is built in memory.
 //! - **Spill**: finalized pages are serialized to temp files, bounding peak memory.
 
+use easypdf_core::AtomicFileOutput;
 use easypdf_core::error::{PdfError, Result};
-use easypdf_core::handler_chain::{WriteHandlerChain, PRIORITY_NORMAL};
+use easypdf_core::handler_chain::{PRIORITY_NORMAL, WriteHandlerChain};
+use easypdf_core::layout::LayoutSink;
 use easypdf_core::{
     FontFamily, Orientation, PageSize, PdfColor, PdfFont, PdfImage, PdfMetadata, PdfText,
     PdfWriteHandler,
 };
-use easypdf_core::AtomicFileOutput;
-use easypdf_core::layout::LayoutSink;
 use printpdf::{Mm, Op, PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
 use std::collections::HashMap;
 use std::io::Write;

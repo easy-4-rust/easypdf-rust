@@ -211,8 +211,7 @@ fn test_open_with_strategy_lazy() {
 #[test]
 fn test_open_with_strategy_streaming() {
     let path = save_test_pdf("easypdf_strategy_streaming.pdf");
-    let reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
+    let reader = PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
     assert_eq!(reader.strategy(), ReadStrategy::Streaming);
     // Streaming mode opens without error (no lopdf::Document built).
     let _ = std::fs::remove_file(&path);
@@ -280,8 +279,7 @@ fn test_read_with_listener_typed() {
 #[test]
 fn test_extract_text_lazy() {
     let path = save_test_pdf("easypdf_lazy_text.pdf");
-    let mut reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Lazy).unwrap();
+    let mut reader = PdfReader::open_with_strategy(&path, ReadStrategy::Lazy).unwrap();
     let text = reader.extract_text_lazy().unwrap();
     assert_eq!(text, "Hello\n");
     let _ = std::fs::remove_file(&path);
@@ -290,8 +288,7 @@ fn test_extract_text_lazy() {
 #[test]
 fn test_extract_text_lazy_full_strategy_delegates() {
     let path = save_test_pdf("easypdf_lazy_full.pdf");
-    let mut reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Full).unwrap();
+    let mut reader = PdfReader::open_with_strategy(&path, ReadStrategy::Full).unwrap();
     let text = reader.extract_text_lazy().unwrap();
     assert_eq!(text, "Hello\n");
     let _ = std::fs::remove_file(&path);
@@ -302,12 +299,8 @@ fn test_extract_text_lazy_full_strategy_delegates() {
 #[test]
 fn test_open_with_repair_valid_file() {
     let path = save_test_pdf("easypdf_repair_valid.pdf");
-    let reader = PdfReader::open_with_repair(
-        &path,
-        RepairOptions::default(),
-        ReadStrategy::Full,
-    )
-    .unwrap();
+    let reader =
+        PdfReader::open_with_repair(&path, RepairOptions::default(), ReadStrategy::Full).unwrap();
     assert!(reader.extract_text().is_ok());
     let _ = std::fs::remove_file(&path);
 }
@@ -348,8 +341,7 @@ fn test_element_explosion_guard_rejects() {
     let path = save_test_pdf("easypdf_element_guard.pdf");
     let input = PdfInput::from_path(&path);
     let limits = ResourceLimits::strict().with_max_element_count(1);
-    let result =
-        PdfReader::open_with_limits_and_strategy(&input, limits, ReadStrategy::Full);
+    let result = PdfReader::open_with_limits_and_strategy(&input, limits, ReadStrategy::Full);
     // The minimal test PDF has > 1 object, so this should fail.
     assert!(result.is_err());
     let _ = std::fs::remove_file(&path);
@@ -360,8 +352,7 @@ fn test_element_explosion_guard_rejects() {
 #[test]
 fn test_streaming_extract_text_from_real_pdf() {
     let path = save_test_pdf("easypdf_streaming_text.pdf");
-    let reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
+    let reader = PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
     assert_eq!(reader.strategy(), ReadStrategy::Streaming);
     // The streaming extractor won't find text in a saved PDF because
     // lopdf compresses content streams.  But it should not crash.
@@ -373,8 +364,7 @@ fn test_streaming_extract_text_from_real_pdf() {
 #[test]
 fn test_streaming_metadata_heuristic() {
     let path = save_test_pdf("easypdf_streaming_meta.pdf");
-    let reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
+    let reader = PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
     let meta = reader.extract_metadata().unwrap();
     // No /Info dict in test PDF -> metadata should be empty.
     assert!(meta.title.is_none());
@@ -384,8 +374,7 @@ fn test_streaming_metadata_heuristic() {
 #[test]
 fn test_streaming_page_count_heuristic() {
     let path = save_test_pdf("easypdf_streaming_count.pdf");
-    let reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
+    let reader = PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
     let count = reader.page_count().unwrap();
     // The heuristic should find at least 1 /Type /Page entry.
     assert!(count >= 1);
@@ -395,8 +384,7 @@ fn test_streaming_page_count_heuristic() {
 #[test]
 fn test_streaming_read_with_listener() {
     let path = save_test_pdf("easypdf_streaming_listener.pdf");
-    let reader =
-        PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
+    let reader = PdfReader::open_with_strategy(&path, ReadStrategy::Streaming).unwrap();
 
     struct CollectListener {
         pages: Vec<usize>,

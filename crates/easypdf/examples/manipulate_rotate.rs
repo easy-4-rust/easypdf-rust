@@ -39,7 +39,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     EasyPdf::manipulate(&source_path)
         .rotate_all(Rotation::Clockwise180)
         .save(&all_rotated_path)?;
-    println!("All pages rotated 180 saved at: {}", all_rotated_path.display());
+    println!(
+        "All pages rotated 180 saved at: {}",
+        all_rotated_path.display()
+    );
 
     // Step 4: Reorder pages (reverse order).
     let reordered_path = out_dir.path().join("reversed.pdf");

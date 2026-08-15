@@ -2,7 +2,9 @@
 
 use std::path::Path;
 
-use super::error::{RenderError, Result};
+#[cfg(not(feature = "pdfium"))]
+use super::error::RenderError;
+use super::error::Result;
 use super::traits::PdfRenderer;
 
 /// Available rendering backends.
@@ -59,8 +61,7 @@ impl RenderBackend {
             }
             #[cfg(feature = "pdfium")]
             Self::Pdfium => {
-                let renderer =
-                    super::backends::pdfium_backend::PdfiumRenderer::open(pdf_path)?;
+                let renderer = super::backends::pdfium_backend::PdfiumRenderer::open(pdf_path)?;
                 Ok(Box::new(renderer))
             }
             #[cfg(not(feature = "pdfium"))]

@@ -138,10 +138,7 @@ impl PdfReader {
             for paragraph in split_paragraphs(&text) {
                 page = page.with_block(PdfBlock::paragraph(paragraph, source));
             }
-            return Ok(PdfDocumentModel::new(
-                self.extract_metadata()?,
-                vec![page],
-            ));
+            return Ok(PdfDocumentModel::new(self.extract_metadata()?, vec![page]));
         }
 
         let mut pages = Vec::new();
@@ -197,10 +194,7 @@ impl PdfReader {
     /// # Errors
     ///
     /// Returns `PdfError::Parse` if the document cannot be read.
-    pub fn read_with_listener_typed<L: PdfReadListener>(
-        &self,
-        listener: &mut L,
-    ) -> Result<()> {
+    pub fn read_with_listener_typed<L: PdfReadListener>(&self, listener: &mut L) -> Result<()> {
         if self.strategy == ReadStrategy::Streaming {
             let scanner = StreamScanner::new(&self.raw_bytes, self.limits);
             scanner.scan(listener)?;
@@ -250,10 +244,7 @@ impl PdfReader {
             .expect("document must be Some for non-Streaming strategies");
         let mut loader = LazyPageLoader::new(doc);
         let mut all_text = String::new();
-        let indices: Vec<usize> = self
-            .selected_pages()
-            .map(|(index, _)| index)
-            .collect();
+        let indices: Vec<usize> = self.selected_pages().map(|(index, _)| index).collect();
 
         for (idx, text) in loader.pages_text(&indices)? {
             if !all_text.is_empty() {

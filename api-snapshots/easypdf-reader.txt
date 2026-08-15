@@ -1,7 +1,3 @@
-    Blocking waiting for file lock on build directory
-    Checking easypdf-core v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-core)
- Documenting easypdf-reader v0.1.0 (/Users/wandl/workspaces/workspace-github-easy-4-rust/easypdf-rust/crates/easypdf-reader)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.68s
 pub mod easypdf_reader
 #[non_exhaustive] pub enum easypdf_reader::ReadStrategy
 pub easypdf_reader::ReadStrategy::Full
@@ -29,10 +25,14 @@ impl core::marker::Unpin for easypdf_reader::ReadStrategy
 impl core::marker::UnsafeUnpin for easypdf_reader::ReadStrategy
 impl core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::ReadStrategy
 impl core::panic::unwind_safe::UnwindSafe for easypdf_reader::ReadStrategy
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_reader::ReadStrategy where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_reader::ReadStrategy where T: 'a
 impl<Q, K> equivalent::Equivalent<K> for easypdf_reader::ReadStrategy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_reader::ReadStrategy::equivalent(&self, &K) -> bool
 impl<Q, K> hashbrown::Equivalent<K> for easypdf_reader::ReadStrategy where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
 pub fn easypdf_reader::ReadStrategy::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_reader::ReadStrategy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_reader::ReadStrategy where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_reader::ReadStrategy where U: core::convert::From<T>
 pub fn easypdf_reader::ReadStrategy::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_reader::ReadStrategy where U: core::convert::Into<T>
@@ -67,6 +67,9 @@ impl<T> tracing::instrument::Instrument for easypdf_reader::ReadStrategy
 impl<T> tracing::instrument::WithSubscriber for easypdf_reader::ReadStrategy
 impl<T> typenum::type_operators::Same for easypdf_reader::ReadStrategy
 pub type easypdf_reader::ReadStrategy::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_reader::ReadStrategy where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_reader::ReadStrategy where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_reader::ReadStrategy::vzip(self) -> V
 pub struct easypdf_reader::PdfManipulator
 impl easypdf_reader::PdfManipulator
 pub fn easypdf_reader::PdfManipulator::add_layer(&mut self, &str) -> easypdf_core::error::Result<lopdf::object::ObjectId>
@@ -87,6 +90,10 @@ impl core::marker::Unpin for easypdf_reader::PdfManipulator
 impl core::marker::UnsafeUnpin for easypdf_reader::PdfManipulator
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::PdfManipulator
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_reader::PdfManipulator
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_reader::PdfManipulator where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_reader::PdfManipulator where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_reader::PdfManipulator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_reader::PdfManipulator where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_reader::PdfManipulator where U: core::convert::From<T>
 pub fn easypdf_reader::PdfManipulator::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_reader::PdfManipulator where U: core::convert::Into<T>
@@ -115,22 +122,26 @@ impl<T> tracing::instrument::Instrument for easypdf_reader::PdfManipulator
 impl<T> tracing::instrument::WithSubscriber for easypdf_reader::PdfManipulator
 impl<T> typenum::type_operators::Same for easypdf_reader::PdfManipulator
 pub type easypdf_reader::PdfManipulator::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_reader::PdfManipulator where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_reader::PdfManipulator where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_reader::PdfManipulator::vzip(self) -> V
 pub struct easypdf_reader::PdfReader
 impl easypdf_reader::PdfReader
 pub fn easypdf_reader::PdfReader::extract_document_model(&self) -> easypdf_core::error::Result<easypdf_core::model::pdf_document_model::PdfDocumentModel>
 pub fn easypdf_reader::PdfReader::extract_metadata(&self) -> easypdf_core::error::Result<easypdf_core::metadata::PdfMetadata>
 pub fn easypdf_reader::PdfReader::extract_text(&self) -> easypdf_core::error::Result<alloc::string::String>
 pub fn easypdf_reader::PdfReader::extract_text_lazy(&mut self) -> easypdf_core::error::Result<alloc::string::String>
+pub fn easypdf_reader::PdfReader::page_count(&self) -> easypdf_core::error::Result<usize>
+pub fn easypdf_reader::PdfReader::read_with_listener(&self, &mut dyn easypdf_core::traits::PdfReadListener) -> easypdf_core::error::Result<()>
+pub fn easypdf_reader::PdfReader::read_with_listener_typed<L: easypdf_core::traits::PdfReadListener>(&self, &mut L) -> easypdf_core::error::Result<()>
+impl easypdf_reader::PdfReader
 pub fn easypdf_reader::PdfReader::from_bytes(impl core::convert::Into<alloc::vec::Vec<u8>>) -> easypdf_core::error::Result<Self>
 pub fn easypdf_reader::PdfReader::open(impl core::convert::AsRef<std::path::Path>) -> easypdf_core::error::Result<Self>
 pub fn easypdf_reader::PdfReader::open_with_limits(&easypdf_core::io::pdf_input::PdfInput, easypdf_core::io::resource_limits::ResourceLimits) -> easypdf_core::error::Result<Self>
 pub fn easypdf_reader::PdfReader::open_with_limits_and_strategy(&easypdf_core::io::pdf_input::PdfInput, easypdf_core::io::resource_limits::ResourceLimits, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
 pub fn easypdf_reader::PdfReader::open_with_repair(impl core::convert::AsRef<std::path::Path>, easypdf_core::io::repair::RepairOptions, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
 pub fn easypdf_reader::PdfReader::open_with_strategy(impl core::convert::AsRef<std::path::Path>, easypdf_reader::ReadStrategy) -> easypdf_core::error::Result<Self>
-pub fn easypdf_reader::PdfReader::page_count(&self) -> easypdf_core::error::Result<usize>
 pub fn easypdf_reader::PdfReader::pages(self, core::ops::range::Range<usize>) -> Self
-pub fn easypdf_reader::PdfReader::read_with_listener(&self, &mut dyn easypdf_core::traits::PdfReadListener) -> easypdf_core::error::Result<()>
-pub fn easypdf_reader::PdfReader::read_with_listener_typed<L: easypdf_core::traits::PdfReadListener>(&self, &mut L) -> easypdf_core::error::Result<()>
 pub const fn easypdf_reader::PdfReader::strategy(&self) -> easypdf_reader::ReadStrategy
 pub fn easypdf_reader::PdfReader::try_pages(self, core::ops::range::Range<usize>) -> easypdf_core::error::Result<Self>
 impl core::marker::Freeze for easypdf_reader::PdfReader
@@ -140,6 +151,10 @@ impl core::marker::Unpin for easypdf_reader::PdfReader
 impl core::marker::UnsafeUnpin for easypdf_reader::PdfReader
 impl !core::panic::unwind_safe::RefUnwindSafe for easypdf_reader::PdfReader
 impl !core::panic::unwind_safe::UnwindSafe for easypdf_reader::PdfReader
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_reader::PdfReader where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_reader::PdfReader where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_reader::PdfReader where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_reader::PdfReader where ST: ?core::marker::Sized, DT: ?core::marker::Sized
 impl<T, U> core::convert::Into<U> for easypdf_reader::PdfReader where U: core::convert::From<T>
 pub fn easypdf_reader::PdfReader::into(self) -> U
 impl<T, U> core::convert::TryFrom<U> for easypdf_reader::PdfReader where U: core::convert::Into<T>
@@ -168,3 +183,6 @@ impl<T> tracing::instrument::Instrument for easypdf_reader::PdfReader
 impl<T> tracing::instrument::WithSubscriber for easypdf_reader::PdfReader
 impl<T> typenum::type_operators::Same for easypdf_reader::PdfReader
 pub type easypdf_reader::PdfReader::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_reader::PdfReader where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_reader::PdfReader where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_reader::PdfReader::vzip(self) -> V

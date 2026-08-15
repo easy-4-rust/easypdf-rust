@@ -248,10 +248,7 @@ mod tests {
             })
             .expect("callback write");
 
-        assert_eq!(
-            std::fs::read_to_string(&target).unwrap(),
-            "callback data"
-        );
+        assert_eq!(std::fs::read_to_string(&target).unwrap(), "callback data");
     }
 
     #[test]
@@ -259,9 +256,8 @@ mod tests {
         let directory = tempfile::tempdir().expect("temporary directory");
         let target = directory.path().join("callback_err.txt");
 
-        let result = AtomicFileOutput::new(&target).atomic_replace(|_| {
-            Err(PdfError::Other("callback failed".to_string()))
-        });
+        let result = AtomicFileOutput::new(&target)
+            .atomic_replace(|_| Err(PdfError::Other("callback failed".to_string())));
 
         assert!(result.is_err());
         let msg = format!("{}", result.unwrap_err());

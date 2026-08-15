@@ -5,8 +5,8 @@
 
 use std::collections::HashMap;
 
+use super::byte_finder::{decode_octal_digit, hex_digit_value, skip_whitespace};
 use super::cmap::CMap;
-use super::byte_finder::{skip_whitespace, decode_octal_digit, hex_digit_value};
 
 // ---------------------------------------------------------------------------
 // CMap-aware text extraction
@@ -39,16 +39,13 @@ pub(super) fn extract_text_with_cmap(content: &[u8], cmaps: &HashMap<String, CMa
         }
 
         // Hex string: <XXXX>
-        if content[i] == b'<' && cmaps.values().any(|c| !c.is_empty())
+        if content[i] == b'<'
+            && cmaps.values().any(|c| !c.is_empty())
             && let Some((hex_bytes, end)) = parse_hex_string(content, i)
         {
             let after = skip_whitespace(content, end);
             if after + 1 < len && content[after] == b'T' && content[after + 1] == b'j' {
-                let decoded = decode_bytes_with_cmap(
-                    &hex_bytes,
-                    current_font.as_deref(),
-                    cmaps,
-                );
+                let decoded = decode_bytes_with_cmap(&hex_bytes, current_font.as_deref(), cmaps);
                 text.push_str(&decoded);
                 text.push('\n');
                 i = after + 2;
@@ -64,11 +61,7 @@ pub(super) fn extract_text_with_cmap(content: &[u8], cmaps: &HashMap<String, CMa
         {
             let after = skip_whitespace(content, end);
             if after + 1 < len {
-                let decoded = decode_bytes_with_cmap(
-                    &string_bytes,
-                    current_font.as_deref(),
-                    cmaps,
-                );
+                let decoded = decode_bytes_with_cmap(&string_bytes, current_font.as_deref(), cmaps);
                 // Tj
                 if content[after] == b'T' && content[after + 1] == b'j' {
                     text.push_str(&decoded);
@@ -97,13 +90,11 @@ pub(super) fn extract_text_with_cmap(content: &[u8], cmaps: &HashMap<String, CMa
 
         // TJ: show string array
         if content[i] == b'['
-            && let Some((strings, end)) = parse_tj_array_with_cmap(content, i, current_font.as_deref(), cmaps)
+            && let Some((strings, end)) =
+                parse_tj_array_with_cmap(content, i, current_font.as_deref(), cmaps)
         {
             let after = skip_whitespace(content, end);
-            if after + 1 < len
-                && content[after] == b'T'
-                && content[after + 1] == b'J'
-            {
+            if after + 1 < len && content[after] == b'T' && content[after + 1] == b'J' {
                 for s in strings {
                     text.push_str(&s);
                 }
@@ -158,9 +149,7 @@ fn extract_current_font_name(content: &[u8], tf_pos: usize) -> Option<String> {
     }
     // `pos` points to the first char after '/'.  The name extends to `name_end`.
     if pos < name_end {
-        return Some(
-            String::from_utf8_lossy(&content[pos..name_end]).into_owned(),
-        );
+        return Some(String::from_utf8_lossy(&content[pos..name_end]).into_owned());
     }
     None
 }

@@ -257,10 +257,7 @@ impl PdfConverter<chrono::DateTime<chrono::Utc>> for ChronoUtcConverter {
 
 #[cfg(test)]
 mod tests {
-    #![allow(
-        clippy::approx_constant,
-        clippy::items_after_statements,
-    )]
+    #![allow(clippy::approx_constant, clippy::items_after_statements)]
     use super::*;
 
     #[test]
@@ -342,9 +339,11 @@ mod tests {
     fn chrono_converter_rejects_invalid_input() {
         let mut registry = ConverterRegistry::new();
         registry.register::<chrono::DateTime<chrono::Utc>>(Box::new(ChronoUtcConverter));
-        assert!(registry
-            .from_pdf_string::<chrono::DateTime<chrono::Utc>>("not-a-date")
-            .is_err());
+        assert!(
+            registry
+                .from_pdf_string::<chrono::DateTime<chrono::Utc>>("not-a-date")
+                .is_err()
+        );
     }
 
     #[test]
@@ -407,7 +406,10 @@ mod tests {
             registry.to_pdf_string(&"hello".to_owned()).unwrap(),
             "HELLO"
         );
-        assert_eq!(registry.from_pdf_string::<String>("WORLD").unwrap(), "world");
+        assert_eq!(
+            registry.from_pdf_string::<String>("WORLD").unwrap(),
+            "world"
+        );
     }
 
     #[test]

@@ -14,7 +14,7 @@ use std::path::Path;
 
 use easypdf_core::error::{PdfError, Result};
 use easypdf_core::io::guards::guard_element_explosion;
-use easypdf_core::io::repair::{attempt_repair, is_likely_corrupt, RepairOptions};
+use easypdf_core::io::repair::{RepairOptions, attempt_repair, is_likely_corrupt};
 use easypdf_core::{PageRange, PdfInput, ResourceLimits};
 
 use super::strategy::ReadStrategy;
@@ -56,8 +56,7 @@ impl PdfReader {
     /// Returns `PdfError::Parse` if the file cannot be opened or is not a valid PDF.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref();
-        let file_size = std::fs::metadata(path)
-            .map_or(0, |m| m.len());
+        let file_size = std::fs::metadata(path).map_or(0, |m| m.len());
         let strategy = ReadStrategy::auto(file_size);
         Self::open_with_strategy(path, strategy)
     }

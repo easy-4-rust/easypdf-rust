@@ -34,12 +34,8 @@ impl MockServer {
             // Accept multiple connections (for retry tests).
             for _ in 0..20 {
                 if let Ok((mut stream, _)) = listener.accept() {
-                    stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
-                        .ok();
-                    stream
-                        .set_write_timeout(Some(Duration::from_secs(2)))
-                        .ok();
+                    stream.set_read_timeout(Some(Duration::from_secs(2))).ok();
+                    stream.set_write_timeout(Some(Duration::from_secs(2))).ok();
 
                     // Read the full request (headers + body).
                     let mut reader = BufReader::new(&stream);
@@ -124,9 +120,11 @@ fn test_http_client_new() {
 
 #[test]
 fn test_http_client_debug() {
-    let client =
-        OcrHttpClient::new("https://example.com", AuthMethod::Bearer("secret".to_owned()))
-            .unwrap();
+    let client = OcrHttpClient::new(
+        "https://example.com",
+        AuthMethod::Bearer("secret".to_owned()),
+    )
+    .unwrap();
     let debug = format!("{client:?}");
     // Debug should show endpoint but redact auth token.
     assert!(debug.contains("https://example.com"));
@@ -142,11 +140,7 @@ fn test_with_config_custom() {
         rate_limit: None,
         user_agent: "test/1.0".to_owned(),
     };
-    let client = OcrHttpClient::with_config(
-        "https://example.com",
-        AuthMethod::None,
-        config,
-    );
+    let client = OcrHttpClient::with_config("https://example.com", AuthMethod::None, config);
     assert!(client.is_ok());
 }
 
@@ -162,21 +156,14 @@ fn test_with_config_rate_limit() {
         }),
         user_agent: "test/1.0".to_owned(),
     };
-    let client = OcrHttpClient::with_config(
-        "https://example.com",
-        AuthMethod::None,
-        config,
-    );
+    let client = OcrHttpClient::with_config("https://example.com", AuthMethod::None, config);
     assert!(client.is_ok());
 }
 
 #[test]
 fn test_auth_accessor() {
-    let client = OcrHttpClient::new(
-        "https://example.com",
-        AuthMethod::Bearer("tok".to_owned()),
-    )
-    .unwrap();
+    let client =
+        OcrHttpClient::new("https://example.com", AuthMethod::Bearer("tok".to_owned())).unwrap();
     match client.auth() {
         AuthMethod::Bearer(t) => assert_eq!(t, "tok"),
         _ => panic!("expected Bearer auth"),
@@ -199,11 +186,7 @@ fn test_execute_success_200() {
     )
     .unwrap();
 
-    let result = client.execute(|c| {
-        c.post(server.url())
-            .body(b"test".to_vec())
-            .send()
-    });
+    let result = client.execute(|c| c.post(server.url()).body(b"test".to_vec()).send());
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status(), 200);
     assert_eq!(server.request_count(), 1);
