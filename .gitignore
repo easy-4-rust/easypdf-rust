@@ -77,6 +77,8 @@ __pycache__/
 .fastRequest
 *.http
 *.json
+# golden 测试基线是源码的一部分，必须入库（上方全局 *.json 误伤）。
+!easypdf-test/golden/**/*.json
 .flattened-pom.xml
 /agentdb.rvf
 /agentdb.rvf.lock
