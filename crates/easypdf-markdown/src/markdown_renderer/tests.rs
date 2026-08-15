@@ -1,4 +1,3 @@
-
 use super::*;
 use easypdf_core::{
     ImageData, ImageFormat, ListItem, PageIndex, PdfBlock, PdfDocumentModel, PdfMetadata,

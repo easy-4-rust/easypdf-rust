@@ -1,7 +1,7 @@
 //! Response parser for Baidu Cloud OCR API.
 //!
 //! Parses the JSON response from Baidu OCR endpoints into a standardized
-//! [`OcrResult`]. Handles multiple response formats:
+//! [`OcrResult`](easypdf_markdown::ocr::OcrResult). Handles multiple response formats:
 //!
 //! - **Text APIs** (`words_result`): `GeneralBasic`, `GeneralAccurate`, `WebImage`,
 //!   `Handwriting`, `Digit`, etc.
@@ -20,7 +20,8 @@
 //! { "error_code": 110, "error_msg": "Access token invalid" }
 //! ```
 //!
-//! The parser checks for these fields and returns [`BaiduError::Api`].
+//! The parser checks for these fields and returns
+//! [`BaiduError::Api`](crate::baidu::config::BaiduError::Api).
 
 mod core;
 mod parsers;
