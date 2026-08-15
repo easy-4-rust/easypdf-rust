@@ -1,0 +1,111 @@
+# cargo-deny 配置：安全审计工作流（.github/workflows/security.yml）使用。
+# 参考文档：https://embarkstudios.github.io/cargo-deny/
+
+[graph]
+all-features = true
+
+# ---------------------------------------------------------------------------
+# [licenses] 许可证白名单
+#
+# 依赖树中实际出现的许可证（Cargo.lock 434 个 package）：
+#   MIT / Apache-2.0 / Apache-2.0 WITH LLVM-exception / 0BSD /
+#   BSD-2-Clause / BSD-3-Clause / ISC / Zlib / BSL-1.0 / MPL-2.0 /
+#   Unicode-3.0 / Unlicense / CDLA-Permissive-2.0
+# 注意 AND 组合（如 ring 的 `(Apache-2.0 OR MIT) AND BSD-3-Clause`、
+# icu_* 的 `(MIT OR Apache-2.0) AND Unicode-3.0`）要求每个分量的许可证
+# 都在白名单内，否则整条被拒绝。
+# LGPL-2.1-or-later 仅出现在 OR 表达式（`MIT OR Apache-2.0 OR LGPL`）中，
+# MIT/Apache-2.0 已在白名单，无需允许 LGPL 本身。
+# ---------------------------------------------------------------------------
+[licenses]
+version = 2
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "0BSD",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "BSL-1.0",
+    "MPL-2.0",
+    "Unicode-3.0",
+    "Unlicense",
+    "CDLA-Permissive-2.0",
+]
+confidence-threshold = 0.93
+
+[[licenses.clarify]]
+# ring 的 LICENSE 文件包含多种许可证文本，spdx 解析置信度不足，显式澄清。
+name = "ring"
+version = "0.17"
+expression = "(MIT OR Apache-2.0) AND BSD-3-Clause"
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
+# ---------------------------------------------------------------------------
+# [advisories] 安全公告
+# 与 .cargo/audit.toml 保持一致，忽略项必须附带理由与重评估条件。
+# ---------------------------------------------------------------------------
+[advisories]
+version = 2
+ignore = [
+    # RUSTSEC-2023-0071: rsa 0.9.x Marvin Attack（时序侧信道潜在密钥恢复）
+    #
+    # 忽略理由：
+    #   rsa 0.9.10 仅为 dev-dependency（easypdf-core / easypdf-test），
+    #   只用于测试中的 RSA 密钥生成（ring 0.17 无 keygen API）。
+    #   生产签名/验签路径全部使用 ring 0.17 常量时间实现。
+    #   生产代码对 rsa 零依赖。
+    #
+    # 重评估条件：
+    #   - ring 提供 keygen API 后移除 rsa dev-dep
+    #   - 或将测试证书改为预生成 .pem fixture（无需运行时生成密钥）
+    { id = "RUSTSEC-2023-0071", reason = "dev-dep only (test keygen); production uses ring constant-time RSA" },
+
+    # RUSTSEC-2026-0253: lru 0.16.x（azul-layout 传递依赖，上游 hard-pin ^0.16.1）
+    #
+    # 忽略理由：
+    #   lru 由 printpdf -> azul 路径引入，azul-layout 0.0.13 将 lru
+    #   hard-pin 在 ^0.16.1，[patch.crates-io] 无法在 semver 不兼容时
+    #   强制升级（已尝试，Cargo 拒绝）。受影响的 LruCache::pop() panic
+    #   safety 问题仅在 panic 后复用缓存触发，本库不触及该路径。
+    #
+    # 重评估条件：
+    #   - azul-layout 发布解除 pin 的新版本后立即升级并移除本忽略
+    { id = "RUSTSEC-2026-0253", reason = "transitive via azul-layout hard-pin ^0.16.1; pop() panic-safety path not exercised" },
+
+    # RUSTSEC-2026-0192: lru 0.16.x LruCache::pop() use-after-free（unsound）
+    # 理由与重评估条件同上（同一 crate 同一 pin 约束）。
+    { id = "RUSTSEC-2026-0192", reason = "transitive via azul-layout hard-pin ^0.16.1; pop() UAF path not exercised" },
+
+    # 以下为 unmaintained（信息性）公告，均为传递依赖，无已知漏洞：
+    # RUSTSEC-2025-0141 bincode（经 reqwest/ring 路径传入）
+    { id = "RUSTSEC-2025-0141", reason = "unmaintained (informational); transitive, no known vuln" },
+    # RUSTSEC-2025-0134 rustls-pemfile（经 reqwest 传入）
+    { id = "RUSTSEC-2025-0134", reason = "unmaintained (informational); transitive via reqwest" },
+    # RUSTSEC-2026-0206 rustybuzz（经 printpdf 字体整形传入）
+    { id = "RUSTSEC-2026-0206", reason = "unmaintained (informational); transitive via printpdf text shaping" },
+]
+
+# ---------------------------------------------------------------------------
+# [bans] 依赖禁用与重复检测
+# ---------------------------------------------------------------------------
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+deny = [
+    # 生产代码已全面迁移到 ring（常量时间 RSA）；禁止 rsa 进入生产依赖图。
+    # dev-dependency 中保留（测试密钥生成），wildcards 已 deny，此处仅列名。
+    { name = "rsa", wrappers = ["easypdf-core", "easypdf-test"] },
+]
+
+# ---------------------------------------------------------------------------
+# [sources] 源白名单：只允许 crates.io 与本仓库 path 依赖
+# ---------------------------------------------------------------------------
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
