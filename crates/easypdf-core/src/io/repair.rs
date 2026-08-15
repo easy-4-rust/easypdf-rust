@@ -1,19 +1,18 @@
-//! Self-healing PDF open: detect corruption and attempt lightweight repairs.
+//! 自修复 PDF 打开：检测损坏并尝试轻量级修复。
 //!
-//! Inspired by the `CreateReadOnlyRepairCopy`, `StripDanglingPackageRels`,
-//! and `FixXmlEncoding` patterns in `OfficeCLI`.
+//! 灵感来自 `OfficeCLI` 中的 `CreateReadOnlyRepairCopy`、
+//! `StripDanglingPackageRels` 和 `FixXmlEncoding` 模式。
 //!
-//! The repair strategy is intentionally conservative: we re-parse the
-//! document through `lopdf`, strip dangling object references, renumber
-//! objects for a clean cross-reference table, and re-serialise.  If
-//! `lopdf` cannot parse the input at all, repair is not possible and the
-//! caller should surface the original parse error.
+//! 修复策略有意保守：通过 `lopdf` 重新解析文档，剥离悬挂的
+//! 对象引用，重新编号对象以获得干净的交叉引用表，然后重新序列化。
+//! 如果 `lopdf` 完全无法解析输入，则无法修复，调用方应返回
+//! 原始解析错误。
 
 use crate::{PdfError, Result};
 
 use crate::PdfInput;
 
-/// Options controlling which repair passes are attempted.
+/// 控制尝试哪些修复通道的选项。
 ///
 /// # Examples
 ///
@@ -27,13 +26,13 @@ use crate::PdfInput;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct RepairOptions {
-    /// Remove references to objects that do not exist in the document.
+    /// 移除指向文档中不存在的对象的引用。
     pub fix_dangling_refs: bool,
-    /// Renumber all objects sequentially to rebuild the cross-reference table.
+    /// 按顺序重新编号所有对象以重建交叉引用表。
     pub fix_xref: bool,
-    /// Fix encoding declarations in text streams (currently a no-op placeholder).
+    /// 修复文本流中的编码声明（当前为空操作占位符）。
     pub fix_encoding: bool,
-    /// Drop streams that cannot be decoded (currently a no-op placeholder).
+    /// 丢弃无法解码的流（当前为空操作占位符）。
     pub strip_unparsed_streams: bool,
 }
 
@@ -49,7 +48,7 @@ impl Default for RepairOptions {
 }
 
 impl RepairOptions {
-    /// No repairs -- return the bytes as-is if they parse.
+    /// 不修复——如果可解析则原样返回字节。
     #[must_use]
     pub const fn none() -> Self {
         Self {
@@ -61,11 +60,11 @@ impl RepairOptions {
     }
 }
 
-/// Quick check: returns `true` if the input fails to parse as a valid PDF.
+/// 快速检查：输入无法作为有效 PDF 解析时返回 `true`。
 ///
-/// This is a cheap heuristic -- it attempts `lopdf::Document::load_mem`
-/// and returns `true` on failure.  A return value of `false` does not
-/// guarantee the PDF is well-formed; it only means `lopdf` accepted it.
+/// 这是廉价的启发式检查——尝试 `lopdf::Document::load_mem`
+/// 失败时返回 `true`。返回 `false` 并不保证 PDF 格式正确；
+/// 只意味着 `lopdf` 接受了它。
 ///
 /// # Examples
 ///
@@ -73,7 +72,7 @@ impl RepairOptions {
 /// use easypdf_core::io::repair::is_likely_corrupt;
 /// use easypdf_core::PdfInput;
 ///
-/// // Not a PDF at all.
+/// // 完全不是 PDF。
 /// let input = PdfInput::from_bytes(b"not a pdf");
 /// assert!(is_likely_corrupt(&input));
 /// ```
@@ -92,16 +91,16 @@ pub fn is_likely_corrupt(input: &PdfInput) -> bool {
     lopdf::Document::load_mem(&bytes).is_err()
 }
 
-/// Attempt to repair a PDF and return the repaired bytes.
+/// 尝试修复 PDF 并返回修复后的字节。
 ///
-/// The function loads the input through `lopdf`, applies the requested
-/// repair passes, and re-serialises the document.  If `lopdf` cannot
-/// parse the input at all, the original parse error is returned.
+/// 函数通过 `lopdf` 加载输入，应用请求的修复通道，
+/// 然后重新序列化文档。如果 `lopdf` 完全无法解析输入，
+/// 则返回原始解析错误。
 ///
 /// # Errors
 ///
-/// Returns [`PdfError::Parse`] when the input cannot be parsed even for
-/// repair, or [`PdfError::Io`] on I/O failures during re-serialisation.
+/// 输入无法解析（即使是用于修复）时返回 [`PdfError::Parse`]，
+/// 或重新序列化期间的 I/O 失败返回 [`PdfError::Io`]。
 ///
 /// # Examples
 ///

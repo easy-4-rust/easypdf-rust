@@ -1,11 +1,11 @@
-//! LLM Vision OCR backend using `rig-core`.
+//! 使用 `rig-core` 的 LLM Vision OCR 后端。
 //!
-//! Requires the `llm` feature flag. Uses OpenAI-compatible vision APIs
-//! for text extraction from images.
+//! 需要 `llm` feature 标志。使用 `OpenAI` 兼容的 Vision API
+//! 从图像中提取文本。
 //!
-//! The LLM client reads its API key from the environment:
-//! - `OpenAI`: `OPENAI_API_KEY`
-//! - `Gemini`: `GEMINI_API_KEY`
+//! LLM 客户端从环境变量读取 API 密钥：
+//! - `OpenAI`：`OPENAI_API_KEY`
+//! - `Gemini`：`GEMINI_API_KEY`
 
 use base64::Engine;
 use easypdf_core::CapabilityLevel;
@@ -15,21 +15,21 @@ use rig::message::{ContentFormat, ImageMediaType, Message, UserContent};
 
 use crate::ocr::engine::{OcrEngine, OcrImage, OcrResult};
 
-/// Default OCR prompt sent to the LLM vision model.
+/// 发送给 LLM Vision 模型的默认 OCR 提示词。
 const DEFAULT_OCR_PROMPT: &str = "Extract all text from this image. \
 Return ONLY the extracted text, maintaining the original layout and order. \
 Do not add any commentary or description.";
 
-/// LLM Vision OCR engine backed by `rig-core`.
+/// 基于 `rig-core` 的 LLM Vision OCR 引擎。
 ///
-/// Supports any OpenAI-compatible vision API (`OpenAI`, Gemini, `DeepSeek`, etc.).
+/// 支持任何 `OpenAI` 兼容的 Vision API（`OpenAI`、`Gemini`、`DeepSeek` 等）。
 ///
 /// # Examples
 ///
 /// ```no_run
 /// use easypdf_markdown::ocr::{OcrEngine, engines::LlmOcrEngine};
 ///
-/// // Requires OPENAI_API_KEY environment variable
+/// // 需要 OPENAI_API_KEY 环境变量
 /// let engine = LlmOcrEngine::openai("gpt-4o");
 /// println!("engine: {}", engine.name());
 /// ```
@@ -39,14 +39,14 @@ pub struct LlmOcrEngine {
     prompt: String,
 }
 
-/// Supported LLM providers.
+/// 支持的 LLM 提供商。
 #[derive(Debug, Clone)]
 enum LlmProvider {
-    /// `OpenAI` (or compatible) API.
+    /// `OpenAI`（或兼容）API。
     OpenAI,
-    /// Google Gemini API.
+    /// Google Gemini API。
     Gemini,
-    /// `DeepSeek` API.
+    /// `DeepSeek` API。
     DeepSeek,
 }
 
@@ -60,9 +60,9 @@ impl std::fmt::Debug for LlmOcrEngine {
 }
 
 impl LlmOcrEngine {
-    /// Create an `OpenAI` vision OCR engine.
+    /// 创建 `OpenAI` Vision OCR 引擎。
     ///
-    /// Requires `OPENAI_API_KEY` environment variable.
+    /// 需要 `OPENAI_API_KEY` 环境变量。
     #[must_use]
     pub fn openai(model: impl Into<String>) -> Self {
         Self {
@@ -72,9 +72,9 @@ impl LlmOcrEngine {
         }
     }
 
-    /// Create a Gemini vision OCR engine.
+    /// 创建 Gemini Vision OCR 引擎。
     ///
-    /// Requires `GEMINI_API_KEY` environment variable.
+    /// 需要 `GEMINI_API_KEY` 环境变量。
     #[must_use]
     pub fn gemini(model: impl Into<String>) -> Self {
         Self {
@@ -84,9 +84,9 @@ impl LlmOcrEngine {
         }
     }
 
-    /// Create a `DeepSeek` vision OCR engine.
+    /// 创建 `DeepSeek` Vision OCR 引擎。
     ///
-    /// Requires `DEEPSEEK_API_KEY` environment variable.
+    /// 需要 `DEEPSEEK_API_KEY` 环境变量。
     #[must_use]
     pub fn deepseek(model: impl Into<String>) -> Self {
         Self {
@@ -96,19 +96,19 @@ impl LlmOcrEngine {
         }
     }
 
-    /// Set a custom OCR prompt.
+    /// 设置自定义 OCR 提示词。
     #[must_use]
     pub fn with_prompt(mut self, prompt: impl Into<String>) -> Self {
         self.prompt = prompt.into();
         self
     }
 
-    /// Run the LLM vision request synchronously.
+    /// 同步运行 LLM Vision 请求。
     fn run_llm(
         &self,
         image: &OcrImage,
     ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Convert RGBA to PNG bytes for the LLM.
+        // 将 RGBA 转换为 PNG 字节供 LLM 使用。
         let img = image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone())
             .ok_or("invalid pixel buffer dimensions")?;
         let dynamic = image::DynamicImage::ImageRgba8(img);
@@ -197,38 +197,37 @@ impl OcrEngine for LlmOcrEngine {
 }
 
 // ================================================================
-// DeepSeek-OCR-2 Engine
+// DeepSeek-OCR-2 引擎
 // ================================================================
 
-/// Default OCR prompt for DeepSeek-OCR-2.
+/// DeepSeek-OCR-2 的默认 OCR 提示词。
 const DEEPSEEK_OCR_PROMPT: &str = "Extract all text from this image. \
 Return ONLY the extracted text, maintaining the original layout and order. \
 Do not add any commentary or description.";
 
-/// DeepSeek-OCR-2 OCR engine using the `DeepSeek` Vision API.
+/// 使用 `DeepSeek` Vision API 的 DeepSeek-OCR-2 OCR 引擎。
 ///
-/// This engine is optimized for [DeepSeek-OCR-2][model], a 3B-parameter
-/// vision-language model specifically designed for OCR tasks including
-/// document-to-markdown conversion.
+/// 该引擎针对 [DeepSeek-OCR-2][model] 进行了优化，这是一个 30 亿参数的
+/// 视觉语言模型，专门设计用于 OCR 任务（包括文档转 Markdown）。
 ///
-/// # Configuration
+/// # 配置
 ///
-/// | Environment Variable | Description | Default |
-/// |---------------------|-------------|---------|
-/// | `DEEPSEEK_API_KEY` | `DeepSeek` API key (required for api.deepseek.com) | — |
-/// | `DEEPSEEK_BASE_URL` | Custom endpoint URL | `https://api.deepseek.com` |
+/// | 环境变量 | 说明 | 默认值 |
+/// |---------|------|--------|
+/// | `DEEPSEEK_API_KEY` | `DeepSeek` API 密钥（api.deepseek.com 必需） | — |
+/// | `DEEPSEEK_BASE_URL` | 自定义端点 URL | `https://api.deepseek.com` |
 ///
-/// When `DEEPSEEK_BASE_URL` is set, requests are routed to that URL instead
-/// of the official `DeepSeek` API. This supports:
-/// - **Self-hosted** vLLM/TGI servers
-/// - **`HuggingFace` Inference Endpoints** (set URL to your endpoint)
+/// 设置 `DEEPSEEK_BASE_URL` 时，请求将路由到该 URL 而非官方 `DeepSeek` API。
+/// 支持：
+/// - **自托管** vLLM/TGI 服务器
+/// - **`HuggingFace` Inference Endpoints**（设置 URL 为你的端点）
 ///
 /// # Examples
 ///
 /// ```no_run
 /// use easypdf_markdown::ocr::{OcrEngine, engines::DeepSeekOcrEngine};
 ///
-/// // Uses DEEPSEEK_API_KEY and optional DEEPSEEK_BASE_URL from environment
+/// // 使用环境变量中的 DEEPSEEK_API_KEY 和可选的 DEEPSEEK_BASE_URL
 /// let engine = DeepSeekOcrEngine::from_env();
 /// println!("engine: {}", engine.name());
 /// ```
@@ -236,7 +235,7 @@ Do not add any commentary or description.";
 /// ```no_run
 /// use easypdf_markdown::ocr::engines::DeepSeekOcrEngine;
 ///
-/// // Explicit configuration
+/// // 显式配置
 /// let engine = DeepSeekOcrEngine::new("my-api-key")
 ///     .with_base_url("https://my-vllm.example.com/v1")
 ///     .with_model("deepseek-ocr-2")
@@ -262,10 +261,10 @@ impl std::fmt::Debug for DeepSeekOcrEngine {
 }
 
 impl DeepSeekOcrEngine {
-    /// Create a new DeepSeek-OCR-2 engine with the given API key.
+    /// 使用给定 API 密钥创建新的 DeepSeek-OCR-2 引擎。
     ///
-    /// Uses the official `DeepSeek` API (`https://api.deepseek.com`).
-    /// Use [`with_base_url`](Self::with_base_url) to target a different endpoint.
+    /// 使用官方 `DeepSeek` API（`https://api.deepseek.com`）。
+    /// 使用 [`with_base_url`](Self::with_base_url) 指定其他端点。
     #[must_use]
     pub fn new(api_key: impl Into<String>) -> Self {
         Self {
@@ -276,13 +275,13 @@ impl DeepSeekOcrEngine {
         }
     }
 
-    /// Create from environment variables.
+    /// 从环境变量创建。
     ///
-    /// Reads `DEEPSEEK_API_KEY` (required) and `DEEPSEEK_BASE_URL` (optional).
+    /// 读取 `DEEPSEEK_API_KEY`（必需）和 `DEEPSEEK_BASE_URL`（可选）。
     ///
     /// # Panics
     ///
-    /// Panics if `DEEPSEEK_API_KEY` is not set.
+    /// 当 `DEEPSEEK_API_KEY` 未设置时 panic。
     #[must_use]
     pub fn from_env() -> Self {
         let api_key = std::env::var("DEEPSEEK_API_KEY")
@@ -296,40 +295,40 @@ impl DeepSeekOcrEngine {
         }
     }
 
-    /// Set a custom base URL for the API endpoint.
+    /// 设置自定义 API 端点基础 URL。
     ///
-    /// Use this to target self-hosted vLLM/TGI servers or `HuggingFace`
-    /// Inference Endpoints.
+    /// 用于指向自托管 vLLM/TGI 服务器或 `HuggingFace`
+    /// Inference Endpoints。
     #[must_use]
     pub fn with_base_url(mut self, url: impl Into<String>) -> Self {
         self.base_url = Some(url.into());
         self
     }
 
-    /// Override the model name.
+    /// 覆盖模型名称。
     ///
-    /// Defaults to `"deepseek-ocr-2"`.
+    /// 默认值为 `"deepseek-ocr-2"`。
     #[must_use]
     pub fn with_model(mut self, model: impl Into<String>) -> Self {
         self.model = model.into();
         self
     }
 
-    /// Set a custom OCR prompt.
+    /// 设置自定义 OCR 提示词。
     ///
-    /// Overrides the default prompt that instructs the model to extract text.
+    /// 覆盖指示模型提取文本的默认提示词。
     #[must_use]
     pub fn with_prompt(mut self, prompt: impl Into<String>) -> Self {
         self.prompt = prompt.into();
         self
     }
 
-    /// Run the vision OCR request synchronously.
+    /// 同步运行 Vision OCR 请求。
     fn run_ocr(
         &self,
         image: &OcrImage,
     ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Convert RGBA to PNG bytes.
+        // 将 RGBA 转换为 PNG 字节。
         let img = image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone())
             .ok_or("invalid pixel buffer dimensions")?;
         let dynamic = image::DynamicImage::ImageRgba8(img);

@@ -1,4 +1,4 @@
-//! Request builder for the Zhipu GLM-OCR API.
+//! 智谱 GLM-OCR API 请求构建器。
 
 use crate::http::auth::AuthMethod;
 use crate::http::error::Result;
@@ -8,27 +8,27 @@ use easypdf_markdown::ocr::OcrImage;
 
 use super::config::{GlmConfig, GlmOutputFormat};
 
-/// Request builder for the Zhipu GLM-OCR layout parsing API.
+/// 智谱 GLM-OCR 版面解析 API 请求构建器。
 ///
-/// Constructs the JSON request body according to the GLM-OCR API specification.
+/// 根据 GLM-OCR API 规范构造 JSON 请求体。
 ///
-/// # API Note
+/// # API 说明
 ///
-/// The request structure is based on the official documentation at
-/// <https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>. The endpoint
-/// is `POST /api/paas/v4/layout_parsing` with a JSON body containing
-/// `model` and `file` (URL or data-URL) fields.
+/// 请求结构基于官方文档
+/// <https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>。
+/// 端点为 `POST /api/paas/v4/layout_parsing`，JSON 请求体包含
+/// `model` 和 `file`（URL 或 data-URL）字段。
 pub struct GlmOcrRequest {
     config: GlmConfig,
     auth: AuthMethod,
 }
 
 impl GlmOcrRequest {
-    /// Create a new GLM-OCR request builder.
+    /// 创建 GLM-OCR 请求构建器。
     ///
-    /// # Arguments
+    /// # 参数
     ///
-    /// * `config` - GLM-OCR configuration including API key and endpoint.
+    /// * `config` - GLM-OCR 配置，包含 API 密钥和端点。
     #[must_use]
     pub fn new(config: GlmConfig) -> Self {
         let auth = AuthMethod::Bearer(config.api_key.clone());
@@ -50,7 +50,7 @@ impl OcrRequest for GlmOcrRequest {
         image: &OcrImage,
         _config: &RequestConfig,
     ) -> Result<serde_json::Value> {
-        // Encode the image as base64 PNG and wrap in a data URL.
+        // 将图像编码为 base64 PNG 并包装为 data URL。
         let encoded = encode_for_request(image, &ImageEncoding::Base64Inline)?;
         let data_url = format!(
             "data:image/png;base64,{}",
@@ -62,12 +62,12 @@ impl OcrRequest for GlmOcrRequest {
             "file": data_url,
         });
 
-        // Add optional language hint.
+        // 添加可选的语言提示。
         if let Some(ref lang) = self.config.language {
             body["language"] = serde_json::Value::String(lang.clone());
         }
 
-        // Add output format hint.
+        // 添加输出格式提示。
         match self.config.output_format {
             GlmOutputFormat::Text => {
                 body["output_format"] = serde_json::Value::String("text".to_owned());

@@ -1,16 +1,16 @@
-//! Configuration for the Tencent Cloud OCR engine.
+//! 腾讯云 OCR 引擎配置。
 //!
-//! Provides [`HunyuanConfig`] for configuring the OCR client and [`HunyuanMode`]
-//! for selecting the recognition mode.
+//! 提供 [`HunyuanConfig`] 用于配置 OCR 客户端，[`HunyuanMode`]
+//! 用于选择识别模式。
 //!
-//! # Getting Started
+//! # 入门指南
 //!
-//! 1. Sign up for a [Tencent Cloud](https://cloud.tencent.com/) account.
-//! 2. Go to the [OCR console](https://console.cloud.tencent.com/ocr/overview)
-//!    and activate the OCR service.
-//! 3. Obtain your `SecretId` and `SecretKey` from the
-//!    [API Key Management](https://console.cloud.tencent.com/cam/capi) page.
-//! 4. Create a [`HunyuanConfig`] with your credentials and desired mode.
+//! 1. 注册[腾讯云](https://cloud.tencent.com/)账号。
+//! 2. 前往 [OCR 控制台](https://console.cloud.tencent.com/ocr/overview)
+//!    开通 OCR 服务。
+//! 3. 从[密钥管理](https://console.cloud.tencent.com/cam/capi)页面
+//!    获取 `SecretId` 和 `SecretKey`。
+//! 4. 使用凭据和所需模式创建 [`HunyuanConfig`]。
 //!
 //! # Example
 //!
@@ -27,31 +27,31 @@
 
 use std::fmt;
 
-/// Tencent Cloud OCR engine configuration.
+/// 腾讯云 OCR 引擎配置。
 ///
-/// Holds credentials, endpoint, and mode for the OCR API.
+/// 持有 OCR API 的凭据、端点和模式。
 ///
-/// # Security
+/// # 安全
 ///
-/// The [`Debug`] implementation redacts `secret_id` and `secret_key` to
-/// prevent accidental credential leakage in logs.
+/// [`Debug`] 实现会脱敏 `secret_id` 和 `secret_key`，
+/// 防止凭据意外泄漏到日志中。
 #[derive(Clone)]
 pub struct HunyuanConfig {
-    /// Tencent Cloud secret ID.
+    /// 腾讯云 Secret ID。
     pub secret_id: String,
-    /// Tencent Cloud secret key.
+    /// 腾讯云 Secret Key。
     pub secret_key: String,
-    /// Region (e.g., `"ap-guangzhou"`).
+    /// 地域（如 `"ap-guangzhou"`）。
     pub region: String,
-    /// Service name (default: `"ocr"`).
+    /// 服务名称（默认：`"ocr"`）。
     pub service: String,
-    /// API version (default: `"2018-11-19"`).
+    /// API 版本（默认：`"2018-11-19"`）。
     pub version: String,
-    /// Full endpoint URL (default: `"https://ocr.tencentcloudapi.com"`).
+    /// 完整端点 URL（默认：`"https://ocr.tencentcloudapi.com"`）。
     pub endpoint: String,
-    /// OCR recognition mode.
+    /// OCR 识别模式。
     pub mode: HunyuanMode,
-    /// Optional language hint (e.g., `"zh"`, `"en"`, `"ja"`, `"ko"`).
+    /// 可选的语言提示（如 `"zh"`、`"en"`、`"ja"`、`"ko"`）。
     pub language: Option<String>,
 }
 
@@ -85,45 +85,44 @@ impl Default for HunyuanConfig {
     }
 }
 
-/// OCR recognition mode for Tencent Cloud OCR.
+/// 腾讯云 OCR 识别模式。
 ///
-/// Selects which API action to call:
+/// 选择调用哪个 API 操作：
 ///
-/// | Mode | API Action | Description |
-/// |------|------------|-------------|
-/// | [`GeneralBasic`](HunyuanMode::GeneralBasic) | `GeneralBasicOCR` | General text recognition (basic) |
-/// | [`SmartStructural`](HunyuanMode::SmartStructural) | `SmartStructuralOCR` | Document extraction (basic version) |
-/// | [`GeneralAccurate`](HunyuanMode::GeneralAccurate) | `GeneralAccurateOCR` | General text recognition (accurate, with position) |
+/// | 模式 | API 操作 | 描述 |
+/// |------|----------|------|
+/// | [`GeneralBasic`](HunyuanMode::GeneralBasic) | `GeneralBasicOCR` | 通用文字识别（基础版） |
+/// | [`SmartStructural`](HunyuanMode::SmartStructural) | `SmartStructuralOCR` | 文档提取（基础版） |
+/// | [`GeneralAccurate`](HunyuanMode::GeneralAccurate) | `GeneralAccurateOCR` | 通用文字识别（高精度版，含位置） |
 ///
-/// # API References
+/// # API 参考
 ///
 /// - [GeneralBasicOCR](https://cloud.tencent.com/document/product/866/36210)
 /// - [SmartStructuralOCR](https://cloud.tencent.com/document/product/866/119452)
 /// - [GeneralAccurateOCR](https://cloud.tencent.com/document/product/866/34936)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HunyuanMode {
-    /// General text recognition (basic version).
+    /// 通用文字识别（基础版）。
     ///
-    /// Uses the `GeneralBasicOCR` API action. Suitable for most common
-    /// text recognition scenarios with good accuracy and low latency.
+    /// 使用 `GeneralBasicOCR` API 操作。适用于大多数常见文字识别场景，
+    /// 具有良好的精度和低延迟。
     GeneralBasic,
 
-    /// Document extraction (basic version).
+    /// 文档提取（基础版）。
     ///
-    /// Uses the `SmartStructuralOCR` API action (alias `ExtractDocBasic`).
-    /// Extracts structured text from documents, receipts, invoices, etc.
-    /// Returns both structured fields and full text.
+    /// 使用 `SmartStructuralOCR` API 操作（别名 `ExtractDocBasic`）。
+    /// 从文档、收据、发票等提取结构化文本。返回结构化字段和全文。
     SmartStructural,
 
-    /// General text recognition (accurate version).
+    /// 通用文字识别（高精度版）。
     ///
-    /// Uses the `GeneralAccurateOCR` API action. Higher accuracy than basic,
-    /// includes word-level bounding box coordinates.
+    /// 使用 `GeneralAccurateOCR` API 操作。精度高于基础版，
+    /// 包含词级边界框坐标。
     GeneralAccurate,
 }
 
 impl HunyuanMode {
-    /// Returns the Tencent Cloud API action name for this mode.
+    /// 返回此模式的腾讯云 API 操作名称。
     #[must_use]
     pub fn action_name(&self) -> &'static str {
         match self {
@@ -133,7 +132,7 @@ impl HunyuanMode {
         }
     }
 
-    /// Returns the engine name prefix for this mode.
+    /// 返回此模式的引擎名称前缀。
     #[must_use]
     pub fn engine_name(&self) -> &'static str {
         match self {
@@ -143,18 +142,18 @@ impl HunyuanMode {
         }
     }
 
-    /// Returns `true` if this mode uses `TextDetections` response format.
+    /// 若此模式使用 `TextDetections` 响应格式则返回 `true`。
     ///
-    /// General OCR modes (`GeneralBasic`, `GeneralAccurate`) return
-    /// `TextDetections[].DetectedText`. Document extraction modes
-    /// (`SmartStructural`) return `WordList[].Text`.
+    /// 通用 OCR 模式（`GeneralBasic`、`GeneralAccurate`）返回
+    /// `TextDetections[].DetectedText`。文档提取模式
+    /// （`SmartStructural`）返回 `WordList[].Text`。
     #[must_use]
     pub fn uses_text_detections(&self) -> bool {
         matches!(self, Self::GeneralBasic | Self::GeneralAccurate)
     }
 }
 
-/// Redact a string, showing only the first 4 and last 4 characters.
+/// 脱敏字符串，仅显示前 4 个和后 4 个字符。
 fn redact(s: &str) -> String {
     if s.len() <= 8 {
         "***".to_owned()

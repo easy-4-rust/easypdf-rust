@@ -1,15 +1,15 @@
-//! Mock OCR engine for testing and default compilation.
+//! 用于测试和默认编译的模拟 OCR 引擎。
 
 use easypdf_core::CapabilityLevel;
 
 use crate::ocr::engine::{OcrEngine, OcrImage, OcrResult};
 
-/// Mock OCR engine that returns fixed text.
+/// 返回固定文本的模拟 OCR 引擎。
 ///
-/// Always available (no feature gate). Useful for:
-/// - Unit and integration tests
-/// - Default compilation without OCR dependencies
-/// - Placeholder in the processor pipeline
+/// 始终可用（无 feature 门控）。适用于：
+/// - 单元测试和集成测试
+/// - 无 OCR 依赖的默认编译
+/// - 处理器管道中的占位实现
 ///
 /// # Examples
 ///
@@ -28,7 +28,7 @@ pub struct MockOcrEngine {
 }
 
 impl MockOcrEngine {
-    /// Create a mock engine with default text ("[OCR text extracted by mock engine]").
+    /// 创建使用默认文本（`"[OCR text extracted by mock engine]"`）的模拟引擎。
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -37,7 +37,7 @@ impl MockOcrEngine {
         }
     }
 
-    /// Create a mock engine that returns the given text.
+    /// 创建返回指定文本的模拟引擎。
     #[must_use]
     pub fn with_text(text: impl Into<String>) -> Self {
         Self {
@@ -46,7 +46,7 @@ impl MockOcrEngine {
         }
     }
 
-    /// Create a mock engine with a specific confidence score.
+    /// 创建具有指定置信度分数的模拟引擎。
     #[must_use]
     pub fn with_confidence(text: impl Into<String>, confidence: f32) -> Self {
         Self {

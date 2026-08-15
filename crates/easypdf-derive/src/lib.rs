@@ -1,9 +1,9 @@
-//! Proc-macro derive for the `PdfModel` trait.
+//! `PdfModel` trait 的过程宏 derive。
 //!
-//! Provides `#[derive(PdfModel)]` which generates compile-time
-//! reflection code mapping Rust struct fields to PDF content elements.
+//! 提供 `#[derive(PdfModel)]`，生成将 Rust 结构体字段映射到
+//! PDF 内容元素的编译期反射代码。
 //!
-//! ## Usage
+//! ## 用法
 //!
 //! ```ignore
 //! use easypdf_derive::PdfModel;
@@ -16,41 +16,41 @@
 //! }
 //! ```
 //!
-//! ## Field Attributes
+//! ## 字段属性
 //!
-//! | Attribute | Description |
+//! | 属性 | 说明 |
 //! |---|---|
-//! | `#[pdf(text, position = (x, y))]` | Render field as positioned text |
-//! | `#[pdf(table, position = (x, y))]` | Render field as a table |
-//! | `#[pdf(image, position = (x, y))]` | Render field as an image |
-//! | `#[pdf(ignore)]` / `#[pdf(skip)]` | Skip field entirely |
-//! | `#[pdf(field = "name")]` | Map to PDF form field name |
-//! | `#[pdf(order = N)]` | Display/render order |
-//! | `#[pdf(default = "value")]` | Default value if empty |
-//! | `#[pdf(required)]` | Field must be non-empty |
-//! | `#[pdf(format = "pattern")]` | Format pattern (e.g. `"YYYY-MM-DD"`) |
-//! | `#[pdf(nested)]` | Recursively include inner model's elements |
-//! | `#[pdf(font = ...)]` | Set font for text rendering |
-//! | `#[pdf(size = N)]` | Set font size for text rendering |
+//! | `#[pdf(text, position = (x, y))]` | 将字段渲染为定位文本 |
+//! | `#[pdf(table, position = (x, y))]` | 将字段渲染为表格 |
+//! | `#[pdf(image, position = (x, y))]` | 将字段渲染为图片 |
+//! | `#[pdf(ignore)]` / `#[pdf(skip)]` | 完全跳过字段 |
+//! | `#[pdf(field = "name")]` | 映射到 PDF 表单字段名 |
+//! | `#[pdf(order = N)]` | 显示/渲染顺序 |
+//! | `#[pdf(default = "value")]` | 为空时的默认值 |
+//! | `#[pdf(required)]` | 字段必须非空 |
+//! | `#[pdf(format = "pattern")]` | 格式模式（如 `"YYYY-MM-DD"`） |
+//! | `#[pdf(nested)]` | 递归包含内部模型的元素 |
+//! | `#[pdf(font = ...)]` | 设置文本渲染字体 |
+//! | `#[pdf(size = N)]` | 设置文本渲染字号 |
 
 use proc_macro::TokenStream;
 
 mod implementation;
 
-/// Derive macro that generates a [`PdfModel`] trait implementation.
+/// 生成 [`PdfModel`] trait 实现的 derive 宏。
 ///
-/// # Attributes
+/// # 属性
 ///
-/// - `#[pdf(page = ..., orientation = ..., margins = ...)]` on the struct
-/// - `#[pdf(text, position = (x, y), font = ...)]` on text fields
-/// - `#[pdf(table, position = (x, y), headers = [...])]` on collection fields
-/// - `#[pdf(field = "field_name")]` on form/template fields
-/// - `#[pdf(order = N)]` display order
-/// - `#[pdf(ignore)]` / `#[pdf(skip)]` to skip a field
-/// - `#[pdf(default = "value")]` default value
-/// - `#[pdf(required)]` mark field as required
-/// - `#[pdf(format = "pattern")]` format pattern
-/// - `#[pdf(nested)]` recursively render inner model
+/// - `#[pdf(page = ..., orientation = ..., margins = ...)]` -- 结构体级
+/// - `#[pdf(text, position = (x, y), font = ...)]` -- 文本字段
+/// - `#[pdf(table, position = (x, y), headers = [...])]` -- 集合字段
+/// - `#[pdf(field = "field_name")]` -- 表单/模板字段映射
+/// - `#[pdf(order = N)]` -- 显示顺序
+/// - `#[pdf(ignore)]` / `#[pdf(skip)]` -- 跳过字段
+/// - `#[pdf(default = "value")]` -- 默认值
+/// - `#[pdf(required)]` -- 标记字段为必填
+/// - `#[pdf(format = "pattern")]` -- 格式模式
+/// - `#[pdf(nested)]` -- 递归渲染内部模型
 #[proc_macro_derive(PdfModel, attributes(pdf))]
 pub fn derive_pdf_model(input: TokenStream) -> TokenStream {
     implementation::expand_pdf_model(input.into())

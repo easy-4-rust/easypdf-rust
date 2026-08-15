@@ -1,27 +1,27 @@
-//! Response parser for Baidu Cloud OCR API.
+//! 百度云 OCR API 响应解析器。
 //!
-//! Parses the JSON response from Baidu OCR endpoints into a standardized
-//! [`OcrResult`](easypdf_markdown::ocr::OcrResult). Handles multiple response formats:
+//! 将百度 OCR 端点的 JSON 响应解析为标准化的
+//! [`OcrResult`](easypdf_markdown::ocr::OcrResult)。处理多种响应格式：
 //!
-//! - **Text APIs** (`words_result`): `GeneralBasic`, `GeneralAccurate`, `WebImage`,
-//!   `Handwriting`, `Digit`, etc.
-//! - **Table API** (`tables_result`): `TableRecognitionV2`
-//! - **Office Document** (`results`): `OfficeDocument`
-//! - **Seal** (`result`): `Seal` with `major`/`minor` words
-//! - **QR Code** (`codes_result`): `Qrcode` with `text` arrays
-//! - **Structured** (`words_result.struct_info.group`): `Structured` with key-value pairs
-//! - **Qianfan-OCR** (`result`): Qianfan large model response
+//! - **文本 API**（`words_result`）：`GeneralBasic`、`GeneralAccurate`、`WebImage`、
+//!   `Handwriting`、`Digit` 等
+//! - **表格 API**（`tables_result`）：`TableRecognitionV2`
+//! - **办公文档**（`results`）：`OfficeDocument`
+//! - **印章**（`result`）：`Seal`，含 `major`/`minor` 文字
+//! - **二维码**（`codes_result`）：`Qrcode`，含 `text` 数组
+//! - **结构化**（`words_result.struct_info.group`）：`Structured`，含键值对
+//! - **千帆 OCR**（`result`）：千帆大模型响应
 //!
-//! # Error Handling
+//! # 错误处理
 //!
-//! Baidu APIs return errors in the response body (not HTTP status codes):
+//! 百度 API 在响应体中返回错误（而非 HTTP 状态码）：
 //!
 //! ```json
 //! { "error_code": 110, "error_msg": "Access token invalid" }
 //! ```
 //!
-//! The parser checks for these fields and returns
-//! [`BaiduError::Api`](crate::baidu::config::BaiduError::Api).
+//! 解析器检查这些字段并返回
+//! [`BaiduError::Api`](crate::baidu::config::BaiduError::Api)。
 
 mod core;
 mod parsers;

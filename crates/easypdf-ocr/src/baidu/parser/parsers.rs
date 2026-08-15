@@ -3,7 +3,7 @@ use easypdf_markdown::ocr::{OcrResult, WordBox};
 use super::core::json_u32;
 use crate::baidu::config::{BaiduError, BaiduResult};
 
-/// Parse a standard `words_result` response.
+/// 解析标准 `words_result` 响应。
 ///
 /// Response format:
 /// ```json
@@ -30,7 +30,7 @@ pub(crate) fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
         let words = item.get("words").and_then(|v| v.as_str()).unwrap_or("");
         lines.push(words);
 
-        // Extract location if present.
+        // 提取位置信息（如有）。
         if let Some(loc) = item.get("location") {
             let x = json_u32(loc.get("left"));
             let y = json_u32(loc.get("top"));
@@ -54,7 +54,7 @@ pub(crate) fn parse_words_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
     })
 }
 
-/// Parse a table recognition response.
+/// 解析表格识别响应。
 ///
 /// Response format:
 /// ```json
@@ -79,9 +79,9 @@ pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
     let mut all_text = Vec::new();
 
     for table in tables {
-        // Collect cells from body.
+        // 从 body 收集单元格。
         if let Some(body) = table.get("body").and_then(serde_json::Value::as_array) {
-            // Group cells by row for tabular output.
+            // 按行分组单元格以进行表格输出。
             let mut cells: Vec<(u64, u64, String)> = Vec::new();
 
             for cell in body {
@@ -101,7 +101,7 @@ pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
                 cells.push((row, col, words));
             }
 
-            // Sort by (row, col) and format as tab-separated.
+            // 按 (row, col) 排序并格式化为制表符分隔。
             cells.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
 
             let mut current_row = 0u64;
@@ -118,7 +118,7 @@ pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
                 all_text.push(row_cells.join("\t"));
             }
 
-            // If no body cells, try header.
+            // 若无 body 单元格，尝试 header。
             if all_text.is_empty()
                 && let Some(header) = table.get("header").and_then(serde_json::Value::as_array)
             {
@@ -137,7 +137,7 @@ pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
     })
 }
 
-/// Parse a Qianfan-OCR response.
+/// 解析千帆 OCR 响应。
 ///
 /// Qianfan-OCR returns a different format:
 /// ```json
@@ -148,7 +148,7 @@ pub(crate) fn parse_table_response(raw: &serde_json::Value) -> BaiduResult<OcrRe
 /// }
 /// ```
 pub(crate) fn parse_qianfan_response(raw: &serde_json::Value) -> BaiduResult<OcrResult> {
-    // Try the "result" field first (Qianfan-OCR format).
+    // 首先尝试 "result" 字段（千帆 OCR 格式）。
     if let Some(result) = raw.get("result")
         && let Some(text) = result.get("text").and_then(|v| v.as_str())
     {
@@ -159,11 +159,11 @@ pub(crate) fn parse_qianfan_response(raw: &serde_json::Value) -> BaiduResult<Ocr
         });
     }
 
-    // Fallback to words_result format (some Qianfan endpoints use this).
+    // 回退到 words_result 格式（部分千帆端点使用此格式）。
     parse_words_response(raw)
 }
 
-/// Parse an office document recognition response.
+/// 解析办公文档识别响应。
 ///
 /// Response format:
 /// ```json
@@ -190,7 +190,7 @@ pub(crate) fn parse_office_doc_response(raw: &serde_json::Value) -> BaiduResult<
     let mut lines = Vec::new();
 
     for item in results {
-        // Each result has a "words" array with word objects.
+        // 每个 result 有一个包含 word 对象的 "words" 数组。
         if let Some(words) = item.get("words").and_then(serde_json::Value::as_array) {
             for word_obj in words {
                 if let Some(word) = word_obj.get("word").and_then(|v| v.as_str()) {
@@ -207,7 +207,7 @@ pub(crate) fn parse_office_doc_response(raw: &serde_json::Value) -> BaiduResult<
     })
 }
 
-/// Parse a seal/stamp recognition response.
+/// 解析印章识别响应。
 ///
 /// Response format:
 /// ```json
@@ -235,7 +235,7 @@ pub(crate) fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrRes
     let mut lines = Vec::new();
 
     for seal in result {
-        // Extract major text.
+        // 提取主文字。
         if let Some(words) = seal
             .get("major")
             .and_then(|m| m.get("words"))
@@ -244,7 +244,7 @@ pub(crate) fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrRes
         {
             lines.push(words.to_owned());
         }
-        // Extract minor text items.
+        // 提取次文字项。
         if let Some(minor) = seal.get("minor").and_then(serde_json::Value::as_array) {
             for item in minor {
                 if let Some(words) = item
@@ -265,7 +265,7 @@ pub(crate) fn parse_seal_response(raw: &serde_json::Value) -> BaiduResult<OcrRes
     })
 }
 
-/// Parse a QR code recognition response.
+/// 解析二维码识别响应。
 ///
 /// Response format:
 /// ```json
@@ -306,7 +306,7 @@ pub(crate) fn parse_qrcode_response(raw: &serde_json::Value) -> BaiduResult<OcrR
     })
 }
 
-/// Parse an intelligent structuring response.
+/// 解析智能结构化响应。
 ///
 /// Response format:
 /// ```json
@@ -330,7 +330,7 @@ pub(crate) fn parse_structured_response(raw: &serde_json::Value) -> BaiduResult<
 
     let mut lines = Vec::new();
 
-    // Navigate: words_result -> struct_info -> group[]
+    // 导航：words_result -> struct_info -> group[]
     if let Some(groups) = words_result
         .get("struct_info")
         .and_then(|si| si.get("group"))
@@ -352,9 +352,9 @@ pub(crate) fn parse_structured_response(raw: &serde_json::Value) -> BaiduResult<
     })
 }
 
-/// Extract concatenated words from a structured field array.
+/// 从结构化字段数组中提取拼接的文字。
 ///
-/// Each element in the array is an object with a `"word"` key.
+/// 数组中的每个元素是包含 `"word"` 键的对象。
 fn extract_struct_words(value: Option<&serde_json::Value>) -> String {
     value
         .and_then(serde_json::Value::as_array)

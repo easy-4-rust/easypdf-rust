@@ -1,4 +1,4 @@
-//! Core rendering traits and output types.
+//! 核心渲染 trait 与输出类型。
 
 use std::ops::Range;
 use std::path::Path;
@@ -6,12 +6,11 @@ use std::path::Path;
 use super::config::{ImageFormat, RenderConfig};
 use super::error::Result;
 
-/// A rendered page image with raw pixel data.
+/// 已渲染的页面图像，包含原始像素数据。
 ///
-/// Contains RGBA pixel bytes along with dimensions and metadata.
-/// Use [`save`](Self::save) to write to disk, or
-/// [`to_dynamic_image`](Self::to_dynamic_image) to convert to an
-/// `image::DynamicImage` for further processing.
+/// 包含 RGBA 像素字节及尺寸和元数据。使用 [`save`](Self::save) 写入磁盘，
+/// 或使用 [`to_dynamic_image`](Self::to_dynamic_image) 转换为
+/// `image::DynamicImage` 以进行后续处理。
 ///
 /// # Examples
 ///
@@ -25,20 +24,20 @@ use super::error::Result;
 /// ```
 #[derive(Debug, Clone)]
 pub struct RenderedImage {
-    /// Width in pixels.
+    /// 宽度（像素）。
     pub width: u32,
-    /// Height in pixels.
+    /// 高度（像素）。
     pub height: u32,
-    /// The format used for encoding.
+    /// 编码使用的格式。
     pub format: ImageFormat,
-    /// Raw RGBA pixel bytes (4 bytes per pixel, row-major, top-to-bottom).
+    /// 原始 RGBA 像素字节（每像素 4 字节，行优先，从上到下）。
     pub pixels: Vec<u8>,
-    /// 0-based page index of the rendered page.
+    /// 渲染页面的从 0 开始的页码索引。
     pub page_index: usize,
 }
 
 impl RenderedImage {
-    /// Create a new `RenderedImage` from raw RGBA pixels.
+    /// 从原始 RGBA 像素创建新的 `RenderedImage`。
     #[must_use]
     pub fn new(
         width: u32,
@@ -56,17 +55,17 @@ impl RenderedImage {
         }
     }
 
-    /// Save the rendered image to a file.
+    /// 将渲染图像保存到文件。
     ///
-    /// The output format is determined by the file extension (`.png`, `.jpg`,
-    /// `.jpeg`) or falls back to the format stored in this image.
+    /// 输出格式由文件扩展名（`.png`、`.jpg`、`.jpeg`）决定，
+    /// 或回退到此图像中存储的格式。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::Io`](super::RenderError::Io) if the file cannot
-    /// be written, or
-    /// [`RenderError::ImageEncode`](super::RenderError::ImageEncode) if
-    /// encoding fails.
+    /// 当文件无法写入时返回
+    /// [`RenderError::Io`](super::RenderError::Io)，
+    /// 当编码失败时返回
+    /// [`RenderError::ImageEncode`](super::RenderError::ImageEncode)。
     pub fn save(&self, path: &Path) -> Result<()> {
         let dynamic = self.to_dynamic_image();
         dynamic
@@ -75,13 +74,13 @@ impl RenderedImage {
         Ok(())
     }
 
-    /// Convert to an `image::DynamicImage`.
+    /// 转换为 `image::DynamicImage`。
     ///
-    /// Returns an `Rgba8` image backed by the stored pixel buffer.
+    /// 返回基于存储像素缓冲区的 `Rgba8` 图像。
     ///
     /// # Panics
     ///
-    /// Panics if the pixel buffer length does not equal `width * height * 4`.
+    /// 当像素缓冲区长度不等于 `width * height * 4` 时 panic。
     #[must_use]
     pub fn to_dynamic_image(&self) -> image::DynamicImage {
         let img = image::RgbaImage::from_raw(self.width, self.height, self.pixels.clone())
@@ -89,12 +88,12 @@ impl RenderedImage {
         image::DynamicImage::ImageRgba8(img)
     }
 
-    /// Encode the image as PNG bytes.
+    /// 将图像编码为 PNG 字节。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::ImageEncode`](super::RenderError::ImageEncode)
-    /// if encoding fails.
+    /// 当编码失败时返回
+    /// [`RenderError::ImageEncode`](super::RenderError::ImageEncode)。
     pub fn to_png_bytes(&self) -> Result<Vec<u8>> {
         let dynamic = self.to_dynamic_image();
         let mut buf = Vec::new();
@@ -105,13 +104,12 @@ impl RenderedImage {
     }
 }
 
-/// PDF page renderer abstraction.
+/// PDF 页面渲染器抽象。
 ///
-/// Implementors provide page-to-raster conversion using a specific backend
-/// (e.g., pdfium, text fallback). The trait is object-safe and requires
-/// `Send + Sync` for use across threads.
+/// 实现者使用特定后端（如 pdfium、文本回退）提供页面到光栅图像的转换。
+/// 该 trait 是对象安全的，且要求 `Send + Sync` 以便跨线程使用。
 ///
-/// # Implementing a custom backend
+/// # 实现自定义后端
 ///
 /// ```
 /// use easypdf_markdown::render::{PdfRenderer, RenderConfig, RenderedImage, ImageFormat, Background};
@@ -145,19 +143,19 @@ impl RenderedImage {
 /// }
 /// ```
 pub trait PdfRenderer: Send + Sync {
-    /// Render a single page to an RGBA pixel buffer.
+    /// 将单页渲染为 RGBA 像素缓冲区。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError`](super::RenderError) if the page index is invalid, the DPI exceeds
-    /// the backend maximum, or the rendering fails.
+    /// 当页码无效、DPI 超过后端最大值或渲染失败时返回
+    /// [`RenderError`](super::RenderError)。
     fn render_page(&self, page_index: usize, config: &RenderConfig) -> Result<RenderedImage>;
 
-    /// Render a single page and save directly to a file path.
+    /// 渲染单页并直接保存到文件路径。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError`](super::RenderError) if rendering or file writing fails.
+    /// 当渲染或文件写入失败时返回 [`RenderError`](super::RenderError)。
     fn render_page_to_path(
         &self,
         page_index: usize,
@@ -167,11 +165,11 @@ pub trait PdfRenderer: Send + Sync {
         self.render_page(page_index, config)?.save(output)
     }
 
-    /// Render a range of pages.
+    /// 渲染一个范围的页面。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError`](super::RenderError) if any page in the range fails to render.
+    /// 当范围内任一页面渲染失败时返回 [`RenderError`](super::RenderError)。
     fn render_pages(
         &self,
         page_range: Range<usize>,
@@ -180,15 +178,15 @@ pub trait PdfRenderer: Send + Sync {
         page_range.map(|i| self.render_page(i, config)).collect()
     }
 
-    /// Human-readable name of this rendering backend.
+    /// 此渲染后端的可读名称。
     fn name(&self) -> &'static str;
 
-    /// Maximum DPI supported by this backend. Default: 600.
+    /// 此后端支持的最大 DPI。默认值：600。
     fn max_dpi(&self) -> u32 {
         600
     }
 
-    /// Whether this backend supports vector (SVG) output. Default: `false`.
+    /// 此后端是否支持矢量（SVG）输出。默认值：`false`。
     fn supports_vector(&self) -> bool {
         false
     }
@@ -243,7 +241,7 @@ mod tests {
         let img = RenderedImage::new(2, 2, ImageFormat::Png, pixels, 0);
         let png = img.to_png_bytes().unwrap();
         assert!(!png.is_empty());
-        // PNG magic bytes
+        // PNG 魔术字节
         assert_eq!(&png[..4], &[0x89, 0x50, 0x4E, 0x47]);
     }
 
@@ -258,7 +256,7 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
-    // Test a mock PdfRenderer implementation
+    // 测试 mock PdfRenderer 实现
     struct MockRenderer;
 
     impl PdfRenderer for MockRenderer {

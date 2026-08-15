@@ -1,8 +1,7 @@
-//! Authentication methods for OCR HTTP APIs.
+//! OCR HTTP API 的认证方式。
 //!
-//! Each cloud OCR provider uses a different authentication scheme.
-//! [`AuthMethod`] abstracts over these, applying the correct headers
-//! (or signature) to outgoing requests.
+//! 每个云 OCR 提供商使用不同的认证方案。[`AuthMethod`] 对这些方案进行抽象，
+//! 为出站请求添加正确的请求头（或签名）。
 
 use std::collections::HashMap;
 use std::fmt;
@@ -12,67 +11,66 @@ use sha2::{Digest, Sha256};
 
 use super::error::{OcrHttpError, Result};
 
-/// Authentication method for an OCR HTTP endpoint.
+/// OCR HTTP 端点的认证方式。
 ///
-/// Variants cover the five supported engines:
-/// - **Bearer**: simple `Authorization: Bearer <token>` (GLM-OCR, DeepSeek-OCR)
-/// - **`ApiKeyHeader`**: custom header key (GLM-OCR `BigModel` `x-api-key`)
-/// - **`BearerFromOAuth`**: exchange API key + secret for an `access_token` via
-///   OAuth, then use Bearer (Qianfan, PP-OCRv6)
-/// - **`TencentCloud`**: TC3-HMAC-SHA256 request signing (`HunyuanOCR`)
-/// - **None**: no authentication (self-hosted endpoints)
+/// 各变体覆盖五种支持的引擎：
+/// - **Bearer**：简单的 `Authorization: Bearer <token>`（GLM-OCR、DeepSeek-OCR）
+/// - **`ApiKeyHeader`**：自定义请求头密钥（GLM-OCR `BigModel` 的 `x-api-key`）
+/// - **`BearerFromOAuth`**：通过 OAuth 将 API Key + Secret 交换为 `access_token`，
+///   然后使用 Bearer（千帆、PP-OCRv6）
+/// - **`TencentCloud`**：TC3-HMAC-SHA256 请求签名（`HunyuanOCR`）
+/// - **None**：无认证（自托管端点）
 ///
-/// # Security
+/// # 安全
 ///
-/// The `Debug` implementation redacts all secret material.
+/// `Debug` 实现会脱敏所有密钥材料。
 #[derive(Clone)]
 pub enum AuthMethod {
-    /// `Authorization: Bearer <token>`.
+    /// `Authorization: Bearer <token>`。
     Bearer(String),
 
-    /// Custom header authentication (e.g., `x-api-key: <key>`).
+    /// 自定义请求头认证（如 `x-api-key: <key>`）。
     ApiKeyHeader {
-        /// Header name (e.g., `"x-api-key"`).
+        /// 请求头名称（如 `"x-api-key"`）。
         header: &'static str,
-        /// The API key value.
+        /// API 密钥值。
         key: String,
     },
 
-    /// `OAuth2` client-credentials flow: exchange API key + secret for a Bearer
-    /// token, then use `Authorization: Bearer <access_token>`.
+    /// `OAuth2` 客户端凭证流程：将 API Key + Secret 交换为 Bearer 令牌，
+    /// 然后使用 `Authorization: Bearer <access_token>`。
     ///
-    /// The `token_url` is called once to obtain the token; the token is cached
-    /// for subsequent requests.
+    /// `token_url` 仅在获取令牌时调用一次；令牌会被缓存以供后续请求使用。
     BearerFromOAuth {
-        /// Token endpoint URL.
+        /// 令牌端点 URL。
         token_url: String,
-        /// OAuth API key (client ID).
+        /// OAuth API 密钥（客户端 ID）。
         api_key: String,
-        /// OAuth secret key (client secret).
+        /// OAuth 密钥（客户端密钥）。
         secret_key: String,
     },
 
-    /// Tencent Cloud TC3-HMAC-SHA256 signature authentication.
+    /// 腾讯云 TC3-HMAC-SHA256 签名认证。
     ///
-    /// Constructs the `Authorization` header per the [TC3 signature spec][tc3].
+    /// 按照 [TC3 签名规范][tc3] 构造 `Authorization` 请求头。
     ///
     /// [tc3]: https://cloud.tencent.com/document/api/1729/101840
     TencentCloud {
-        /// Tencent Cloud secret ID.
+        /// 腾讯云 Secret ID。
         secret_id: String,
-        /// Tencent Cloud secret key.
+        /// 腾讯云 Secret Key。
         secret_key: String,
-        /// Service name (e.g., `"hunyuan"`).
+        /// 服务名称（如 `"hunyuan"`）。
         service: String,
-        /// API host (e.g., `"hunyuan.tencentcloudapi.com"`).
+        /// API 主机名（如 `"hunyuan.tencentcloudapi.com"`）。
         host: String,
-        /// Region (e.g., `"ap-guangzhou"`).
+        /// 地域（如 `"ap-guangzhou"`）。
         region: String,
-        /// API version (e.g., `"2023-09-01"`).
+        /// API 版本（如 `"2023-09-01"`）。
         version: String,
     },
 
-    /// No authentication (self-hosted or public endpoints).
+    /// 无认证（自托管或公开端点）。
     None,
 }
 
@@ -114,7 +112,7 @@ impl fmt::Debug for AuthMethod {
     }
 }
 
-/// Redact a string, showing only the first 4 and last 4 characters.
+/// 脱敏字符串，仅显示前 4 个和后 4 个字符。
 fn redact(s: &str) -> String {
     if s.len() <= 8 {
         "***".to_owned()
@@ -123,13 +121,13 @@ fn redact(s: &str) -> String {
     }
 }
 
-/// Apply authentication to a set of HTTP headers.
+/// 将认证信息应用到一组 HTTP 请求头。
 ///
-/// Returns the headers that should be added to the request.
+/// 返回应添加到请求中的请求头。
 ///
 /// # Errors
 ///
-/// Returns `OcrHttpError::Auth` if token exchange fails (for `BearerFromOAuth`).
+/// 若令牌交换失败（`BearerFromOAuth`），返回 `OcrHttpError::Auth`。
 pub fn apply_auth(auth: &AuthMethod) -> Result<HashMap<String, String>> {
     let mut headers = HashMap::new();
     match auth {
@@ -155,16 +153,16 @@ pub fn apply_auth(auth: &AuthMethod) -> Result<HashMap<String, String>> {
             region,
             version,
         } => {
-            // TC3 signature is request-specific; we only set the static headers here.
-            // The actual signing happens in `sign_tencent_cloud_request`.
+            // TC3 签名与请求相关，此处仅设置静态请求头。
+            // 实际签名在 `sign_tencent_cloud_request` 中完成。
             headers.insert("Host".to_owned(), host.clone());
             headers.insert("X-TC-Action".to_owned(), "RecognizeGeneralOCR".to_owned());
             headers.insert("X-TC-Version".to_owned(), version.clone());
             headers.insert("X-TC-Region".to_owned(), region.clone());
             headers.insert("X-TC-Service".to_owned(), service.clone());
-            // Store secret_id for the signing step.
+            // 存储 secret_id 供签名步骤使用。
             headers.insert("X-TC-SecretId".to_owned(), secret_id.clone());
-            // Store secret_key as a pseudo-header for signing (removed before sending).
+            // 将 secret_key 作为伪头存储供签名使用（发送前会被移除）。
             headers.insert("X-TC-SecretKey-Pending".to_owned(), secret_key.clone());
         }
         AuthMethod::None => {}
@@ -172,30 +170,29 @@ pub fn apply_auth(auth: &AuthMethod) -> Result<HashMap<String, String>> {
     Ok(headers)
 }
 
-/// Sign a Tencent Cloud request with TC3-HMAC-SHA256.
+/// 使用 TC3-HMAC-SHA256 签名腾讯云请求。
 ///
-/// This must be called after all other headers are set and the request body
-/// is known. It returns the `Authorization` header value and timestamp.
+/// 必须在所有其他请求头已设置且请求体已知后调用。
+/// 返回 `Authorization` 请求头值和时间戳。
 ///
-/// # Arguments
+/// # 参数
 ///
-/// * `secret_id` - Tencent Cloud secret ID
-/// * `secret_key` - Tencent Cloud secret key
-/// * `service` - Service name (e.g., `"hunyuan"`)
-/// * `host` - API host
-/// * `action` - API action name
-/// * `version` - API version
-/// * `region` - Region
-/// * `payload` - JSON request body
+/// * `secret_id` - 腾讯云 Secret ID
+/// * `secret_key` - 腾讯云 Secret Key
+/// * `service` - 服务名称（如 `"hunyuan"`）
+/// * `host` - API 主机名
+/// * `action` - API 操作名称
+/// * `version` - API 版本
+/// * `region` - 地域
+/// * `payload` - JSON 请求体
 ///
-/// # Returns
+/// # 返回
 ///
-/// A tuple of `(authorization_header, timestamp_seconds)`.
+/// `(authorization_header, timestamp_seconds)` 元组。
 ///
 /// # Panics
 ///
-/// Panics if the current system time cannot be converted to a valid timestamp
-/// (should not happen in practice).
+/// 若当前系统时间无法转换为有效时间戳则 panic（正常情况下不会发生）。
 #[must_use]
 #[allow(clippy::too_many_arguments)]
 pub fn sign_tencent_cloud_request(
@@ -216,7 +213,7 @@ pub fn sign_tencent_cloud_request(
         .format("%Y-%m-%d")
         .to_string();
 
-    // Step 1: Canonical request.
+    // 步骤 1：规范请求。
     let http_request_method = "POST";
     let canonical_uri = "/";
     let canonical_querystring = "";
@@ -236,7 +233,7 @@ pub fn sign_tencent_cloud_request(
          {canonical_headers}\n{signed_headers}\n{hashed_payload}"
     );
 
-    // Step 2: String to sign.
+    // 步骤 2：待签名字符串。
     let algorithm = "TC3-HMAC-SHA256";
     let credential_scope = format!("{date}/{service}/tc3_request");
     let hashed_canonical_request = {
@@ -247,7 +244,7 @@ pub fn sign_tencent_cloud_request(
     let string_to_sign =
         format!("{algorithm}\n{timestamp}\n{credential_scope}\n{hashed_canonical_request}");
 
-    // Step 3: Signature.
+    // 步骤 3：签名。
     let secret_date = {
         let mut mac = HmacSha256::new_from_slice(format!("TC3{secret_key}").as_bytes())
             .expect("HMAC accepts any key length");
@@ -273,7 +270,7 @@ pub fn sign_tencent_cloud_request(
         hex::encode(mac.finalize().into_bytes())
     };
 
-    // Step 4: Authorization header.
+    // 步骤 4：Authorization 请求头。
     let authorization = format!(
         "{algorithm} Credential={secret_id}/{credential_scope}, \
          SignedHeaders={signed_headers}, Signature={signature}"
@@ -282,9 +279,9 @@ pub fn sign_tencent_cloud_request(
     (authorization, timestamp.to_string())
 }
 
-/// Exchange API key + secret for an `OAuth2` Bearer token (client credentials flow).
+/// 将 API Key + Secret 交换为 `OAuth2` Bearer 令牌（客户端凭证流程）。
 ///
-/// Used by Baidu Cloud (Qianfan, PP-OCRv6) to obtain `access_token`.
+/// 百度云（千帆、PP-OCRv6）使用此方式获取 `access_token`。
 fn exchange_oauth_token(token_url: &str, api_key: &str, secret_key: &str) -> Result<String> {
     let client = reqwest::blocking::Client::new();
     let resp = client

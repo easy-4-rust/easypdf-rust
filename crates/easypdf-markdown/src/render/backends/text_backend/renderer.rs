@@ -8,15 +8,14 @@ use crate::render::traits::{PdfRenderer, RenderedImage};
 
 use super::glyph::glyph_for;
 
-// A4 at 72 DPI: 595 x 842 points.
+// A4 在 72 DPI 下：595 x 842 点。
 const A4_WIDTH_PT: f64 = 595.0;
 const A4_HEIGHT_PT: f64 = 842.0;
 
-/// Pure-Rust text fallback renderer.
+/// 纯 Rust 文本回退渲染器。
 ///
-/// Opens a PDF with [`PdfReader`], extracts text per page, and renders it as
-/// a simple raster image using a built-in 5x7 bitmap font. The output is
-/// suitable for OCR pipelines where visual fidelity is not critical.
+/// 使用 [`PdfReader`] 打开 PDF，逐页提取文本，并使用内置 5x7 位图字体
+/// 将其渲染为简单的光栅图像。输出适用于视觉保真度要求不高的 OCR 流水线。
 ///
 /// # Examples
 ///
@@ -31,19 +30,19 @@ const A4_HEIGHT_PT: f64 = 842.0;
 /// # Ok::<(), easypdf_markdown::render::RenderError>(())
 /// ```
 pub struct TextRenderer {
-    /// Raw PDF bytes retained so we can create a fresh `PdfReader` per render
-    /// call (because `PdfReader::pages()` consumes `self`).
+    /// 保留原始 PDF 字节以便每次渲染调用时创建新的 `PdfReader`
+    ///（因为 `PdfReader::pages()` 会消耗 `self`）。
     pdf_bytes: Vec<u8>,
     page_count: usize,
 }
 
 impl TextRenderer {
-    /// Open a PDF file for text-based rendering.
+    /// 打开 PDF 文件进行基于文本的渲染。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::Io`] if the file cannot be read, or
-    /// [`RenderError::Parse`] if the PDF is malformed.
+    /// 当文件无法读取时返回 [`RenderError::Io`]，
+    /// 当 PDF 格式错误时返回 [`RenderError::Parse`]。
     pub fn open(path: &Path) -> Result<Self> {
         let pdf_bytes = std::fs::read(path)?;
         let reader = PdfReader::from_bytes(pdf_bytes.clone())
@@ -57,11 +56,11 @@ impl TextRenderer {
         })
     }
 
-    /// Open a PDF from in-memory bytes.
+    /// 从内存字节打开 PDF。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::Parse`] if the bytes are not a valid PDF.
+    /// 当字节不是有效的 PDF 时返回 [`RenderError::Parse`]。
     pub fn from_bytes(bytes: Vec<u8>) -> Result<Self> {
         let reader =
             PdfReader::from_bytes(bytes.clone()).map_err(|e| RenderError::Parse(e.to_string()))?;
@@ -74,7 +73,7 @@ impl TextRenderer {
         })
     }
 
-    /// Extract text for a single page (0-based index).
+    /// 提取单页文本（从 0 开始的索引）。
     pub(crate) fn extract_page_text(&self, page_index: usize) -> String {
         PdfReader::from_bytes(self.pdf_bytes.clone())
             .ok()
@@ -82,7 +81,7 @@ impl TextRenderer {
             .unwrap_or_default()
     }
 
-    /// Compute pixel dimensions for an A4 page at the given DPI.
+    /// 计算给定 DPI 下 A4 页面的像素尺寸。
     pub(crate) fn page_pixels(dpi: u32) -> (u32, u32) {
         let scale = f64::from(dpi) / 72.0;
         let w = f64_to_u32(A4_WIDTH_PT * scale);
@@ -90,7 +89,7 @@ impl TextRenderer {
         (w.max(1), h.max(1))
     }
 
-    /// Render extracted text onto an RGBA pixel buffer.
+    /// 将提取的文本渲染到 RGBA 像素缓冲区上。
     pub(crate) fn render_text_to_pixels(
         text: &str,
         width: u32,
@@ -106,15 +105,15 @@ impl TextRenderer {
 
         let mut pixels = vec![0u8; usize::try_from(width * height * 4).unwrap_or(0)];
 
-        // Fill background.
+        // 填充背景。
         for chunk in pixels.chunks_exact_mut(4) {
             chunk.copy_from_slice(&bg_color);
         }
 
-        // Scale factor: at 72 DPI the font is 1x, at 150 DPI ~2x, etc.
+        // 缩放因子：72 DPI 时字体为 1x，150 DPI 时约 2x，依此类推。
         let scale = f64_to_u32((f64::from(dpi) / 72.0).max(1.0));
-        let glyph_w = 5 * scale + scale; // 5 pixel glyph + 1 pixel spacing
-        let glyph_h = 7 * scale + scale; // 7 pixel glyph + 1 pixel spacing
+        let glyph_w = 5 * scale + scale; // 5 像素字形 + 1 像素间距
+        let glyph_h = 7 * scale + scale; // 7 像素字形 + 1 像素间距
         let line_height = glyph_h + scale;
         let margin = 2 * scale;
 
@@ -125,7 +124,7 @@ impl TextRenderer {
             .unwrap_or(1)
             .max(1);
 
-        // Split text into lines that fit the page width.
+        // 将文本拆分为适合页面宽度的行。
         let lines: Vec<&str> = text.lines().collect();
         let mut drawn_rows: usize = 0;
 
@@ -134,7 +133,7 @@ impl TextRenderer {
                 break;
             }
 
-            // Wrap long lines.
+            // 自动换行。
             let mut remaining = *line;
             while !remaining.is_empty() && drawn_rows < rows {
                 let take = remaining.len().min(cols);
@@ -160,7 +159,7 @@ impl TextRenderer {
                 drawn_rows += 1;
             }
 
-            // Empty line handling: if the original line was empty, advance one row.
+            // 空行处理：如果原始行为空，前进一行。
             if line.is_empty() && drawn_rows < rows {
                 drawn_rows += 1;
             }
@@ -170,17 +169,17 @@ impl TextRenderer {
     }
 }
 
-/// Convert an `f64` to `u32` with saturation (clamps negative to 0, overflow to `u32::MAX`).
+/// 将 `f64` 转换为 `u32`（饱和模式：负值截断为 0，溢出截断为 `u32::MAX`）。
 #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
 pub(crate) fn f64_to_u32(value: f64) -> u32 {
     if value.is_sign_negative() {
         0
     } else {
-        value.round() as u32 // Cast is intentional for DPI/pixel math; negative handled above.
+        value.round() as u32 // 有意转换用于 DPI/像素计算；负值已在上方处理。
     }
 }
 
-/// Draw a single glyph onto the pixel buffer.
+/// 将单个字形绘制到像素缓冲区上。
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_glyph(
     pixels: &mut [u8],
@@ -196,7 +195,7 @@ pub(crate) fn draw_glyph(
     for (row, &bits) in glyph.iter().enumerate() {
         for col in 0..5 {
             if bits & (1 << (4 - col)) != 0 {
-                // Fill the scaled pixel block.
+                // 填放缩后的像素块。
                 for sy in 0..scale {
                     for sx in 0..scale {
                         let px = x + col * scale + sx;
@@ -232,7 +231,7 @@ impl PdfRenderer for TextRenderer {
 
         let (mut width, mut height) = Self::page_pixels(config.dpi);
 
-        // Apply max dimension constraints.
+        // 应用最大尺寸约束。
         if let Some(max_w) = config.max_width
             && width > max_w
         {
@@ -248,7 +247,7 @@ impl PdfRenderer for TextRenderer {
             width = f64_to_u32(f64::from(width) * ratio).max(1);
         }
 
-        // Extract text for this page.
+        // 提取此页的文本。
         let text = self.extract_page_text(page_index);
 
         let pixels =

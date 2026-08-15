@@ -1,4 +1,4 @@
-//! PDF signature dictionary construction, signing, and verification.
+//! PDF 签名字典构造、签名与验证。
 use super::PdfSigner;
 use super::SignatureInfo;
 use super::cms::{
@@ -52,11 +52,11 @@ fn trailer_section(xref_offset: usize) -> Vec<u8> {
     format!("\ntrailer\n<< /Size 1 /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF\n").into_bytes()
 }
 
-/// Sign a PDF document using RSA PKCS#1 v1.5 with SHA-256 and a CMS detached `SignedData` envelope.
+/// 使用 RSA PKCS#1 v1.5 + SHA-256 和 CMS 分离式 `SignedData` 信封对 PDF 文档进行数字签名。
 ///
 /// # Errors
 ///
-/// Returns [`CryptoError`] if signing fails.
+/// 签名失败时返回 [`CryptoError`]。
 pub fn sign_pdf(pdf_bytes: &[u8], signer: &PdfSigner) -> Result<Vec<u8>, CryptoError> {
     use ring::rand::SystemRandom;
     use x509_parser::prelude::FromDer;
@@ -109,11 +109,11 @@ pub fn sign_pdf(pdf_bytes: &[u8], signer: &PdfSigner) -> Result<Vec<u8>, CryptoE
     Ok(output)
 }
 
-/// Verify a PDF digital signature.
+/// 验证 PDF 文档的数字签名。
 ///
 /// # Errors
 ///
-/// Returns [`CryptoError`] if verification fails.
+/// 验证失败时返回 [`CryptoError`]。
 pub fn verify_pdf_signature(pdf_bytes: &[u8]) -> Result<SignatureInfo, CryptoError> {
     let sig_start = rfind_bytes(pdf_bytes, b"/Type /Sig")
         .ok_or_else(|| CryptoError::InvalidSignedPdf("no /Type /Sig found".into()))?;

@@ -1,4 +1,4 @@
-//! Table detector processor implementing [`PdfMarkdownProcessor`].
+//! 实现 [`PdfMarkdownProcessor`] 的表格检测处理器。
 
 use crate::{MarkdownProcessorCapabilities, MarkdownWarning, PdfMarkdownProcessor};
 use easypdf_core::PdfInput;
@@ -8,21 +8,19 @@ use easypdf_core::{PdfBlock, PdfDocumentModel, PdfPageModel};
 use super::config::TableDetectionConfig;
 use super::heuristic::detect_table_region;
 
-/// Heuristic table detection processor.
+/// 启发式表格检测处理器。
 ///
-/// Scans each page's [`PdfBlock::Paragraph`] blocks for table patterns
-/// (pipe-separated, tab-separated, or whitespace-aligned) and replaces
-/// consecutive matching rows with a single [`PdfBlock::Table`].
+/// 扫描每个页面的 [`PdfBlock::Paragraph`] 块，查找表格模式
+///（管道分隔、制表符分隔或空格对齐），并将连续匹配的行
+/// 替换为单个 [`PdfBlock::Table`]。
 ///
-/// The first row of a detected region becomes the table header; the
-/// remaining rows become data rows. Separator rows (e.g., `|---|---|`)
-/// are automatically skipped.
+/// 检测到的区域的第一行成为表头；其余行成为数据行。
+/// 分隔行（如 `|---|---|`）会被自动跳过。
 ///
-/// # Capability level
+/// # 能力等级
 ///
-/// This processor declares [`CapabilityLevel::Heuristic`](easypdf_core::CapabilityLevel::Heuristic)
-/// for table detection — it works purely on text patterns without
-/// inspecting PDF vector graphics or font metrics.
+/// 此处理器声明 [`CapabilityLevel::Heuristic`](easypdf_core::CapabilityLevel::Heuristic)
+/// 的表格检测能力——纯粹基于文本模式工作，不检查 PDF 矢量图形或字体度量。
 ///
 /// # Examples
 ///
@@ -39,7 +37,7 @@ pub struct TableDetectorProcessor {
 }
 
 impl TableDetectorProcessor {
-    /// Create a processor with default configuration.
+    /// 使用默认配置创建处理器。
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -47,7 +45,7 @@ impl TableDetectorProcessor {
         }
     }
 
-    /// Create a processor with custom configuration.
+    /// 使用自定义配置创建处理器。
     #[must_use]
     pub fn with_config(config: TableDetectionConfig) -> Self {
         Self { config }
@@ -84,7 +82,7 @@ impl PdfMarkdownProcessor for TableDetectorProcessor {
     }
 }
 
-/// Process a single page, replacing table regions with `PdfBlock::Table`.
+/// 处理单页，将表格区域替换为 `PdfBlock::Table`。
 fn process_page(page: &PdfPageModel, config: &TableDetectionConfig) -> PdfPageModel {
     let blocks = page.blocks();
     let mut new_blocks = Vec::new();
@@ -92,7 +90,7 @@ fn process_page(page: &PdfPageModel, config: &TableDetectionConfig) -> PdfPageMo
 
     while i < blocks.len() {
         if let Some(region) = detect_table_region(blocks, i, config) {
-            // Use the source location of the first row (the header paragraph).
+            // 使用第一行（表头段落）的源位置。
             let source = *blocks[i].source();
             new_blocks.push(PdfBlock::table(region.headers, region.rows, source));
             i = region.end_index + 1;
@@ -102,7 +100,7 @@ fn process_page(page: &PdfPageModel, config: &TableDetectionConfig) -> PdfPageMo
         }
     }
 
-    // Reconstruct the page preserving dimensions and rotation.
+    // 重建页面，保留尺寸和旋转。
     let mut new_page = PdfPageModel::new(page.index());
     if let (Some(w), Some(h)) = (page.width_pt(), page.height_pt()) {
         new_page = new_page.with_dimensions(w, h);

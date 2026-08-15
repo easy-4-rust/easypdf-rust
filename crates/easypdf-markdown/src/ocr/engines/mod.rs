@@ -1,11 +1,11 @@
-//! OCR engine implementations.
+//! OCR 引擎实现。
 //!
-//! Provides a mock engine by default, with optional feature-gated backends:
+//! 默认提供模拟引擎，可选 feature 门控的后端：
 //!
-//! - [`MockOcrEngine`] -- returns fixed text (always available, for testing)
-//! - `OcrsEngine` -- pure Rust OCR via `ocrs` crate (feature `ocrs`)
-//! - `LlmOcrEngine` -- LLM Vision API via `rig-core` (feature `llm`)
-//! - `DeepSeekOcrEngine` -- DeepSeek-OCR-2 via `rig-core` (feature `llm`)
+//! - [`MockOcrEngine`] -- 返回固定文本（始终可用，用于测试）
+//! - `OcrsEngine` -- 基于 `ocrs` crate 的纯 Rust OCR（feature `ocrs`）
+//! - `LlmOcrEngine` -- 基于 `rig-core` 的 LLM Vision API（feature `llm`）
+//! - `DeepSeekOcrEngine` -- 基于 `rig-core` 的 DeepSeek-OCR-2（feature `llm`）
 
 mod mock;
 

@@ -1,7 +1,7 @@
-//! Resident PDF daemon server.
+//! Resident PDF 守护进程服务器。
 //!
-//! Maintains open PDF sessions in memory and accepts commands over IPC
-//! (Unix socket or TCP, depending on the platform and transport configuration).
+//! 在内存中维护已打开的 PDF 会话，并通过 IPC（Unix socket 或 TCP，
+//! 取决于平台和传输配置）接受命令。
 
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Write};
@@ -18,29 +18,27 @@ use super::protocol::{MAX_MESSAGE_BYTES, Request, Response, ResponseData, Sessio
 use super::session::DocumentSession;
 use super::transport::Transport;
 
-/// Shared server state, protected by a mutex.
+/// 共享的服务器状态，由互斥锁保护。
 struct ServerState {
-    /// Active document sessions.
+    /// 活跃的文档会话。
     sessions: HashMap<SessionId, DocumentSession>,
-    /// Last activity timestamp (for idle timeout).
+    /// 最后活动时间戳（用于空闲超时）。
     last_activity: Instant,
-    /// Server configuration.
+    /// 服务器配置。
     config: ResidentConfig,
 }
 
-/// Resident PDF daemon.
+/// Resident PDF 守护进程。
 ///
-/// Maintains multiple open PDF sessions in memory and accepts commands over
-/// IPC. The transport layer is pluggable via the [`Transport`] trait:
+/// 在内存中维护多个已打开的 PDF 会话，并通过 IPC 接受命令。
+/// 传输层通过 [`Transport`] trait 可插拔：
 ///
-/// - **Unix (Linux/macOS)**: use [`bind()`](ResidentServer::bind) for Unix
-///   domain sockets.
-/// - **Windows**: use [`bind_tcp()`](ResidentServer::bind_tcp) for TCP
-///   localhost.
-/// - **Custom**: use [`with_transport()`](ResidentServer::with_transport) for
-///   any [`Transport`] implementation.
+/// - **Unix（Linux/macOS）**：使用 [`bind()`](ResidentServer::bind) 创建 Unix 域 socket。
+/// - **Windows**：使用 [`bind_tcp()`](ResidentServer::bind_tcp) 创建 TCP localhost。
+/// - **自定义**：使用 [`with_transport()`](ResidentServer::with_transport) 传入任何
+///   [`Transport`] 实现。
 ///
-/// # Examples
+/// # 示例
 ///
 /// ```no_run
 /// use easypdf_runtime::resident::{ResidentServer, ResidentConfig};
@@ -50,40 +48,39 @@ struct ServerState {
 /// # Ok::<(), easypdf_runtime::resident::ResidentError>(())
 /// ```
 pub struct ResidentServer {
-    /// The transport layer (listener).
+    /// 传输层（监听器）。
     transport: Box<dyn Transport>,
-    /// Socket path for cleanup (Unix) or empty (TCP).
+    /// 用于清理的 socket 路径（Unix）或空路径（TCP）。
     socket_path: PathBuf,
-    /// Shared state.
+    /// 共享状态。
     state: Arc<Mutex<ServerState>>,
-    /// Next session id counter.
+    /// 下一个会话 ID 计数器。
     next_session_id: Arc<AtomicU64>,
-    /// Running flag (for watchdog coordination).
+    /// 运行标志（用于看门狗线程协调）。
     running: Arc<AtomicBool>,
 }
 
 impl ResidentServer {
-    /// Bind to the given socket path with default configuration.
+    /// 使用默认配置绑定到指定 socket 路径。
     ///
-    /// On Unix this creates a Unix domain socket. On non-Unix platforms this
-    /// falls back to TCP localhost -- the `socket_path` parameter is ignored
-    /// and a random port is assigned.
+    /// 在 Unix 上创建 Unix 域 socket。在非 Unix 平台上回退到
+    /// TCP localhost -- `socket_path` 参数被忽略，分配随机端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind(socket_path: impl AsRef<Path>) -> Result<Self> {
         Self::bind_with_config(socket_path, ResidentConfig::default())
     }
 
-    /// Bind to the given socket path with explicit configuration.
+    /// 使用显式配置绑定到指定 socket 路径。
     ///
-    /// On Unix this creates a Unix domain socket with the configured
-    /// `socket_mode`. On non-Unix platforms this falls back to TCP localhost.
+    /// 在 Unix 上使用配置的 `socket_mode` 创建 Unix 域 socket。
+    /// 在非 Unix 平台上回退到 TCP localhost。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_with_config(socket_path: impl AsRef<Path>, config: ResidentConfig) -> Result<Self> {
         #[cfg(unix)]
         {
@@ -103,33 +100,32 @@ impl ResidentServer {
         }
     }
 
-    /// Bind to a TCP port on localhost with default configuration.
+    /// 使用默认配置绑定到 localhost 的 TCP 端口。
     ///
-    /// Listens exclusively on `127.0.0.1` to prevent remote connections.
-    /// Assigns a random available port.
+    /// 仅监听 `127.0.0.1` 以阻止远程连接。
+    /// 分配随机可用端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_tcp() -> Result<Self> {
         Self::bind_tcp_with_config(ResidentConfig::default())
     }
 
-    /// Bind to a specific TCP port on localhost with default configuration.
+    /// 使用默认配置绑定到 localhost 的指定 TCP 端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails
-    /// (e.g. port already in use).
+    /// 如果绑定失败（例如端口已被占用），返回 `ResidentError::Io`。
     pub fn bind_tcp_port(port: u16) -> Result<Self> {
         Self::bind_tcp_port_with_config(port, ResidentConfig::default())
     }
 
-    /// Bind to a TCP port on localhost with explicit configuration.
+    /// 使用显式配置绑定到 localhost 的 TCP 端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_tcp_with_config(config: ResidentConfig) -> Result<Self> {
         let transport = super::tcp::TcpTransport::bind_localhost()?;
         Ok(Self::with_transport_and_path(
@@ -139,11 +135,11 @@ impl ResidentServer {
         ))
     }
 
-    /// Bind to a specific TCP port on localhost with explicit configuration.
+    /// 使用显式配置绑定到 localhost 的指定 TCP 端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_tcp_port_with_config(port: u16, config: ResidentConfig) -> Result<Self> {
         let transport = super::tcp::TcpTransport::bind_port(port)?;
         Ok(Self::with_transport_and_path(
@@ -153,15 +149,13 @@ impl ResidentServer {
         ))
     }
 
-    /// Create a server with an explicit [`Transport`] implementation.
+    /// 使用显式 [`Transport`] 实现创建服务器。
     ///
-    /// This is the most flexible constructor. Use it for custom transports
-    /// or when you need full control over the listener.
+    /// 这是最灵活的构造函数。用于自定义传输或需要完全控制监听器的场景。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if the transport fails
-    /// to initialize.
+    /// 如果传输初始化失败，返回 `ResidentError::Io`。
     pub fn with_transport(transport: Box<dyn Transport>) -> Result<Self> {
         Ok(Self::with_transport_and_path(
             transport,
@@ -190,30 +184,30 @@ impl ResidentServer {
         }
     }
 
-    /// Run the server main loop (blocking).
+    /// 运行服务器主循环（阻塞）。
     ///
-    /// Accepts connections and handles each one synchronously.
-    /// Starts watchdog threads for idle timeout and autosave.
+    /// 接受连接并同步处理每个连接。
+    /// 启动空闲超时和自动保存的看门狗线程。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if the listener fails.
+    /// 如果监听器失败，返回 `ResidentError::Io`。
     pub fn run(&self) -> Result<()> {
         info!(addr = %self.transport.local_addr(), "resident server starting");
 
         self.transport.set_nonblocking(true)?;
 
-        // Start watchdog threads
+        // 启动看门狗线程
         self.start_idle_watchdog();
         self.start_autosave_watchdog();
 
-        // Collect handles for spawned handler threads so we can join them on shutdown.
+        // 收集已生成的处理线程句柄，以便在关闭时 join。
         let mut handles = Vec::new();
 
         while self.running.load(Ordering::SeqCst) {
             match self.transport.accept() {
                 Ok(conn) => {
-                    // Set a short read timeout so handler threads can observe shutdown.
+                    // 设置较短的读取超时，使处理线程可以观察关闭信号。
                     let _ = conn.set_read_timeout(std::time::Duration::from_millis(500));
 
                     let state = Arc::clone(&self.state);
@@ -224,7 +218,7 @@ impl ResidentServer {
                     }));
                 }
                 Err(ResidentError::Io(ref e)) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                    // No connection pending; sleep briefly to avoid busy-spin
+                    // 没有待处理的连接；短暂休眠以避免忙等待
                     std::thread::sleep(std::time::Duration::from_millis(50));
                 }
                 Err(e) => {
@@ -236,7 +230,7 @@ impl ResidentServer {
             }
         }
 
-        // Join all handler threads so they are cleaned up before run() returns.
+        // join 所有处理线程，确保在 run() 返回前完成清理。
         for handle in handles {
             let _ = handle.join();
         }
@@ -244,13 +238,13 @@ impl ResidentServer {
         Ok(())
     }
 
-    /// Gracefully shut down the server.
+    /// 优雅关闭服务器。
     ///
-    /// Signals all watchdog threads and the main loop to stop.
-    /// Saves all dirty sessions before shutting down.
+    /// 向所有看门狗线程和主循环发送停止信号。
+    /// 关闭前保存所有脏会话。
     pub fn shutdown(&self) {
         self.running.store(false, Ordering::SeqCst);
-        // Save dirty sessions
+        // 保存脏会话
         if let Ok(mut state) = self.state.lock() {
             for session in state.sessions.values_mut() {
                 if session.is_dirty() {
@@ -261,27 +255,27 @@ impl ResidentServer {
         }
     }
 
-    /// Number of active sessions.
+    /// 活跃会话数量。
     #[must_use]
     pub fn session_count(&self) -> usize {
         self.state.lock().map_or(0, |state| state.sessions.len())
     }
 
-    /// The socket path this server is listening on (Unix only).
+    /// 此服务器正在监听的 socket 路径（仅 Unix）。
     ///
-    /// Returns an empty path for TCP transports.
+    /// 对于 TCP 传输返回空路径。
     #[must_use]
     pub fn socket_path(&self) -> &Path {
         &self.socket_path
     }
 
-    /// Human-readable description of the transport address (for logging).
+    /// 传输地址的人类可读描述（用于日志记录）。
     #[must_use]
     pub fn transport_addr(&self) -> String {
         self.transport.local_addr()
     }
 
-    // --- Private helpers ---
+    // --- 私有辅助方法 ---
 
     fn handle_connection(
         conn: Box<dyn super::transport::Connection>,
@@ -307,17 +301,17 @@ impl ResidentServer {
                 break;
             }
 
-            // Read one line (JSON request).
-            // The connection has a 500ms read timeout so we periodically check `running`.
+            // 读取一行（JSON 请求）。
+            // 连接有 500ms 读取超时，因此定期检查 `running`。
             let mut line = String::new();
             match buf_reader.read_line(&mut line) {
-                Ok(0) => break, // Client disconnected
+                Ok(0) => break, // 客户端断开
                 Ok(_) => {}
                 Err(ref e)
                     if e.kind() == std::io::ErrorKind::WouldBlock
                         || e.kind() == std::io::ErrorKind::TimedOut =>
                 {
-                    // Read timeout -- loop back to check `running`.
+                    // 读取超时 -- 循环回来检查 `running`。
                     continue;
                 }
                 Err(ref e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
@@ -333,7 +327,7 @@ impl ResidentServer {
                 continue;
             }
 
-            // Parse request
+            // 解析请求
             let request: Request = match serde_json::from_str(line.trim()) {
                 Ok(r) => r,
                 Err(e) => {
@@ -344,7 +338,7 @@ impl ResidentServer {
                 }
             };
 
-            // Handle request
+            // 处理请求
             let is_shutdown = matches!(request, Request::Shutdown);
             let response = Self::handle_request(request, state, next_session_id);
             let _ = Self::write_response(&mut writer, &response);
@@ -362,7 +356,7 @@ impl ResidentServer {
         state: &Arc<Mutex<ServerState>>,
         next_session_id: &Arc<AtomicU64>,
     ) -> Response {
-        // Reset idle timer on any request
+        // 任何请求都重置空闲计时器
         if let Ok(mut s) = state.lock() {
             s.last_activity = Instant::now();
         }
@@ -640,11 +634,11 @@ impl ResidentServer {
 impl Drop for ResidentServer {
     fn drop(&mut self) {
         self.shutdown();
-        // Clean up socket file (Unix only)
+        // 清理 socket 文件（仅 Unix）
         if !self.socket_path.as_os_str().is_empty() {
             let _ = std::fs::remove_file(&self.socket_path);
         }
-        // Clean up port file (TCP / Windows)
+        // 清理端口文件（TCP / Windows）
         super::port::remove_port_file();
     }
 }

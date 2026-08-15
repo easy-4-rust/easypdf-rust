@@ -1,12 +1,12 @@
 //! 同目录临时文件与原子替换输出。
 //!
-//! All write operations follow the same pattern:
-//! 1. Write data to a temporary file in the same directory as the target.
-//! 2. Sync the temporary file to durable storage.
-//! 3. Atomically rename the temporary file to the target path.
+//! 所有写入操作遵循相同模式：
+//! 1. 将数据写入与目标同目录的临时文件。
+//! 2. 将临时文件同步到持久存储。
+//! 3. 原子地将临时文件重命名为目标路径。
 //!
-//! This guarantees that the target file is never in a half-written state,
-//! even if the process is killed mid-write.
+//! 这保证了目标文件永远不会处于半写状态，
+//! 即使进程在写入过程中被终止。
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -45,8 +45,8 @@ impl AtomicFileOutput {
 
     /// 原子写入完整字节内容。
     ///
-    /// Uses [`std::fs::File::sync_all`] to flush data and metadata to
-    /// durable storage before the rename.
+    /// 使用 [`std::fs::File::sync_all`] 在重命名前将数据和元数据
+    /// 刷新到持久存储。
     ///
     /// # Errors
     ///
@@ -65,29 +65,28 @@ impl AtomicFileOutput {
         Ok(())
     }
 
-    /// Write data with an explicit fsync, then atomically replace the target.
+    /// 使用显式 fsync 写入数据，然后原子替换目标。
     ///
-    /// On macOS this maps to `fcntl(F_FULLFSYNC)` (via Rust's
-    /// [`std::fs::File::sync_all`]), on Linux to `fdatasync`, and on
-    /// Windows to `FlushFileBuffers`.  All through safe Rust.
+    /// 在 macOS 上映射到 `fcntl(F_FULLFSYNC)`（通过 Rust 的
+    /// [`std::fs::File::sync_all`]），在 Linux 上映射到 `fdatasync`，
+    /// 在 Windows 上映射到 `FlushFileBuffers`。全部通过安全 Rust。
     ///
     /// # Errors
     ///
-    /// Returns an error on I/O failure at any stage.
+    /// 任何阶段的 I/O 失败时返回错误。
     pub fn write_with_fsync(&self, data: &[u8]) -> Result<()> {
         self.write(data)
     }
 
-    /// Backup the existing file (if any), then atomically write new data.
+    /// 备份现有文件（如果有），然后原子写入新数据。
     ///
-    /// If the write succeeds, the backup is removed.  If the write fails,
-    /// the backup is restored to the original path.
+    /// 写入成功则移除备份。写入失败则将备份恢复到原始路径。
     ///
-    /// The backup is created at `<target>.bak` in the same directory.
+    /// 备份创建在同目录的 `<target>.bak`。
     ///
     /// # Errors
     ///
-    /// Returns an error if backup creation, write, or restore fails.
+    /// 备份创建、写入或恢复失败时返回错误。
     pub fn write_with_backup(&self, data: &[u8]) -> Result<()> {
         let backup_path = backup_path(&self.target);
         let target_existed = self.target.exists();
@@ -120,15 +119,15 @@ impl AtomicFileOutput {
         }
     }
 
-    /// Callback-based atomic write: the caller fills a buffer, then the
-    /// buffer is atomically written to the target.
+    /// 基于回调的原子写入：调用方填充缓冲区，然后缓冲区
+    /// 被原子地写入目标。
     ///
-    /// This pattern avoids holding the entire output in memory twice
-    /// (once for the caller's buffer, once for the write call).
+    /// 此模式避免了在内存中两次持有整个输出
+    ///（一次用于调用方的缓冲区，一次用于写入调用）。
     ///
     /// # Errors
     ///
-    /// Returns an error if the callback fails or the atomic write fails.
+    /// 回调失败或原子写入失败时返回错误。
     ///
     /// # Examples
     ///

@@ -1,5 +1,5 @@
-//! Event types for listener-based PDF processing.
+//! 基于事件监听器的 PDF 处理。
 //!
-//! Re-exports the listener trait and related types.
+//! 重新导出监听器 trait 及相关类型。
 
 pub use crate::traits::PdfReadListener;

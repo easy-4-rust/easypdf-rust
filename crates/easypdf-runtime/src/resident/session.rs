@@ -1,4 +1,4 @@
-//! Document session management.
+//! 文档会话管理。
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -10,39 +10,39 @@ use tracing::{debug, info};
 use super::error::{ResidentError, Result};
 use super::protocol::{OpenMode, PageRange, PdfMetadataDto, SessionId};
 
-/// A single open document session.
+/// 单个已打开的文档会话。
 ///
-/// Wraps either a [`PdfReader`] (read-only) or a [`PdfManipulator`] (read-write),
-/// keeping the parsed PDF in memory for the lifetime of the session.
+/// 包装 [`PdfReader`]（只读）或 [`PdfManipulator`]（读写），
+/// 在会话生命周期内将解析后的 PDF 保持在内存中。
 pub struct DocumentSession {
-    /// Unique session identifier.
+    /// 唯一会话标识符。
     pub id: SessionId,
-    /// File path this session was opened from.
+    /// 此会话打开的文件路径。
     pub path: PathBuf,
-    /// Open mode.
+    /// 打开模式。
     pub mode: OpenMode,
-    /// Reader (always present).
+    /// 读取器（始终存在）。
     reader: Option<PdfReader>,
-    /// Manipulator (present only in `ReadWrite` mode).
+    /// 操作器（仅在 `ReadWrite` 模式下存在）。
     manipulator: Option<PdfManipulator>,
-    /// When the session was created.
+    /// 会话创建时间。
     pub opened_at: Instant,
-    /// Last time this session was accessed.
+    /// 最后访问此会话的时间。
     pub last_accessed: Instant,
-    /// Whether the document has unsaved modifications.
+    /// 文档是否有未保存的修改。
     pub dirty: bool,
-    /// Adaptive autosave EMA of save durations (in seconds). `None` = no sample yet.
+    /// 自适应自动保存的保存耗时 EMA（秒）。`None` = 尚无采样。
     pub save_ema_secs: Option<f64>,
-    /// Current autosave interval (adaptive mode).
+    /// 当前自动保存间隔（自适应模式）。
     pub autosave_interval: Option<std::time::Duration>,
 }
 
 impl DocumentSession {
-    /// Open a new document session.
+    /// 打开一个新的文档会话。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if the file cannot be opened or parsed.
+    /// 如果文件无法打开或解析，返回 [`ResidentError::Pdf`]。
     pub fn open(id: SessionId, path: &Path, mode: OpenMode) -> Result<Self> {
         info!(session_id = id, path = %path.display(), ?mode, "opening document session");
         let now = Instant::now();
@@ -66,11 +66,11 @@ impl DocumentSession {
         })
     }
 
-    /// Extract text from the specified page range.
+    /// 从指定页面范围提取文本。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if text extraction fails.
+    /// 如果文本提取失败，返回 [`ResidentError::Pdf`]。
     pub fn extract_text(&mut self, pages: Option<&PageRange>) -> Result<String> {
         debug!(session_id = self.id, ?pages, "extracting text");
         self.touch();
@@ -85,21 +85,20 @@ impl DocumentSession {
             if range.start >= end {
                 return Ok(String::new());
             }
-            // Page-range extraction: use per-page extraction when available,
-            // fall back to full text extraction for now.
-            // TODO: use reader.extract_page_text() per page for precise slicing.
+            // 页面范围提取：可用时使用逐页提取，
+            // 目前回退到全文提取。
             let _ = (range.start, end);
         }
 
-        // Delegate to full text extraction (covers all pages or filtered above).
+        // 委托给全文提取（覆盖上述过滤后的所有页面）。
         Ok(reader.extract_text()?)
     }
 
-    /// Get the total number of pages.
+    /// 获取总页数。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if the page count cannot be determined.
+    /// 如果无法确定页数，返回 [`ResidentError::Pdf`]。
     pub fn page_count(&mut self) -> Result<usize> {
         debug!(session_id = self.id, "getting page count");
         self.touch();
@@ -110,11 +109,11 @@ impl DocumentSession {
         Ok(reader.page_count()?)
     }
 
-    /// Extract document metadata.
+    /// 提取文档元数据。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if metadata extraction fails.
+    /// 如果元数据提取失败，返回 [`ResidentError::Pdf`]。
     pub fn extract_metadata(&mut self) -> Result<PdfMetadataDto> {
         self.touch();
         let reader = self
@@ -132,12 +131,12 @@ impl DocumentSession {
         })
     }
 
-    /// Rotate a page.
+    /// 旋转某个页面。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if the page is invalid.
-    /// Returns [`ResidentError::Server`] if the session is read-only.
+    /// - 如果页面无效，返回 [`ResidentError::Pdf`]。
+    /// - 如果会话是只读的，返回 [`ResidentError::Server`]。
     pub fn rotate_page(&mut self, page: usize, degrees: u16) -> Result<()> {
         info!(session_id = self.id, page, degrees, "rotating page");
         self.touch();
@@ -168,12 +167,12 @@ impl DocumentSession {
         Ok(())
     }
 
-    /// Save the document.
+    /// 保存文档。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::Pdf`] if the save fails.
-    /// Returns [`ResidentError::Server`] if the session is read-only.
+    /// - 如果保存失败，返回 [`ResidentError::Pdf`]。
+    /// - 如果会话是只读的，返回 [`ResidentError::Server`]。
     pub fn save(&mut self, path: Option<&Path>) -> Result<PathBuf> {
         info!(session_id = self.id, ?path, "saving document");
         self.touch();
@@ -195,29 +194,29 @@ impl DocumentSession {
         let elapsed = start.elapsed();
         self.dirty = false;
 
-        // Record save duration for adaptive autosave
+        // 记录保存耗时用于自适应自动保存
         self.record_save_duration(elapsed);
 
-        // Re-open the manipulator so the session stays alive
+        // 重新打开操作器以保持会话存活
         self.manipulator = Some(PdfManipulator::open(&self.path)?);
-        // Also re-open the reader to reflect saved state
+        // 同时重新打开读取器以反映已保存的状态
         self.reader = Some(PdfReader::open(&self.path)?);
 
         Ok(save_path_buf)
     }
 
-    /// Whether the document has unsaved changes.
+    /// 文档是否有未保存的更改。
     #[must_use]
     pub fn is_dirty(&self) -> bool {
         self.dirty
     }
 
-    /// Update the last-accessed timestamp.
+    /// 更新最后访问时间戳。
     pub fn touch(&mut self) {
         self.last_accessed = Instant::now();
     }
 
-    /// Record a save duration for adaptive autosave EMA.
+    /// 记录保存耗时用于自适应自动保存 EMA。
     pub fn record_save_duration(&mut self, elapsed: std::time::Duration) {
         const ALPHA: f64 = 0.3;
         const MULTIPLIER: f64 = 4.0;

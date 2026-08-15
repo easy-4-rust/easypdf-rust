@@ -6,7 +6,7 @@ use std::path::Path;
 #[cfg(feature = "html")]
 use easypdf_core::PdfError;
 
-/// Convert basic Markdown to HTML.
+/// 将基本 Markdown 转换为 HTML。
 pub(crate) fn markdown_to_html(md: &str) -> String {
     let mut html = String::from("<html><body>\n");
     for line in md.lines() {
@@ -38,7 +38,7 @@ pub(crate) fn markdown_to_html(md: &str) -> String {
     html
 }
 
-/// Process inline **bold** and *italic* Markdown.
+/// 处理行内 **粗体** 和 *斜体* Markdown。
 fn process_inline_formatting(text: &str) -> String {
     let mut result = String::new();
     let chars: Vec<char> = text.chars().collect();
@@ -74,7 +74,7 @@ fn process_inline_formatting(text: &str) -> String {
     result
 }
 
-/// Builder for HTML-to-PDF conversion (requires `html` feature).
+/// HTML 转 PDF 的 Builder（需要 `html` feature）。
 #[cfg(feature = "html")]
 #[must_use]
 pub struct HtmlToPdfBuilder {
@@ -91,18 +91,18 @@ impl HtmlToPdfBuilder {
         }
     }
 
-    /// Set the document title.
+    /// 设置文档标题。
     #[must_use = "builder method"]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self
     }
 
-    /// Render HTML to PDF and save.
+    /// 将 HTML 渲染为 PDF 并保存。
     ///
     /// # Errors
     ///
-    /// Returns an error if Chromium is not available or rendering fails.
+    /// 如果 Chromium 不可用或渲染失败，返回错误。
     pub fn save(self, output: impl AsRef<Path>) -> crate::Result<()> {
         use std::collections::BTreeMap;
         let mut warnings = Vec::new();

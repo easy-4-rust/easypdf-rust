@@ -1,8 +1,7 @@
-//! MCP server -- stdio main loop and JSON-RPC dispatch.
+//! MCP 服务器 -- stdio 主循环与 JSON-RPC 分发。
 //!
-//! Reads JSON-RPC 2.0 requests from stdin (one per line), dispatches them
-//! to the appropriate handler, and writes responses to stdout. All logging
-//! goes to stderr to avoid corrupting the JSON-RPC stream.
+//! 从 stdin 逐行读取 JSON-RPC 2.0 请求，将其分发到相应的处理器，
+//! 并将响应写入 stdout。所有日志输出到 stderr 以避免破坏 JSON-RPC 流。
 
 use std::io::{BufRead, Write};
 
@@ -16,28 +15,28 @@ use super::protocol::{
 };
 use super::tools::{self, ToolResult};
 
-/// The easypdf MCP server.
+/// easypdf MCP 服务器。
 ///
-/// Implements the MCP protocol over stdio, exposing PDF operations as
-/// tools that LLM agents can discover and invoke.
+/// 通过 stdio 实现 MCP 协议，将 PDF 操作暴露为工具，
+/// 供 LLM agent 发现和调用。
 pub struct McpServer;
 
 impl McpServer {
-    /// Create a new MCP server.
+    /// 创建一个新的 MCP 服务器。
     #[must_use]
     pub fn new() -> Self {
         Self
     }
 
-    /// Run the main stdio loop.
+    /// 运行 stdio 主循环。
     ///
-    /// Reads JSON-RPC requests from stdin line by line, dispatches them,
-    /// and writes responses to stdout. Exits when stdin is closed (EOF).
+    /// 逐行从 stdin 读取 JSON-RPC 请求，进行分发，
+    /// 并将响应写入 stdout。stdin 关闭（EOF）时退出。
     ///
     /// # Errors
     ///
-    /// Returns an error only if stdout writes fail (broken pipe, etc.).
-    /// Individual request errors are reported as JSON-RPC error responses.
+    /// 仅在 stdout 写入失败（broken pipe 等）时返回错误。
+    /// 单个请求的错误作为 JSON-RPC 错误响应报告。
     #[allow(clippy::unused_self)]
     pub fn run(&self) -> Result<()> {
         info!("MCP server starting on stdio");
@@ -64,8 +63,8 @@ impl McpServer {
         Ok(())
     }
 
-    /// Process a single line of JSON-RPC input and return a response
-    /// (or `None` for notifications and empty lines).
+    /// 处理一行 JSON-RPC 输入并返回响应
+    /// （通知和空行返回 `None`）。
     fn handle_line(line: &str) -> Option<JsonRpcResponse> {
         if line.trim().is_empty() {
             return None;
@@ -73,7 +72,7 @@ impl McpServer {
         match serde_json::from_str::<JsonRpcRequest>(line) {
             Ok(request) => Self::handle_request(&request),
             Err(e) => {
-                // Parse error -- cannot reliably extract id, use null.
+                // 解析错误 -- 无法可靠提取 id，使用 null。
                 Some(protocol::error_response(
                     None,
                     protocol::ERROR_PARSE,
@@ -83,11 +82,11 @@ impl McpServer {
         }
     }
 
-    /// Dispatch a parsed JSON-RPC request.
+    /// 分发已解析的 JSON-RPC 请求。
     fn handle_request(request: &JsonRpcRequest) -> Option<JsonRpcResponse> {
         let id = request.id.clone();
 
-        // Notifications (no id) do not receive a response.
+        // 通知（无 id）不接收响应。
         id.as_ref()?;
 
         debug!(method = %request.method, "JSON-RPC request");
@@ -109,7 +108,7 @@ impl McpServer {
         }
     }
 
-    /// Handle `initialize` -- return server capabilities.
+    /// 处理 `initialize` -- 返回服务器能力。
     fn handle_initialize(id: Option<serde_json::Value>) -> JsonRpcResponse {
         let result = serde_json::json!({
             "protocolVersion": PROTOCOL_VERSION,
@@ -126,19 +125,19 @@ impl McpServer {
         protocol::success_response(id, result)
     }
 
-    /// Handle `tools/list` -- return tool definitions.
+    /// 处理 `tools/list` -- 返回工具定义。
     fn handle_tools_list(id: Option<serde_json::Value>) -> JsonRpcResponse {
         let defs = tools::tool_definitions();
         let result = serde_json::json!({ "tools": defs });
         protocol::success_response(id, result)
     }
 
-    /// Handle `tools/call` -- dispatch to the appropriate tool.
+    /// 处理 `tools/call` -- 分发到相应的工具。
     fn handle_tools_call(
         id: Option<serde_json::Value>,
         params: &serde_json::Value,
     ) -> JsonRpcResponse {
-        // Extract tool name and arguments from params.
+        // 从 params 中提取工具名和参数。
         let Some(name) = params["name"].as_str() else {
             warn!("tools/call missing tool name");
             return protocol::error_response(
@@ -163,9 +162,9 @@ impl McpServer {
             }
             Err(e) => {
                 warn!(tool = name, error = %e, "tool call failed");
-                // Tool-level errors are returned as a successful JSON-RPC
-                // response with isError=true in the ToolResult, NOT as a
-                // JSON-RPC error. This matches MCP convention.
+                // 工具级别的错误作为成功的 JSON-RPC 响应返回，
+                // 其中 ToolResult 的 isError=true，而非 JSON-RPC 错误。
+                // 这符合 MCP 惯例。
                 let tool_result = ToolResult {
                     content: vec![super::tools::ContentBlock::Text {
                         text: e.to_string(),
@@ -183,7 +182,7 @@ impl McpServer {
         }
     }
 
-    /// Handle `ping` -- return empty result.
+    /// 处理 `ping` -- 返回空结果。
     fn handle_ping(id: Option<serde_json::Value>) -> JsonRpcResponse {
         protocol::success_response(id, serde_json::json!({}))
     }
@@ -195,7 +194,7 @@ impl Default for McpServer {
     }
 }
 
-/// Truncate a string to `max_len` characters, appending `...` if truncated.
+/// 将字符串截断到 `max_len` 个字符，截断时追加 `...`。
 fn truncate(s: &str, max_len: usize) -> String {
     if s.len() <= max_len {
         s.to_string()
@@ -269,8 +268,8 @@ mod tests {
             params: serde_json::json!({"name": "nope", "arguments": {}}),
         };
         let resp = McpServer::handle_request(&req).unwrap();
-        // Unknown tool returns as a successful response with isError=true
-        // (tool-level error, not JSON-RPC error).
+        // 未知工具作为 isError=true 的成功响应返回
+        // （工具级别错误，非 JSON-RPC 错误）。
         assert!(resp.error.is_none());
         let result = resp.result.unwrap();
         assert_eq!(result["isError"], true);
@@ -339,17 +338,12 @@ mod tests {
 
     #[test]
     fn empty_line_returns_none() {
-        // handle_line is called with trimmed non-empty lines in run(),
-        // but test the trim path anyway.
         assert!(McpServer::handle_line("").is_none());
         assert!(McpServer::handle_line("  ").is_none());
     }
 
     #[test]
     fn full_stdio_roundtrip() {
-        // Simulate a full initialize -> tools/list -> tools/call flow
-        // by calling handle_line with serialized requests.
-
         // 1. initialize
         let init_req = serde_json::to_string(&JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
@@ -374,7 +368,7 @@ mod tests {
         assert_eq!(resp.id, Some(serde_json::json!(2)));
         assert!(resp.error.is_none());
 
-        // 3. tools/call with missing path -> error result
+        // 3. tools/call -- 缺少 path 导致错误结果
         let call_req = serde_json::to_string(&JsonRpcRequest {
             jsonrpc: "2.0".to_string(),
             id: Some(serde_json::json!(3)),

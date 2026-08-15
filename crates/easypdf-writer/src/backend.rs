@@ -1,18 +1,17 @@
-//! Write backend selection and page-level spill mechanism.
+//! 写入后端选择与页面级溢出机制。
 //!
-//! Provides [`WriteBackend`] for choosing between in-memory and spill-to-disk
-//! modes, and [`PageSpillWriter`] for serializing finalized page content to
-//! temporary files to bound peak memory usage.
+//! 提供 [`WriteBackend`] 用于在内存模式和溢出到磁盘模式之间选择，
+//! 以及 [`PageSpillWriter`] 用于将已完成的页面内容序列化到临时文件
+//! 以限制峰值内存使用。
 //!
-//! # Design
+//! # 设计
 //!
-//! The spill mechanism operates at page granularity: once a page is finalized,
-//! its operations (`Vec<printpdf::Op>`) and dimensions are serialized to a
-//! temporary file (optionally gzip-compressed). At `finish()` time, all spilled
-//! pages are read back and merged into the final PDF document.
+//! 溢出机制以页面粒度运行：页面完成后，其操作（`Vec<printpdf::Op>`）
+//! 和尺寸被序列化到临时文件（可选 gzip 压缩）。在 `finish()` 时，
+//! 所有溢出的页面被读回并合并到最终 PDF 文档中。
 //!
-//! This mirrors the SXSSF spill pattern from `easyexcel-rust`, adapted for
-//! PDF's page-level (rather than row-level) content unit.
+//! 这借鉴了 `easyexcel-rust` 的 SXSSF 溢出模式，适配了 PDF 的
+//! 页面级（而非行级）内容单元。
 
 use easypdf_core::error::{PdfError, Result};
 use flate2::Compression;
@@ -38,17 +37,17 @@ pub(crate) struct SpilledPageData {
     pub ops: Vec<Op>,
 }
 
-/// PDF write backend selection.
+/// PDF 写入后端选择。
 ///
-/// Controls whether the writer keeps all pages in memory or spills finalized
-/// pages to temporary files to bound peak memory usage.
+/// 控制写入器是将所有页面保留在内存中，还是将已完成的页面溢出到
+/// 临时文件以限制峰值内存使用。
 ///
 /// # Examples
 ///
 /// ```
 /// use easypdf_writer::WriteBackend;
 ///
-/// // Auto-select based on expected page count.
+/// // 根据预期页数自动选择。
 /// let backend = WriteBackend::auto(50);
 /// assert!(!backend.is_constant_memory());
 ///
@@ -57,19 +56,18 @@ pub(crate) struct SpilledPageData {
 /// ```
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum WriteBackend {
-    /// Full in-memory mode (default for small documents).
+    /// 全量内存模式（小型文档默认）。
     ///
-    /// The entire PDF document is constructed in memory via `printpdf`.
-    /// Suitable for documents up to ~100 pages.
+    /// 整个 PDF 文档通过 `printpdf` 在内存中构建。
+    /// 适合约 100 页以内的文档。
     #[default]
     InMemory,
 
-    /// Page-level spill mode for large documents.
+    /// 页面级溢出模式，适用于大型文档。
     ///
-    /// Each finalized page is serialized to a temporary file and dropped from
-    /// memory. At `finish()` time, all spilled pages are read back and merged.
-    /// This bounds peak memory to approximately one page's content plus the
-    /// final PDF output buffer.
+    /// 每个已完成的页面被序列化到临时文件并从内存中释放。在 `finish()` 时，
+    /// 所有溢出的页面被读回并合并。这将峰值内存限制为大约一个页面的内容
+    /// 加上最终 PDF 输出缓冲区。
     Spill {
         /// Directory for spill files. `None` uses the system temporary directory.
         spill_dir: Option<PathBuf>,
@@ -83,11 +81,10 @@ pub enum WriteBackend {
 }
 
 impl WriteBackend {
-    /// Automatically select a backend based on the estimated page count.
+    /// 根据估计的页数自动选择后端。
     ///
-    /// For 100 or fewer pages, returns [`InMemory`](Self::InMemory).
-    /// For more than 100 pages, returns [`Spill`](Self::Spill) with compression
-    /// enabled and a threshold of 50 pages.
+    /// 100 页及以下返回 [`InMemory`](Self::InMemory)。
+    /// 超过 100 页返回启用压缩且阈值为 50 页的 [`Spill`](Self::Spill)。
     #[must_use]
     pub fn auto(estimated_pages: usize) -> Self {
         match estimated_pages {
@@ -100,16 +97,15 @@ impl WriteBackend {
         }
     }
 
-    /// Returns `true` if this backend uses the constant-memory spill strategy.
+    /// 当此后端使用常量内存溢出策略时返回 `true`。
     #[must_use]
     pub const fn is_constant_memory(&self) -> bool {
         matches!(self, Self::Spill { .. })
     }
 
-    /// Create a spill backend with constant-memory semantics (threshold = 1).
+    /// 创建具有常量内存语义的溢出后端（阈值 = 1）。
     ///
-    /// This is a convenience constructor that spills every page immediately
-    /// after finalization.
+    /// 这是一个便捷构造函数，每个页面在完成后立即溢出。
     #[must_use]
     pub fn constant_memory() -> Self {
         Self::Spill {
@@ -120,12 +116,11 @@ impl WriteBackend {
     }
 }
 
-/// Page-level spill writer.
+/// 页面级溢出写入器。
 ///
-/// Manages serialization of finalized page content to temporary files and
-/// deserialization at finish time. Spill files are stored in a temporary
-/// directory that is automatically cleaned up when the `PageSpillWriter` is
-/// dropped (via [`tempfile::TempDir`]).
+/// 管理已完成页面内容到临时文件的序列化以及完成时的反序列化。
+/// 溢出文件存储在临时目录中，当 `PageSpillWriter` 被 drop 时
+/// 自动清理（通过 [`tempfile::TempDir`]）。
 pub(crate) struct PageSpillWriter {
     /// Temporary directory guard (cleaned up on drop).
     _temp_dir: Option<tempfile::TempDir>,
@@ -142,14 +137,14 @@ pub(crate) struct PageSpillWriter {
 }
 
 impl PageSpillWriter {
-    /// Create a new spill writer.
+    /// 创建新的溢出写入器。
     ///
-    /// If `spill_dir` is `None`, a unique temporary directory is created
-    /// automatically (cleaned up on drop).
+    /// 如果 `spill_dir` 为 `None`，会自动创建唯一的临时目录
+    /// （drop 时清理）。
     ///
     /// # Errors
     ///
-    /// Returns an error if the spill directory cannot be created.
+    /// 当无法创建溢出目录时返回错误。
     pub fn new(spill_dir: Option<PathBuf>, compress: bool, threshold_pages: usize) -> Result<Self> {
         let (dir, temp_dir_guard) = if let Some(d) = spill_dir {
             std::fs::create_dir_all(&d)?;
@@ -169,14 +164,14 @@ impl PageSpillWriter {
         })
     }
 
-    /// Attempt to spill a finalized page's data.
+    /// 尝试溢出已完成页面的数据。
     ///
-    /// If the finalized page count has not yet exceeded the threshold, this is
-    /// a no-op and the caller should keep the page data in memory.
+    /// 如果已完成的页面数尚未超过阈值，此操作为空操作，
+    /// 调用方应将页面数据保留在内存中。
     ///
     /// # Errors
     ///
-    /// Returns an error if serialization or file I/O fails.
+    /// 当序列化或文件 I/O 失败时返回错误。
     pub fn maybe_spill(&mut self, page_data: &SpilledPageData) -> Result<Option<()>> {
         self.finalized_count += 1;
         if self.finalized_count <= self.threshold_pages {
@@ -206,11 +201,11 @@ impl PageSpillWriter {
         Ok(Some(()))
     }
 
-    /// Collect all spilled pages, returning them in page-number order.
+    /// 收集所有溢出的页面，按页码顺序返回。
     ///
     /// # Errors
     ///
-    /// Returns an error if any spill file cannot be read or deserialized.
+    /// 当任何溢出文件无法读取或反序列化时返回错误。
     pub fn collect_all(&self) -> Result<Vec<SpilledPageData>> {
         let mut pages = Vec::with_capacity(self.spilled_pages.len());
         for path in self.spilled_pages.values() {
@@ -230,7 +225,7 @@ impl PageSpillWriter {
         Ok(pages)
     }
 
-    /// Return the number of pages that have been spilled to disk.
+    /// 返回已溢出到磁盘的页面数量。
     #[must_use]
     pub fn spilled_count(&self) -> usize {
         self.spilled_pages.len()

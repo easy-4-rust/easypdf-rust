@@ -1,63 +1,63 @@
-//! Error types for PDF rendering.
+//! PDF 渲染错误类型。
 
 use std::path::PathBuf;
 
-/// Errors that can occur during PDF page rendering.
+/// PDF 页面渲染过程中可能发生的错误。
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum RenderError {
-    /// An I/O error occurred (reading PDF or writing output).
+    /// 发生 I/O 错误（读取 PDF 或写入输出）。
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
-    /// The PDF could not be parsed or is malformed.
+    /// PDF 无法解析或格式错误。
     #[error("PDF parse error: {0}")]
     Parse(String),
 
-    /// The requested page index is out of bounds.
+    /// 请求的页码索引超出范围。
     #[error("page index {index} out of bounds (total {total})")]
     InvalidPage {
-        /// The requested page index (0-based).
+        /// 请求的页码索引（从 0 开始）。
         index: usize,
-        /// Total number of pages in the document.
+        /// 文档总页数。
         total: usize,
     },
 
-    /// The requested rendering backend is not available.
+    /// 请求的渲染后端不可用。
     #[error("render backend '{name}' is not available: {reason}")]
     BackendUnavailable {
-        /// Backend name.
+        /// 后端名称。
         name: &'static str,
-        /// Why it is unavailable.
+        /// 不可用原因。
         reason: String,
     },
 
-    /// The pdfium dynamic library could not be loaded.
+    /// pdfium 动态库无法加载。
     #[cfg(feature = "pdfium")]
     #[error("pdfium library error: {0}")]
     Pdfium(String),
 
-    /// Image encoding failed (PNG/JPEG).
+    /// 图像编码失败（PNG/JPEG）。
     #[error("image encoding error: {0}")]
     ImageEncode(String),
 
-    /// The requested DPI exceeds the backend's maximum.
+    /// 请求的 DPI 超过后端最大值。
     #[error("DPI {requested} exceeds backend maximum {max}")]
     DpiExceeded {
-        /// Requested DPI.
+        /// 请求的 DPI。
         requested: u32,
-        /// Backend maximum DPI.
+        /// 后端最大 DPI。
         max: u32,
     },
 
-    /// The output path is not a valid destination.
+    /// 输出路径不是有效的目标。
     #[error("invalid output path: {0}")]
     InvalidOutput(PathBuf),
 
-    /// Catch-all for other rendering errors.
+    /// 其他渲染错误的兜底变体。
     #[error("{0}")]
     Other(String),
 }
 
-/// Convenience `Result` type for rendering operations.
+/// 渲染操作的便捷 `Result` 类型。
 pub type Result<T, E = RenderError> = std::result::Result<T, E>;

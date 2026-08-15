@@ -1,13 +1,13 @@
-//! Configuration for the resident daemon.
+//! Resident 守护进程配置。
 
 use std::time::Duration;
 
-/// Configuration for the resident PDF daemon.
+/// Resident PDF 守护进程的配置。
 ///
-/// Controls idle timeout, session limits, autosave behavior, and socket
-/// permissions. Use [`Default`] for sensible defaults, or build manually.
+/// 控制空闲超时、会话上限、自动保存行为和 socket 权限。
+/// 使用 [`Default`] 获取合理的默认值，或手动构建。
 ///
-/// # Examples
+/// # 示例
 ///
 /// ```
 /// use easypdf_runtime::resident::ResidentConfig;
@@ -21,50 +21,49 @@ use std::time::Duration;
 /// ```
 #[derive(Debug, Clone)]
 pub struct ResidentConfig {
-    /// Idle timeout: the server shuts down after this duration with no activity.
+    /// 空闲超时：服务器在无活动达到此时间后自动关闭。
     ///
-    /// Defaults to 5 minutes.
+    /// 默认为 5 分钟。
     pub idle_timeout: Duration,
 
-    /// Maximum number of concurrent document sessions.
+    /// 最大并发文档会话数。
     ///
-    /// Defaults to 16.
+    /// 默认为 16。
     pub max_sessions: usize,
 
-    /// Autosave mode for dirty sessions.
+    /// 脏会话的自动保存模式。
     ///
-    /// Defaults to [`AutosaveMode::Adaptive`].
+    /// 默认为 [`AutosaveMode::Adaptive`]。
     pub autosave: AutosaveMode,
 
-    /// Unix socket file permission mode (e.g. `0o600`).
+    /// Unix socket 文件权限模式（例如 `0o600`）。
     ///
-    /// Only applies on Unix platforms. Defaults to `0o600` (owner read/write only).
+    /// 仅在 Unix 平台上生效。默认为 `0o600`（仅所有者可读写）。
     #[cfg(unix)]
     pub socket_mode: u32,
 }
 
-/// Autosave strategy for dirty document sessions.
+/// 脏文档会话的自动保存策略。
 ///
-/// Borrowed from the `OfficeCLI` pattern: adaptive autosave uses an
-/// exponential moving average (EMA) of save durations to dynamically
-/// adjust the save interval, preventing background saves from consuming
-/// more than ~25% of wall-clock time.
+/// 借鉴自 `OfficeCLI` 模式：自适应自动保存使用保存耗时的
+/// 指数移动平均值（EMA）动态调整保存间隔，防止后台保存
+/// 占用超过约 25% 的挂钟时间。
 #[derive(Debug, Clone)]
 pub enum AutosaveMode {
-    /// Autosave disabled. Dirty sessions are only saved on explicit `Save` command.
+    /// 禁用自动保存。脏会话仅在收到显式 `Save` 命令时保存。
     Disabled,
-    /// Fixed autosave interval.
+    /// 固定自动保存间隔。
     Fixed(Duration),
-    /// Adaptive autosave (default).
+    /// 自适应自动保存（默认）。
     ///
-    /// The interval adjusts based on measured save durations:
-    /// `clamp(4 * EMA(save_duration), min_interval, max_interval)`.
+    /// 间隔根据测量到的保存耗时动态调整：
+    /// `clamp(4 * EMA(save_duration), min_interval, max_interval)`。
     Adaptive {
-        /// Minimum autosave interval (floor).
+        /// 最小自动保存间隔（下限）。
         min_interval: Duration,
-        /// Maximum autosave interval (ceiling).
+        /// 最大自动保存间隔（上限）。
         max_interval: Duration,
-        /// Initial interval before any save measurements.
+        /// 任何保存测量之前的初始间隔。
         initial: Duration,
     },
 }
@@ -86,10 +85,15 @@ impl Default for ResidentConfig {
 }
 
 impl AutosaveMode {
-    /// Compute the next adaptive interval given a new save duration sample.
+    /// 根据新的保存耗时样本计算下一个自适应间隔。
     ///
-    /// Uses EMA (exponential moving average) with alpha = 0.3.
-    /// Returns `None` if not in adaptive mode.
+    /// 使用 alpha = 0.3 的 EMA（指数移动平均）。
+    /// 如果不处于自适应模式，返回 `None`。
+    ///
+    /// # 参数
+    ///
+    /// * `prev_ema_secs` - 上一次的 EMA 值（秒），首次采样时为 `None`。
+    /// * `save_duration` - 本次保存耗时。
     #[must_use]
     pub fn next_adaptive_interval(
         &self,
@@ -121,7 +125,7 @@ impl AutosaveMode {
         }
     }
 
-    /// Returns the initial interval for adaptive mode, or `None` otherwise.
+    /// 返回自适应模式的初始间隔，其他模式返回 `None`。
     #[must_use]
     pub fn initial_interval(&self) -> Option<Duration> {
         match self {

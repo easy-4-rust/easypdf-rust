@@ -1,4 +1,4 @@
-//! Struct-level and field-level attribute parsing for `#[derive(PdfModel)]`.
+//! `#[derive(PdfModel)]` 的结构体级和字段级属性解析。
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -51,7 +51,7 @@ pub(super) fn parse_struct_attrs(attrs: &[syn::Attribute]) -> Result<PdfStructAt
 // Field-level attributes
 // ============================================================================
 
-/// All parsed attributes for a single field.
+/// 单个字段的所有已解析属性。
 pub(super) struct ParsedField {
     /// The Rust field identifier.
     pub ident: syn::Ident,

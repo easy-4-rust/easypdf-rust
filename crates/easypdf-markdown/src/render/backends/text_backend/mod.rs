@@ -1,8 +1,7 @@
-//! Pure-Rust text fallback renderer.
+//! 纯 Rust 文本回退渲染器。
 //!
-//! Extracts text from a PDF via [`easypdf_reader::PdfReader`] and renders it
-//! as a simple white-background, black-text raster image. Quality is low but
-//! sufficient for OCR pipelines. No external dependencies are required.
+//! 通过 [`easypdf_reader::PdfReader`] 从 PDF 中提取文本，并将其渲染为
+//! 简单的白底黑字光栅图像。质量较低但足以满足 OCR 流水线需求，无需外部依赖。
 #![cfg_attr(test, allow(clippy::similar_names))]
 
 mod glyph;

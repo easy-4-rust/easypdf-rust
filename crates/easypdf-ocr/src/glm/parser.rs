@@ -1,19 +1,18 @@
-//! Response parser for the Zhipu GLM-OCR API.
+//! 智谱 GLM-OCR API 响应解析器。
 
 use crate::http::error::{OcrHttpError, Result};
 use crate::http::response::OcrResponseParser;
 use easypdf_markdown::ocr::OcrResult;
 
-/// Response parser for the Zhipu GLM-OCR layout parsing API.
+/// 智谱 GLM-OCR 版面解析 API 响应解析器。
 ///
-/// Parses the JSON response from the GLM-OCR endpoint into a standard
-/// [`OcrResult`].
+/// 将 GLM-OCR 端点的 JSON 响应解析为标准 [`OcrResult`]。
 ///
-/// # API Response Structure
+/// # API 响应结构
 ///
-/// Based on the official documentation at
-/// <https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>, the response
-/// is expected to follow a structure similar to:
+/// 根据官方文档
+/// <https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>，响应
+/// 预期遵循类似以下的结构：
 ///
 /// ```json
 /// {
@@ -24,7 +23,7 @@ use easypdf_markdown::ocr::OcrResult;
 /// }
 /// ```
 ///
-/// The parser also handles error responses of the form:
+/// 解析器还处理以下形式的错误响应：
 ///
 /// ```json
 /// {
@@ -35,14 +34,13 @@ use easypdf_markdown::ocr::OcrResult;
 /// }
 /// ```
 ///
-/// **Note**: The exact response field structure is inferred from the
-/// Zhipu `BigModel` API conventions. If the actual response differs,
-/// adjustments may be needed.
+/// **注意**：响应字段结构是根据智谱 `BigModel` API 惯例推断的。
+/// 若实际响应不同，可能需要调整。
 pub struct GlmOcrParser;
 
 impl OcrResponseParser for GlmOcrParser {
     fn parse_response(&self, raw: &serde_json::Value) -> Result<OcrResult> {
-        // Check for error responses first.
+        // 首先检查错误响应。
         if let Some(error) = raw.get("error") {
             let message = error
                 .get("message")
@@ -60,11 +58,11 @@ impl OcrResponseParser for GlmOcrParser {
             )));
         }
 
-        // Extract text from the response.
-        // Try multiple response structure patterns:
+        // 从响应中提取文本。
+        // 尝试多种响应结构模式：
         // 1. { "data": { "text": "..." } }
         // 2. { "text": "..." }
-        // 3. { "choices": [{ "message": { "content": "..." } }] } (OpenAI-compat)
+        // 3. { "choices": [{ "message": { "content": "..." } }] }（OpenAI 兼容格式）
         let text = extract_text(raw)?;
 
         if text.is_empty() {
@@ -73,7 +71,7 @@ impl OcrResponseParser for GlmOcrParser {
             ));
         }
 
-        // Extract optional confidence.
+        // 提取可选的置信度。
         let confidence = extract_confidence(raw);
 
         Ok(OcrResult {
@@ -84,7 +82,7 @@ impl OcrResponseParser for GlmOcrParser {
     }
 }
 
-/// Extract text from various possible GLM-OCR response structures.
+/// 从多种可能的 GLM-OCR 响应结构中提取文本。
 fn extract_text(raw: &serde_json::Value) -> Result<String> {
     // Pattern 1: { "data": { "text": "..." } }
     if let Some(text) = raw
@@ -136,7 +134,7 @@ fn extract_text(raw: &serde_json::Value) -> Result<String> {
     ))
 }
 
-/// Extract optional confidence score from the response.
+/// 从响应中提取可选的置信度分数。
 #[allow(clippy::cast_possible_truncation)]
 fn extract_confidence(raw: &serde_json::Value) -> Option<f32> {
     raw.get("confidence")

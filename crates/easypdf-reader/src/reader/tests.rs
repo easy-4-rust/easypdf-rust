@@ -1,5 +1,7 @@
-use super::*;
-use easypdf_core::PdfReadListener;
+use super::PdfReader;
+use crate::strategy::ReadStrategy;
+use easypdf_core::io::repair::RepairOptions;
+use easypdf_core::{PdfInput, PdfReadListener, ResourceLimits};
 
 /// Helper: build a minimal valid `lopdf::Document` for tests.
 fn make_test_doc() -> lopdf::Document {

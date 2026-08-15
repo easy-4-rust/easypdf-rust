@@ -1,52 +1,52 @@
-//! Configuration for Baidu Cloud OCR engines.
+//! 百度云 OCR 引擎配置。
 //!
-//! Baidu Cloud offers 15 OCR API endpoints plus Qianfan-OCR (a large model
-//! endpoint). Each endpoint is represented by a [`BaiduApi`] variant.
+//! 百度云提供 15 个 OCR API 端点加千帆 OCR（大模型端点）。
+//! 每个端点由 [`BaiduApi`] 变体表示。
 //!
-//! # Authentication
+//! # 认证
 //!
-//! Baidu OCR uses OAuth 2.0 client-credentials flow:
-//! 1. Exchange `api_key` + `secret_key` for an `access_token` via the token URL.
-//! 2. Pass `access_token` as a URL query parameter on OCR requests.
+//! 百度 OCR 使用 OAuth 2.0 客户端凭证流程：
+//! 1. 通过令牌 URL 将 `api_key` + `secret_key` 交换为 `access_token`。
+//! 2. 在 OCR 请求中将 `access_token` 作为 URL 查询参数传递。
 //!
-//! Tokens are valid for ~30 days; the engine caches them automatically.
+//! 令牌有效期约 30 天；引擎自动缓存。
 //!
-//! # API Endpoints
+//! # API 端点
 //!
-//! All standard endpoints are at:
+//! 所有标准端点位于：
 //! `https://aip.baidubce.com/rest/2.0/ocr/v1/{action}`
 //!
-//! | API | Action Path | Description |
-//! |-----|-------------|-------------|
-//! | [`BaiduApi::GeneralBasic`] | `general_basic` | General text recognition (standard) |
-//! | [`BaiduApi::GeneralAccurate`] | `accurate_basic` | General text recognition (high accuracy) |
-//! | [`BaiduApi::GeneralBasicWithLocation`] | `general_basic` | Standard with bounding boxes |
-//! | [`BaiduApi::GeneralAccurateWithLocation`] | `accurate_basic` | High accuracy with bounding boxes |
-//! | [`BaiduApi::TableRecognitionV2`] | `table` | Table structure recognition |
-//! | [`BaiduApi::WebImage`] | `webimage` | Web image text recognition |
-//! | [`BaiduApi::WebImageWithLocation`] | `webimage_loc` | Web image with bounding boxes |
-//! | [`BaiduApi::OfficeDocument`] | `doc_analysis_office` | Office document recognition |
-//! | [`BaiduApi::Handwriting`] | `handwriting` | Handwriting recognition |
-//! | [`BaiduApi::Seal`] | `seal` | Seal/stamp recognition |
-//! | [`BaiduApi::Digit`] | `numbers` | Digit recognition |
-//! | [`BaiduApi::Qrcode`] | `qrcode` | QR code recognition |
-//! | [`BaiduApi::Structured`] | `smart_struct` | Intelligent structuring |
-//! | [`BaiduApi::DocParser`] | `doc_parser` | Document parsing (basic) |
-//! | [`BaiduApi::DocParserPaddle`] | `doc_parser_paddle` | Document parsing (PaddleOCR-VL) |
-//! | [`BaiduApi::QianfanOcr`] | N/A | Qianfan large model OCR |
+//! | API | 操作路径 | 描述 |
+//! |-----|----------|------|
+//! | [`BaiduApi::GeneralBasic`] | `general_basic` | 通用文字识别（标准版） |
+//! | [`BaiduApi::GeneralAccurate`] | `accurate_basic` | 通用文字识别（高精度版） |
+//! | [`BaiduApi::GeneralBasicWithLocation`] | `general_basic` | 标准版含边界框 |
+//! | [`BaiduApi::GeneralAccurateWithLocation`] | `accurate_basic` | 高精度版含边界框 |
+//! | [`BaiduApi::TableRecognitionV2`] | `table` | 表格结构识别 |
+//! | [`BaiduApi::WebImage`] | `webimage` | 网络图片文字识别 |
+//! | [`BaiduApi::WebImageWithLocation`] | `webimage_loc` | 网络图片含边界框 |
+//! | [`BaiduApi::OfficeDocument`] | `doc_analysis_office` | 办公文档识别 |
+//! | [`BaiduApi::Handwriting`] | `handwriting` | 手写体识别 |
+//! | [`BaiduApi::Seal`] | `seal` | 印章识别 |
+//! | [`BaiduApi::Digit`] | `numbers` | 数字识别 |
+//! | [`BaiduApi::Qrcode`] | `qrcode` | 二维码识别 |
+//! | [`BaiduApi::Structured`] | `smart_struct` | 智能结构化 |
+//! | [`BaiduApi::DocParser`] | `doc_parser` | 文档解析（基础版） |
+//! | [`BaiduApi::DocParserPaddle`] | `doc_parser_paddle` | 文档解析（PaddleOCR-VL） |
+//! | [`BaiduApi::QianfanOcr`] | N/A | 千帆大模型 OCR |
 //!
-//! # Getting Credentials
+//! # 获取凭据
 //!
-//! 1. Create an application at [Baidu AI Cloud Console](https://console.bce.baidu.com/ai/#/ai/ocr/overview/index).
-//! 2. Obtain the API Key and Secret Key from the application credentials page.
+//! 1. 在[百度智能云控制台](https://console.bce.baidu.com/ai/#/ai/ocr/overview/index)创建应用。
+//! 2. 从应用凭据页面获取 API Key 和 Secret Key。
 
 use std::fmt;
 
-/// Baidu Cloud OCR API endpoint selector.
+/// 百度云 OCR API 端点选择器。
 ///
-/// Each variant corresponds to a specific OCR capability offered by Baidu Cloud.
-/// Use [`BaiduApi::path()`](BaiduApi::path) to get the URL path segment and
-/// [`BaiduApi::engine_name()`](BaiduApi::engine_name) for a human-readable label.
+/// 每个变体对应百度云提供的一种特定 OCR 能力。
+/// 使用 [`BaiduApi::path()`](BaiduApi::path) 获取 URL 路径段，
+/// 使用 [`BaiduApi::engine_name()`](BaiduApi::engine_name) 获取人类可读标签。
 ///
 /// # Examples
 ///
@@ -59,61 +59,61 @@ use std::fmt;
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BaiduApi {
-    /// General text recognition (standard version).
-    /// Endpoint: `general_basic`.
+    /// 通用文字识别（标准版）。
+    /// 端点：`general_basic`。
     GeneralBasic,
-    /// General text recognition (high-accuracy version).
-    /// Endpoint: `accurate_basic`.
+    /// 通用文字识别（高精度版）。
+    /// 端点：`accurate_basic`。
     GeneralAccurate,
-    /// General text recognition (standard with bounding boxes).
-    /// Same endpoint as `GeneralBasic` but with `recognizeGranularity=char`.
+    /// 通用文字识别（标准版含边界框）。
+    /// 与 `GeneralBasic` 相同端点，但带 `recognizeGranularity=char`。
     GeneralBasicWithLocation,
-    /// General text recognition (high-accuracy with bounding boxes).
-    /// Same endpoint as `GeneralAccurate` but with `recognizeGranularity=char`.
+    /// 通用文字识别（高精度版含边界框）。
+    /// 与 `GeneralAccurate` 相同端点，但带 `recognizeGranularity=char`。
     GeneralAccurateWithLocation,
-    /// Table structure recognition V2.
-    /// Endpoint: `table`.
+    /// 表格结构识别 V2。
+    /// 端点：`table`。
     TableRecognitionV2,
-    /// Web image text recognition.
-    /// Endpoint: `webimage`.
+    /// 网络图片文字识别。
+    /// 端点：`webimage`。
     WebImage,
-    /// Web image text recognition with bounding boxes.
-    /// Endpoint: `webimage_loc`.
+    /// 网络图片文字识别含边界框。
+    /// 端点：`webimage_loc`。
     WebImageWithLocation,
-    /// Office document recognition.
-    /// Endpoint: `doc_analysis_office`.
+    /// 办公文档识别。
+    /// 端点：`doc_analysis_office`。
     OfficeDocument,
-    /// Handwriting recognition.
-    /// Endpoint: `handwriting`.
+    /// 手写体识别。
+    /// 端点：`handwriting`。
     Handwriting,
-    /// Seal/stamp recognition.
-    /// Endpoint: `seal`.
+    /// 印章识别。
+    /// 端点：`seal`。
     Seal,
-    /// Digit recognition.
-    /// Endpoint: `numbers`.
+    /// 数字识别。
+    /// 端点：`numbers`。
     Digit,
-    /// QR code recognition.
-    /// Endpoint: `qrcode`.
+    /// 二维码识别。
+    /// 端点：`qrcode`。
     Qrcode,
-    /// Intelligent structuring recognition.
-    /// Endpoint: `smart_struct`.
+    /// 智能结构化识别。
+    /// 端点：`smart_struct`。
     Structured,
-    /// Document parsing (basic version).
-    /// Endpoint: `doc_parser`.
+    /// 文档解析（基础版）。
+    /// 端点：`doc_parser`。
     DocParser,
-    /// Document parsing (PaddleOCR-VL).
-    /// Endpoint: `doc_parser_paddle`.
+    /// 文档解析（PaddleOCR-VL）。
+    /// 端点：`doc_parser_paddle`。
     DocParserPaddle,
-    /// Qianfan-OCR large model (uses a different API endpoint).
+    /// 千帆 OCR 大模型（使用不同的 API 端点）。
     QianfanOcr,
 }
 
 impl BaiduApi {
-    /// URL path segment for this API endpoint.
+    /// 此 API 端点的 URL 路径段。
     ///
-    /// For standard APIs, the full URL is `{base_endpoint}/{path()}`.
-    /// For [`QianfanOcr`](BaiduApi::QianfanOcr), the path is used differently
-    /// (see [`BaiduConfig::qianfan_endpoint`]).
+    /// 对于标准 API，完整 URL 为 `{base_endpoint}/{path()}`。
+    /// 对于 [`QianfanOcr`](BaiduApi::QianfanOcr)，路径的使用方式不同
+    ///（参见 [`BaiduConfig::qianfan_endpoint`]）。
     #[must_use]
     pub const fn path(&self) -> &'static str {
         match self {
@@ -134,10 +134,9 @@ impl BaiduApi {
         }
     }
 
-    /// Whether this variant requests character-level bounding boxes.
+    /// 此变体是否请求字符级边界框。
     ///
-    /// When `true`, the request includes `recognizeGranularity=char` to obtain
-    /// per-character location data.
+    /// 为 `true` 时，请求包含 `recognizeGranularity=char` 以获取逐字符位置数据。
     #[must_use]
     pub const fn requests_boxes(&self) -> bool {
         matches!(
@@ -148,9 +147,9 @@ impl BaiduApi {
         )
     }
 
-    /// Whether the response typically contains text (`words_result`).
+    /// 响应是否通常包含文本（`words_result`）。
     ///
-    /// Most APIs return `words_result`; table and doc APIs return structured data.
+    /// 大多数 API 返回 `words_result`；表格和文档 API 返回结构化数据。
     #[must_use]
     pub const fn returns_text(&self) -> bool {
         !matches!(
@@ -165,7 +164,7 @@ impl BaiduApi {
         )
     }
 
-    /// Whether the response contains bounding-box coordinates.
+    /// 响应是否包含边界框坐标。
     #[must_use]
     pub const fn returns_boxes(&self) -> bool {
         matches!(
@@ -179,7 +178,7 @@ impl BaiduApi {
         )
     }
 
-    /// Human-readable engine name for logging and identification.
+    /// 用于日志和标识的人类可读引擎名称。
     #[must_use]
     pub const fn engine_name(&self) -> &'static str {
         match self {
@@ -202,9 +201,9 @@ impl BaiduApi {
         }
     }
 
-    /// Whether this API is currently supported by the engine.
+    /// 此 API 是否当前受引擎支持。
     ///
-    /// Unsupported variants will return [`BaiduError::UnsupportedApi`] at runtime.
+    /// 不支持的变体在运行时将返回 [`BaiduError::UnsupportedApi`]。
     #[must_use]
     pub const fn is_supported(&self) -> bool {
         !matches!(self, Self::DocParser | Self::DocParserPaddle)
@@ -217,10 +216,10 @@ impl fmt::Display for BaiduApi {
     }
 }
 
-/// Configuration for a Baidu Cloud OCR engine.
+/// 百度云 OCR 引擎配置。
 ///
-/// Holds credentials, API selection, and endpoint URLs. The [`Default`] impl
-/// uses the standard Baidu Cloud OCR base endpoint with [`BaiduApi::GeneralBasic`].
+/// 持有凭据、API 选择和端点 URL。[`Default`] 实现使用
+/// 标准百度云 OCR 基础端点和 [`BaiduApi::GeneralBasic`]。
 ///
 /// # Examples
 ///
@@ -236,24 +235,24 @@ impl fmt::Display for BaiduApi {
 /// ```
 #[derive(Clone)]
 pub struct BaiduConfig {
-    /// Baidu Cloud API key (client ID).
+    /// 百度云 API 密钥（客户端 ID）。
     pub api_key: String,
-    /// Baidu Cloud secret key (client secret).
+    /// 百度云密钥（客户端密钥）。
     pub secret_key: String,
-    /// Which OCR API endpoint to use.
+    /// 使用哪个 OCR API 端点。
     pub api: BaiduApi,
-    /// Base URL for standard OCR endpoints.
+    /// 标准 OCR 端点的基础 URL。
     ///
-    /// Default: `https://aip.baidubce.com/rest/2.0/ocr/v1`.
-    /// The API path is appended automatically.
+    /// 默认值：`https://aip.baidubce.com/rest/2.0/ocr/v1`。
+    /// API 路径会自动追加。
     pub endpoint: String,
-    /// OAuth token exchange URL.
+    /// OAuth 令牌交换 URL。
     ///
-    /// Default: `https://aip.baidubce.com/oauth/2.0/token`.
+    /// 默认值：`https://aip.baidubce.com/oauth/2.0/token`。
     pub token_url: String,
-    /// Qianfan-OCR endpoint (used only when `api` is [`BaiduApi::QianfanOcr`]).
+    /// 千帆 OCR 端点（仅当 `api` 为 [`BaiduApi::QianfanOcr`] 时使用）。
     ///
-    /// Default: `https://qianfan.baidubce.com/v2/app/tool`.
+    /// 默认值：`https://qianfan.baidubce.com/v2/app/tool`。
     pub qianfan_endpoint: String,
 }
 
@@ -283,40 +282,40 @@ impl fmt::Debug for BaiduConfig {
     }
 }
 
-/// Error type for Baidu OCR operations.
+/// 百度 OCR 操作的错误类型。
 #[derive(Debug, thiserror::Error)]
 pub enum BaiduError {
-    /// HTTP transport error (connection, timeout, DNS).
+    /// HTTP 传输错误（连接、超时、DNS）。
     #[error("HTTP transport error: {0}")]
     Transport(#[from] reqwest::Error),
 
-    /// OAuth token exchange failed.
+    /// OAuth 令牌交换失败。
     #[error("OAuth token exchange failed: {0}")]
     Auth(String),
 
-    /// The Baidu API returned an application-level error.
+    /// 百度 API 返回了应用级错误。
     #[error("Baidu API error {code}: {message}")]
     Api {
-        /// Baidu error code.
+        /// 百度错误码。
         code: i64,
-        /// Baidu error message.
+        /// 百度错误消息。
         message: String,
     },
 
-    /// The response JSON could not be parsed.
+    /// 响应 JSON 无法解析。
     #[error("Invalid response: {0}")]
     InvalidResponse(String),
 
-    /// The selected API variant is not yet implemented.
+    /// 选定的 API 变体尚未实现。
     #[error("Unsupported Baidu API: {0}")]
     UnsupportedApi(BaiduApi),
 
-    /// Image encoding failed.
+    /// 图像编码失败。
     #[error("Image encoding failed: {0}")]
     ImageEncoding(String),
 }
 
-/// Convenience result type for Baidu OCR operations.
+/// 百度 OCR 操作的便捷 Result 类型。
 pub type BaiduResult<T> = std::result::Result<T, BaiduError>;
 
 #[cfg(test)]

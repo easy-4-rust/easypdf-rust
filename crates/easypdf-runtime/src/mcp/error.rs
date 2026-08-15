@@ -1,55 +1,55 @@
-//! MCP server error types.
+//! MCP 服务器错误类型。
 
 use thiserror::Error;
 
-/// Result alias for MCP operations.
+/// MCP 操作的 Result 类型别名。
 pub type Result<T> = std::result::Result<T, McpError>;
 
-/// Errors that can occur in the MCP server.
+/// MCP 服务器中可能发生的错误。
 #[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum McpError {
-    /// The JSON-RPC request could not be parsed.
+    /// 无法解析 JSON-RPC 请求。
     #[error("parse error: {0}")]
     Parse(String),
 
-    /// The request is not a valid JSON-RPC 2.0 request.
+    /// 请求不是有效的 JSON-RPC 2.0 请求。
     #[error("invalid request: {0}")]
     InvalidRequest(String),
 
-    /// The requested method does not exist.
+    /// 请求的方法不存在。
     #[error("method not found: {0}")]
     MethodNotFound(String),
 
-    /// Tool parameters are missing or invalid.
+    /// 工具参数缺失或无效。
     #[error("invalid params: {0}")]
     InvalidParams(String),
 
-    /// An internal error occurred during tool execution.
+    /// 工具执行期间发生内部错误。
     #[error("internal error: {0}")]
     Internal(String),
 
-    /// The underlying PDF library returned an error.
+    /// 底层 PDF 库返回的错误。
     #[error("pdf error: {0}")]
     Pdf(#[from] easypdf_core::PdfError),
 
-    /// An I/O error occurred.
+    /// I/O 错误。
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
 }
 
 impl McpError {
-    /// Create an `InvalidParams` error with a message.
+    /// 创建一个 `InvalidParams` 错误。
     pub fn invalid_params(message: impl Into<String>) -> Self {
         Self::InvalidParams(message.into())
     }
 
-    /// Create an `Internal` error with a message.
+    /// 创建一个 `Internal` 错误。
     pub fn internal(message: impl Into<String>) -> Self {
         Self::Internal(message.into())
     }
 
-    /// Return the JSON-RPC error code for this error variant.
+    /// 返回此错误变体对应的 JSON-RPC 错误码。
     #[must_use]
     pub const fn error_code(&self) -> i32 {
         match self {

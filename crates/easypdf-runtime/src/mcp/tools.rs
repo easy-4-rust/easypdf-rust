@@ -1,55 +1,54 @@
-//! MCP tool definitions and dispatch.
+//! MCP 工具定义与分发。
 //!
-//! Each tool maps a high-level PDF operation (read text, convert to markdown,
-//! create, merge, split, extract metadata, get page count) to the
-//! corresponding sub-crate API.
+//! 每个工具将高级 PDF 操作（读取文本、转 Markdown、创建、合并、
+//! 拆分、提取元数据、获取页数）映射到对应的子 crate API。
 
 use serde::{Deserialize, Serialize};
 
 use super::error::{McpError, Result};
 
 // ---------------------------------------------------------------------------
-// MCP wire types
+// MCP 线路类型
 // ---------------------------------------------------------------------------
 
-/// A tool definition returned by `tools/list`.
+/// `tools/list` 返回的工具定义。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToolDefinition {
-    /// Unique tool name.
+    /// 唯一工具名称。
     pub name: String,
-    /// Human-readable description.
+    /// 人类可读的描述。
     pub description: String,
-    /// JSON Schema for the tool's input parameters.
+    /// 工具输入参数的 JSON Schema。
     pub input_schema: serde_json::Value,
 }
 
-/// The result of a `tools/call` invocation.
+/// `tools/call` 调用的结果。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToolResult {
-    /// Content blocks to return to the LLM.
+    /// 返回给 LLM 的内容块。
     pub content: Vec<ContentBlock>,
-    /// If `true`, the tool execution failed.
+    /// 如果为 `true`，表示工具执行失败。
     #[serde(rename = "isError", skip_serializing_if = "Option::is_none")]
     pub is_error: Option<bool>,
 }
 
-/// A single content block inside a [`ToolResult`].
+/// [`ToolResult`] 内的单个内容块。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum ContentBlock {
-    /// Plain text content.
+    /// 纯文本内容。
     #[serde(rename = "text")]
     Text {
-        /// The text payload.
+        /// 文本载荷。
         text: String,
     },
 }
 
 // ---------------------------------------------------------------------------
-// Tool definitions
+// 工具定义
 // ---------------------------------------------------------------------------
 
-/// Return the complete list of tools exposed by this MCP server.
+/// 返回此 MCP 服务器暴露的完整工具列表。
 #[must_use]
 pub fn tool_definitions() -> Vec<ToolDefinition> {
     vec![
@@ -214,17 +213,15 @@ fn pdf_page_count() -> ToolDefinition {
 }
 
 // ---------------------------------------------------------------------------
-// Dispatch
+// 分发
 // ---------------------------------------------------------------------------
 
-/// Dispatch a tool call by name, validating parameters and executing the
-/// corresponding PDF operation.
+/// 按名称分发工具调用，验证参数并执行对应的 PDF 操作。
 ///
 /// # Errors
 ///
-/// Returns `McpError::InvalidParams` if the tool name is unknown or
-/// parameters are invalid. Returns `McpError::Internal` / `McpError::Pdf`
-/// if the underlying PDF operation fails.
+/// - 如果工具名未知或参数无效，返回 `McpError::InvalidParams`。
+/// - 如果底层 PDF 操作失败，返回 `McpError::Internal` / `McpError::Pdf`。
 pub fn dispatch_tool(name: &str, args: &serde_json::Value) -> Result<ToolResult> {
     match name {
         "pdf_read_text" => execute_pdf_read_text(args),
@@ -241,7 +238,7 @@ pub fn dispatch_tool(name: &str, args: &serde_json::Value) -> Result<ToolResult>
 }
 
 // ---------------------------------------------------------------------------
-// Tool implementations
+// 工具实现
 // ---------------------------------------------------------------------------
 
 fn text_result(text: String) -> ToolResult {
@@ -259,7 +256,7 @@ fn error_result(message: String) -> ToolResult {
     }
 }
 
-/// Extract a required string field from JSON args.
+/// 从 JSON 参数中提取必需的字符串字段。
 fn require_string(args: &serde_json::Value, field: &str) -> Result<String> {
     args[field]
         .as_str()
@@ -267,7 +264,7 @@ fn require_string(args: &serde_json::Value, field: &str) -> Result<String> {
         .ok_or_else(|| McpError::invalid_params(format!("Missing or invalid '{field}' parameter")))
 }
 
-/// Validate that a path is absolute and does not contain path traversal.
+/// 验证路径是绝对路径且不包含路径遍历。
 fn validate_absolute_path(path: &str, label: &str) -> Result<()> {
     if path.contains("..") {
         return Err(McpError::invalid_params(format!(
@@ -444,7 +441,7 @@ fn execute_pdf_page_count(args: &serde_json::Value) -> Result<ToolResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Tests
+// 测试
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]

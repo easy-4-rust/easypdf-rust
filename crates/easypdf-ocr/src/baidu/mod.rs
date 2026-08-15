@@ -1,45 +1,42 @@
-//! Baidu Cloud OCR engine for `easypdf-markdown`.
+//! 百度云 OCR 引擎。
 //!
-//! This crate provides a Baidu Cloud OCR engine that supports multiple API
-//! endpoints through the [`BaiduApi`] enum. It implements [`OcrEngine`] from
-//! `easypdf-markdown-ocr` and can be used directly in the OCR processor pipeline.
+//! 提供支持多种 API 端点的百度云 OCR 引擎，通过 [`BaiduApi`] 枚举选择。
+//! 实现了 `easypdf-markdown-ocr` 的 [`OcrEngine`](easypdf_markdown::ocr::OcrEngine)，可直接用于 OCR 处理流水线。
 //!
-//! # Supported APIs
+//! # 支持的 API
 //!
-//! | API | Variant | Status |
-//! |-----|---------|--------|
-//! | General (standard) | [`BaiduApi::GeneralBasic`] | Supported |
-//! | General (high accuracy) | [`BaiduApi::GeneralAccurate`] | Supported |
-//! | General (standard + location) | [`BaiduApi::GeneralBasicWithLocation`] | Supported |
-//! | General (high accuracy + location) | [`BaiduApi::GeneralAccurateWithLocation`] | Supported |
-//! | Table V2 | [`BaiduApi::TableRecognitionV2`] | Supported |
-//! | Web image | [`BaiduApi::WebImage`] | Supported |
-//! | Web image + location | [`BaiduApi::WebImageWithLocation`] | Supported |
-//! | Qianfan-OCR | [`BaiduApi::QianfanOcr`] | Supported |
-//! | Office document | [`BaiduApi::OfficeDocument`] | Supported |
-//! | Handwriting | [`BaiduApi::Handwriting`] | Supported |
-//! | Seal | [`BaiduApi::Seal`] | Supported |
-//! | Digit | [`BaiduApi::Digit`] | Supported |
-//! | QR code | [`BaiduApi::Qrcode`] | Supported |
-//! | Structured | [`BaiduApi::Structured`] | Supported |
-//! | Doc parser | [`BaiduApi::DocParser`] | Stub (async API) |
-//! | Doc parser (Paddle) | [`BaiduApi::DocParserPaddle`] | Stub (async API) |
+//! | API | 变体 | 状态 |
+//! |-----|------|------|
+//! | 通用文字识别（标准版） | [`BaiduApi::GeneralBasic`] | 支持 |
+//! | 通用文字识别（高精度版） | [`BaiduApi::GeneralAccurate`] | 支持 |
+//! | 通用文字识别（标准含位置） | [`BaiduApi::GeneralBasicWithLocation`] | 支持 |
+//! | 通用文字识别（高精度含位置） | [`BaiduApi::GeneralAccurateWithLocation`] | 支持 |
+//! | 表格识别 V2 | [`BaiduApi::TableRecognitionV2`] | 支持 |
+//! | 网络图片 | [`BaiduApi::WebImage`] | 支持 |
+//! | 网络图片含位置 | [`BaiduApi::WebImageWithLocation`] | 支持 |
+//! | 千帆 OCR | [`BaiduApi::QianfanOcr`] | 支持 |
+//! | 办公文档 | [`BaiduApi::OfficeDocument`] | 支持 |
+//! | 手写体 | [`BaiduApi::Handwriting`] | 支持 |
+//! | 印章 | [`BaiduApi::Seal`] | 支持 |
+//! | 数字 | [`BaiduApi::Digit`] | 支持 |
+//! | 二维码 | [`BaiduApi::Qrcode`] | 支持 |
+//! | 智能结构化 | [`BaiduApi::Structured`] | 支持 |
+//! | 文档解析 | [`BaiduApi::DocParser`] | 桩（异步 API） |
+//! | 文档解析（Paddle） | [`BaiduApi::DocParserPaddle`] | 桩（异步 API） |
 //!
-//! # Authentication
+//! # 认证
 //!
-//! Baidu OCR uses OAuth 2.0 client-credentials flow. The engine automatically
-//! exchanges API key + secret key for an access token and caches it. Tokens
-//! are valid for ~30 days and are refreshed automatically.
+//! 百度 OCR 使用 OAuth 2.0 客户端凭证流程。引擎自动将 API Key + Secret Key
+//! 交换为 `access_token` 并缓存。令牌有效期约 30 天，会自动刷新。
 //!
-//! # Request Format
+//! # 请求格式
 //!
-//! Baidu standard OCR APIs use `application/x-www-form-urlencoded` with a
-//! base64-encoded image in the `image` field. The `access_token` is passed
-//! as a URL query parameter.
+//! 百度标准 OCR API 使用 `application/x-www-form-urlencoded`，图像以 base64
+//! 编码放在 `image` 字段中。`access_token` 作为 URL 查询参数传递。
 //!
-//! Qianfan-OCR uses JSON with Bearer token authentication.
+//! 千帆 OCR 使用 JSON + Bearer 令牌认证。
 //!
-//! # Quick Start
+//! # 快速开始
 //!
 //! ```ignore
 //! use easypdf_ocr::baidu::{BaiduOcrEngine, BaiduConfig, BaiduApi};
@@ -54,234 +51,20 @@
 //! // let result = engine.recognize(&image)?;
 //! ```
 
+pub mod baidu_ocr_engine;
 pub mod config;
 pub mod parser;
 pub mod token;
 
-use base64::Engine;
-use easypdf_core::CapabilityLevel;
-use easypdf_markdown::ocr::{OcrEngine, OcrImage, OcrResult};
-
+pub use baidu_ocr_engine::BaiduOcrEngine;
 pub use config::{BaiduApi, BaiduConfig, BaiduError, BaiduResult};
 pub use parser::BaiduOcrParser;
 pub use token::TokenManager;
 
-/// Baidu Cloud OCR engine.
-///
-/// Implements [`OcrEngine`] by performing OAuth token exchange (cached) and
-/// sending form-urlencoded requests to the Baidu OCR API. Supports multiple
-/// API endpoints via [`BaiduApi`].
-///
-/// # Thread Safety
-///
-/// `BaiduOcrEngine` is `Send + Sync` and can be shared across threads.
-/// The OAuth token cache uses `parking_lot::Mutex` for contention-free access.
-pub struct BaiduOcrEngine {
-    /// Engine configuration.
-    config: BaiduConfig,
-    /// OAuth token manager (for standard APIs).
-    token_manager: TokenManager,
-    /// Response parser.
-    parser: BaiduOcrParser,
-    /// HTTP client (reused for connection pooling).
-    client: reqwest::blocking::Client,
-}
-
-impl std::fmt::Debug for BaiduOcrEngine {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("BaiduOcrEngine")
-            .field("api", &self.config.api)
-            .field("endpoint", &self.config.endpoint)
-            .field("api_key", &self.config.api_key)
-            .field("secret_key", &"***")
-            .field("token_manager", &self.token_manager)
-            .field("parser", &self.parser)
-            .finish_non_exhaustive()
-    }
-}
-
-impl BaiduOcrEngine {
-    /// Create a new Baidu OCR engine with the given configuration.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the `reqwest` HTTP client cannot be built (should not happen
-    /// in practice).
-    #[must_use]
-    pub fn new(config: BaiduConfig) -> Self {
-        let token_manager = TokenManager::new(
-            config.token_url.clone(),
-            config.api_key.clone(),
-            config.secret_key.clone(),
-        );
-        let parser = BaiduOcrParser::new(config.api);
-        let client = reqwest::blocking::Client::builder()
-            .timeout(std::time::Duration::from_secs(60))
-            .build()
-            .expect("failed to build HTTP client");
-
-        Self {
-            config,
-            token_manager,
-            parser,
-            client,
-        }
-    }
-
-    /// Build the full request URL for a standard Baidu OCR API.
-    ///
-    /// Format: `{endpoint}/{path}?access_token={token}`
-    fn build_url(&self, token: &str) -> String {
-        format!(
-            "{}/{}?access_token={}",
-            self.config.endpoint,
-            self.config.api.path(),
-            token
-        )
-    }
-
-    /// Build the request URL for Qianfan-OCR.
-    fn build_qianfan_url(&self) -> &str {
-        &self.config.qianfan_endpoint
-    }
-
-    /// Encode an image to base64 and URL-encode it for form submission.
-    fn encode_image_form(image: &OcrImage) -> BaiduResult<String> {
-        let png_bytes = encode_to_png(image)?;
-        let b64 = base64::engine::general_purpose::STANDARD.encode(&png_bytes);
-        Ok(urlencoding::encode(&b64).into_owned())
-    }
-
-    /// Execute a standard Baidu OCR request (form-urlencoded with `access_token`).
-    fn execute_standard(&self, image: &OcrImage) -> BaiduResult<OcrResult> {
-        if !self.config.api.is_supported() {
-            return Err(BaiduError::UnsupportedApi(self.config.api));
-        }
-
-        let token = self.token_manager.get_token()?;
-        let url = self.build_url(&token);
-        let image_data = Self::encode_image_form(image)?;
-
-        let mut params = vec![("image", image_data)];
-
-        // Add recognizeGranularity=char for location variants.
-        if self.config.api.requests_boxes() {
-            params.push(("recognizeGranularity", "char".to_owned()));
-        }
-
-        let resp = self
-            .client
-            .post(&url)
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .form(&params)
-            .send()
-            .map_err(BaiduError::Transport)?;
-
-        if !resp.status().is_success() {
-            let status = resp.status().as_u16();
-            let body = resp.text().unwrap_or_default();
-            return Err(BaiduError::InvalidResponse(format!(
-                "HTTP {status}: {body}"
-            )));
-        }
-
-        let raw: serde_json::Value = resp.json().map_err(BaiduError::Transport)?;
-        self.parser.parse(&raw)
-    }
-
-    /// Execute a Qianfan-OCR request (JSON with Bearer token).
-    fn execute_qianfan(&self, image: &OcrImage) -> BaiduResult<OcrResult> {
-        let png_bytes = encode_to_png(image)?;
-        let b64 = base64::engine::general_purpose::STANDARD.encode(&png_bytes);
-
-        // Qianfan-OCR uses the api_key as Bearer token directly.
-        let url = self.build_qianfan_url();
-
-        let body = serde_json::json!({
-            "image": b64,
-            "model": "Qianfan-OCR"
-        });
-
-        let resp = self
-            .client
-            .post(url)
-            .header("Content-Type", "application/json; charset=utf-8")
-            .header("Authorization", format!("Bearer {}", self.config.api_key))
-            .json(&body)
-            .send()
-            .map_err(BaiduError::Transport)?;
-
-        if !resp.status().is_success() {
-            let status = resp.status().as_u16();
-            let body = resp.text().unwrap_or_default();
-            return Err(BaiduError::InvalidResponse(format!(
-                "HTTP {status}: {body}"
-            )));
-        }
-
-        let raw: serde_json::Value = resp.json().map_err(BaiduError::Transport)?;
-        self.parser.parse(&raw)
-    }
-
-    /// Get a reference to the engine configuration.
-    #[must_use]
-    pub fn config(&self) -> &BaiduConfig {
-        &self.config
-    }
-}
-
-impl OcrEngine for BaiduOcrEngine {
-    fn recognize(
-        &self,
-        image: &OcrImage,
-    ) -> std::result::Result<OcrResult, Box<dyn std::error::Error + Send + Sync>> {
-        if self.config.api == BaiduApi::QianfanOcr {
-            self.execute_qianfan(image).map_err(Into::into)
-        } else {
-            self.execute_standard(image).map_err(Into::into)
-        }
-    }
-
-    fn name(&self) -> &'static str {
-        self.config.api.engine_name()
-    }
-
-    fn languages(&self) -> &[&str] {
-        &["zh", "en", "ja", "ko"]
-    }
-
-    fn level(&self) -> CapabilityLevel {
-        CapabilityLevel::Cloud
-    }
-}
-
-/// Encode the RGBA pixel data as PNG bytes.
-///
-/// # Errors
-///
-/// Returns [`BaiduError::ImageEncoding`] if the pixel data cannot be encoded.
-fn encode_to_png(image: &OcrImage) -> BaiduResult<Vec<u8>> {
-    let rgba_img = image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone())
-        .ok_or_else(|| {
-            BaiduError::ImageEncoding(format!(
-                "pixel buffer length {} does not match {}x{}x4",
-                image.pixels.len(),
-                image.width,
-                image.height,
-            ))
-        })?;
-
-    let dynamic = image::DynamicImage::ImageRgba8(rgba_img);
-    let mut buf = Vec::new();
-    dynamic
-        .write_to(&mut std::io::Cursor::new(&mut buf), image::ImageFormat::Png)
-        .map_err(|e| BaiduError::ImageEncoding(format!("PNG encoding failed: {e}")))?;
-    Ok(buf)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use easypdf_markdown::ocr::{OcrEngine, OcrImage};
 
     fn make_test_image(width: u32, height: u32) -> OcrImage {
         let pixels = vec![255u8; (width * height * 4) as usize];
@@ -325,20 +108,20 @@ mod tests {
     fn test_baidu_ocr_engine_level() {
         let config = BaiduConfig::default();
         let engine = BaiduOcrEngine::new(config);
-        assert_eq!(engine.level(), CapabilityLevel::Cloud);
+        assert_eq!(engine.level(), easypdf_core::CapabilityLevel::Cloud);
     }
 
     #[test]
     fn test_encode_to_png() {
         let image = make_test_image(2, 2);
-        let png = encode_to_png(&image).unwrap();
+        let png = baidu_ocr_engine::encode_to_png(&image).unwrap();
         assert!(png.starts_with(b"\x89PNG"));
     }
 
     #[test]
     fn test_encode_to_png_invalid() {
-        let image = OcrImage::new(2, 2, vec![0u8; 10]); // wrong size
-        let result = encode_to_png(&image);
+        let image = OcrImage::new(2, 2, vec![0u8; 10]); // 大小不匹配
+        let result = baidu_ocr_engine::encode_to_png(&image);
         assert!(result.is_err());
     }
 
@@ -371,11 +154,12 @@ mod tests {
 
     #[test]
     fn test_encode_image_form() {
+        use base64::Engine;
         let image = make_test_image(1, 1);
         let encoded = BaiduOcrEngine::encode_image_form(&image).unwrap();
-        // Should be URL-encoded base64.
+        // 应为 URL 编码的 base64。
         assert!(!encoded.is_empty());
-        // Verify it decodes back to valid base64.
+        // 验证解码后为有效的 base64。
         let decoded = urlencoding::decode(&encoded).unwrap();
         let bytes = base64::engine::general_purpose::STANDARD
             .decode(decoded.as_ref())

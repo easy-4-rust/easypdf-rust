@@ -1,6 +1,6 @@
-//! Cloud OCR engine collection for easypdf.
+//! easypdf 云端 OCR 引擎集合。
 //!
-//! Provides HTTP-based OCR engines for GLM, `HunyuanOCR`, and Baidu Cloud.
+//! 提供基于 HTTP 的 OCR 引擎，支持 GLM、`HunyuanOCR` 和百度云。
 
 #![deny(unsafe_code)]
 #![warn(missing_docs)]

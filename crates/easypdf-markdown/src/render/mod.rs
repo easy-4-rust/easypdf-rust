@@ -1,33 +1,30 @@
-//! PDF page rendering to raster images for `easypdf-rust`.
+//! PDF 页面渲染为光栅图像。
 //!
-//! This module provides a trait-based abstraction ([`PdfRenderer`]) for rendering
-//! PDF pages to raster images (PNG, JPEG). Two backends are available:
+//! 本模块提供基于 trait 的抽象（[`PdfRenderer`]）用于将 PDF 页面渲染为
+//! 光栅图像（PNG、JPEG）。两个可用后端：
 //!
-//! - **`TextRenderer`** (default, pure Rust) -- extracts text via
-//!   [`easypdf_reader::PdfReader`] and renders it as a simple bitmap image.
-//!   Quality is low but sufficient for OCR pipelines. No external dependencies.
+//! - **`TextRenderer`**（默认，纯 Rust）——通过 [`easypdf_reader::PdfReader`]
+//!   提取文本并渲染为简单位图图像。质量较低但足以满足 OCR 流水线需求，无外部依赖。
 //!
-//! - **`PdfiumRenderer`** (feature `pdfium`) -- uses Google `PDFium` for
-//!   high-quality rendering. Requires the `libpdfium` dynamic library at
-//!   runtime.
+//! - **`PdfiumRenderer`**（feature `pdfium`）——使用 Google `PDFium` 进行
+//!   高质量渲染，运行时需要 `libpdfium` 动态库。
 //!
-//! # Quick start
+//! # 快速开始
 //!
 //! ```no_run
 //! use easypdf_markdown::render::{render_page_to_png, render_all_pages_to_dir};
 //!
-//! // Render page 0 at 150 DPI:
+//! // 以 150 DPI 渲染第 0 页：
 //! render_page_to_png("input.pdf".as_ref(), 0, "page_0.png".as_ref(), 150)?;
 //!
-//! // Render all pages to a directory:
+//! // 将全部页面渲染到目录：
 //! let paths = render_all_pages_to_dir("input.pdf".as_ref(), "output/".as_ref(), 150)?;
 //! # Ok::<(), easypdf_markdown::render::RenderError>(())
 //! ```
 //!
-//! # Choosing a backend
+//! # 选择后端
 //!
-//! Use [`RenderBackend::default_backend`] to auto-select the best available
-//! backend, or pick explicitly:
+//! 使用 [`RenderBackend::default_backend`] 自动选择最佳可用后端，或手动指定：
 //!
 //! ```no_run
 //! use easypdf_markdown::render::RenderBackend;
@@ -40,128 +37,23 @@
 pub mod backend;
 pub mod backends;
 pub mod config;
+mod convenience;
 pub mod error;
 pub mod traits;
 
-// --- Re-exports for convenience ---
+// --- 公共类型重导出 ---
 pub use backend::RenderBackend;
 pub use config::{Background, ImageFormat, RenderConfig};
+pub use convenience::{render_all_pages_to_dir, render_page, render_page_to_png};
 pub use error::{RenderError, Result};
 pub use traits::{PdfRenderer, RenderedImage};
-
-use std::path::{Path, PathBuf};
-
-/// Render a single PDF page to a PNG file.
-///
-/// Uses the default backend (text fallback) at the specified DPI.
-///
-/// # Errors
-///
-/// Returns [`RenderError`] if the PDF cannot be opened, the page index
-/// is invalid, or the output file cannot be written.
-///
-/// # Examples
-///
-/// ```no_run
-/// use easypdf_markdown::render::render_page_to_png;
-///
-/// render_page_to_png("input.pdf".as_ref(), 0, "page_0.png".as_ref(), 150)?;
-/// # Ok::<(), easypdf_markdown::render::RenderError>(())
-/// ```
-pub fn render_page_to_png(
-    pdf_path: &Path,
-    page_index: usize,
-    output: &Path,
-    dpi: u32,
-) -> Result<()> {
-    let config = RenderConfig {
-        dpi,
-        format: ImageFormat::Png,
-        ..RenderConfig::default()
-    };
-    let renderer = RenderBackend::default_backend().build_renderer(pdf_path)?;
-    renderer.render_page_to_path(page_index, &config, output)
-}
-
-/// Render all pages of a PDF to PNG files in a directory.
-///
-/// Output files are named `page_000.png`, `page_001.png`, etc.
-/// The output directory is created if it does not exist.
-///
-/// # Errors
-///
-/// Returns [`RenderError`] if the PDF cannot be opened, a page fails
-/// to render, or the output directory/files cannot be written.
-///
-/// # Examples
-///
-/// ```no_run
-/// use easypdf_markdown::render::render_all_pages_to_dir;
-///
-/// let paths = render_all_pages_to_dir("input.pdf".as_ref(), "output/".as_ref(), 150)?;
-/// for p in &paths {
-///     println!("rendered: {}", p.display());
-/// }
-/// # Ok::<(), easypdf_markdown::render::RenderError>(())
-/// ```
-pub fn render_all_pages_to_dir(
-    pdf_path: &Path,
-    output_dir: &Path,
-    dpi: u32,
-) -> Result<Vec<PathBuf>> {
-    std::fs::create_dir_all(output_dir)?;
-
-    let config = RenderConfig {
-        dpi,
-        format: ImageFormat::Png,
-        ..RenderConfig::default()
-    };
-    let renderer = RenderBackend::default_backend().build_renderer(pdf_path)?;
-
-    // Determine page count by probing indices until InvalidPage.
-    let mut page_count = 0usize;
-    loop {
-        match renderer.render_page(page_count, &config) {
-            Ok(_) => page_count += 1,
-            Err(RenderError::InvalidPage { .. }) => break,
-            Err(e) => return Err(e),
-        }
-    }
-
-    // Re-render and save (the probe above consumed the images).
-    let mut paths = Vec::with_capacity(page_count);
-    for i in 0..page_count {
-        let filename = format!("page_{i:03}.png");
-        let path = output_dir.join(&filename);
-        renderer.render_page_to_path(i, &config, &path)?;
-        paths.push(path);
-    }
-    Ok(paths)
-}
-
-/// Render a single PDF page to an in-memory [`RenderedImage`].
-///
-/// Uses the default backend at the specified DPI.
-///
-/// # Errors
-///
-/// Returns [`RenderError`] if the PDF cannot be opened or the page
-/// index is invalid.
-pub fn render_page(
-    pdf_path: &Path,
-    page_index: usize,
-    config: &RenderConfig,
-) -> Result<RenderedImage> {
-    let renderer = RenderBackend::default_backend().build_renderer(pdf_path)?;
-    renderer.render_page(page_index, config)
-}
 
 #[cfg(test)]
 mod tests {
     #![allow(clippy::similar_names, clippy::float_cmp)]
     use super::*;
 
-    /// Helper: build a minimal valid PDF in memory.
+    /// 辅助函数：在内存中构建一个最小有效 PDF。
     fn make_test_pdf_bytes() -> Vec<u8> {
         let mut doc = lopdf::Document::new();
         let content_id = doc.add_object(lopdf::Object::Stream(lopdf::Stream::new(
@@ -211,7 +103,7 @@ mod tests {
         let bytes = make_test_pdf_bytes();
         let dir = std::env::temp_dir().join("easypdf_render_lib_test");
         let _ = std::fs::remove_dir_all(&dir);
-        // Write the PDF to a temp file (convenience API takes a path).
+        // 将 PDF 写入临时文件（便捷 API 需要路径）。
         let pdf_path = dir.join("test.pdf");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(&pdf_path, &bytes).unwrap();
@@ -263,7 +155,7 @@ mod tests {
     #[test]
     fn test_default_backend_is_text() {
         let backend = RenderBackend::default_backend();
-        // Without pdfium feature, default should be Text.
+        // 未启用 pdfium feature 时，默认应为 Text。
         assert_eq!(backend, RenderBackend::Text);
     }
 
@@ -280,7 +172,7 @@ mod tests {
 
     #[test]
     fn test_pdfium_backend_not_available_without_feature() {
-        // Without the pdfium feature, Pdfium should not be available.
+        // 未启用 pdfium feature 时，Pdfium 应不可用。
         #[cfg(not(feature = "pdfium"))]
         assert!(!RenderBackend::Pdfium.is_available());
     }

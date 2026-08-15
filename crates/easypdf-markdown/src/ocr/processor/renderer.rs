@@ -2,7 +2,7 @@ use crate::render::{RenderConfig, RenderError};
 
 use easypdf_core::PdfError;
 
-/// Adapter that delegates to a borrowed `PdfRenderer`.
+/// 委托给借用的 `PdfRenderer` 的适配器。
 pub(super) struct StoredRendererAdapter<'a>(pub &'a dyn crate::render::PdfRenderer);
 
 impl crate::render::PdfRenderer for StoredRendererAdapter<'_> {
@@ -44,14 +44,14 @@ impl crate::render::PdfRenderer for StoredRendererAdapter<'_> {
     }
 }
 
-/// Convert a `RenderError` to a `PdfError`.
+/// 将 `RenderError` 转换为 `PdfError`。
 pub(super) fn render_error_to_pdf(e: &RenderError) -> PdfError {
     PdfError::Other(format!("render error: {e}"))
 }
 
-/// Build a `RenderedImage` for testing without a real PDF.
+/// 构建用于测试的 `RenderedImage`（无需真实 PDF）。
 ///
-/// Creates a white RGBA image of the given dimensions.
+/// 创建给定尺寸的白色 RGBA 图像。
 #[cfg(test)]
 pub(crate) fn make_test_rendered_image(
     width: u32,

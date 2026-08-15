@@ -1,8 +1,14 @@
-use super::*;
+use super::super::auth::AuthMethod;
+use super::super::error::{OcrHttpError, Result};
+use super::super::rate_limit::RateLimitConfig;
+use super::super::retry::BackoffStrategy;
+use super::HttpClientConfig;
+use super::OcrHttpClient;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::TcpListener;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 
 /// A minimal HTTP mock server for testing `OcrHttpClient`.
 ///

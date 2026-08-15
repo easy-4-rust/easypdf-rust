@@ -1,32 +1,32 @@
-//! Observability initialization and logging utilities.
+//! 可观测性初始化与日志工具。
 //!
-//! Provides two subscriber modes:
+//! 提供两种订阅者模式：
 //!
-//! - [`init_logging`]: compact human-readable output to stderr (development).
-//! - [`init_logging_json`]: structured JSON output to stderr (production).
+//! - [`init_logging`]: 紧凑的人类可读输出到 stderr（开发环境）。
+//! - [`init_logging_json`]: 结构化 JSON 输出到 stderr（生产环境）。
 //!
-//! Both read the `RUST_LOG` environment variable to control filtering.
-//! See [`tracing_subscriber::EnvFilter`] for syntax.
+//! 两者均读取 `RUST_LOG` 环境变量来控制过滤级别。
+//! 语法参见 [`tracing_subscriber::EnvFilter`]。
 //!
 //! # Examples
 //!
 //! ```rust
-//! // In your application entry point:
+//! // 在应用入口点中：
 //! easypdf_core::logging::init_logging().ok();
 //! tracing::info!("application started");
 //! ```
 
 use tracing_subscriber::EnvFilter;
 
-/// Initialize the global tracing subscriber with compact human-readable output.
+/// 使用紧凑的人类可读输出初始化全局 tracing 订阅者。
 ///
-/// Intended for development. Reads `RUST_LOG` for level filtering
-/// (defaults to `info` if unset). Output goes to stderr.
+/// 适用于开发环境。读取 `RUST_LOG` 进行级别过滤
+///（未设置时默认为 `info`）。输出到 stderr。
 ///
 /// # Errors
 ///
-/// Returns an error if the global subscriber has already been set
-/// (e.g. by a previous call to `init_logging` or `init_logging_json`).
+/// 全局订阅者已被设置时返回错误
+///（例如之前已调用 `init_logging` 或 `init_logging_json`）。
 pub fn init_logging() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     tracing_subscriber::fmt()
         .with_env_filter(
@@ -37,15 +37,15 @@ pub fn init_logging() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .try_init()
 }
 
-/// Initialize the global tracing subscriber with structured JSON output.
+/// 使用结构化 JSON 输出初始化全局 tracing 订阅者。
 ///
-/// Intended for production. Reads `RUST_LOG` for level filtering
-/// (defaults to `info` if unset). Output goes to stderr.
+/// 适用于生产环境。读取 `RUST_LOG` 进行级别过滤
+///（未设置时默认为 `info`）。输出到 stderr。
 ///
 /// # Errors
 ///
-/// Returns an error if the global subscriber has already been set
-/// (e.g. by a previous call to `init_logging` or `init_logging_json`).
+/// 全局订阅者已被设置时返回错误
+///（例如之前已调用 `init_logging` 或 `init_logging_json`）。
 pub fn init_logging_json() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     tracing_subscriber::fmt()
         .with_env_filter(

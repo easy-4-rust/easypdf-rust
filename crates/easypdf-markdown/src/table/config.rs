@@ -1,29 +1,29 @@
-//! Table detection configuration.
+//! 表格检测配置。
 
-/// Column separator strategy for heuristic table detection.
+/// 启发式表格检测的列分隔策略。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ColumnSeparator {
-    /// Pipe character (`|`) separator — requires at least two `|` in the line.
+    /// 管道符（`|`）分隔——要求行中至少有两个 `|`。
     Pipe,
-    /// Tab character separator.
+    /// 制表符分隔。
     Tab,
-    /// Two-or-more consecutive spaces treated as column boundary.
+    /// 两个或更多连续空格视为列边界。
     Whitespace,
-    /// Try all strategies in order: Pipe, Tab, Whitespace.
+    /// 按顺序尝试所有策略：Pipe、Tab、Whitespace。
     #[default]
     Auto,
 }
 
-/// Configuration for the heuristic table detector.
+/// 启发式表格检测器的配置。
 #[derive(Debug, Clone)]
 pub struct TableDetectionConfig {
-    /// Minimum number of columns for a line to qualify as a table row (default: 2).
+    /// 一行被视为表格行的最小列数（默认值：2）。
     pub min_columns: usize,
-    /// Minimum number of rows (including header) for a region to be a table (default: 2).
+    /// 一个区域被视为表格的最小行数（含表头，默认值：2）。
     pub min_rows: usize,
-    /// Column separator strategy.
+    /// 列分隔策略。
     pub separator: ColumnSeparator,
-    /// When `true`, allow rows with varying column counts.
+    /// 为 `true` 时允许行具有不同的列数。
     pub allow_irregular: bool,
 }
 
@@ -39,34 +39,34 @@ impl Default for TableDetectionConfig {
 }
 
 impl TableDetectionConfig {
-    /// Create a new config with default values.
+    /// 使用默认值创建新配置。
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Set the minimum column count.
+    /// 设置最小列数。
     #[must_use]
     pub const fn with_min_columns(mut self, min: usize) -> Self {
         self.min_columns = min;
         self
     }
 
-    /// Set the minimum row count (including header).
+    /// 设置最小行数（含表头）。
     #[must_use]
     pub const fn with_min_rows(mut self, min: usize) -> Self {
         self.min_rows = min;
         self
     }
 
-    /// Set the column separator strategy.
+    /// 设置列分隔策略。
     #[must_use]
     pub const fn with_separator(mut self, separator: ColumnSeparator) -> Self {
         self.separator = separator;
         self
     }
 
-    /// Allow rows with varying column counts.
+    /// 允许行具有不同的列数。
     #[must_use]
     pub const fn allow_irregular(mut self) -> Self {
         self.allow_irregular = true;

@@ -1,110 +1,110 @@
-//! JSON-RPC 2.0 types and MCP protocol constants.
+//! JSON-RPC 2.0 类型和 MCP 协议常量。
 //!
-//! Defines the wire format for MCP communication over stdio.
+//! 定义通过 stdio 进行 MCP 通信的线路格式。
 
 use serde::{Deserialize, Serialize};
 
 // ---------------------------------------------------------------------------
-// JSON-RPC 2.0 types
+// JSON-RPC 2.0 类型
 // ---------------------------------------------------------------------------
 
-/// A JSON-RPC 2.0 request received from the client (LLM agent).
+/// 从客户端（LLM agent）接收的 JSON-RPC 2.0 请求。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JsonRpcRequest {
-    /// Protocol version -- must be `"2.0"`.
+    /// 协议版本 -- 必须为 `"2.0"`。
     pub jsonrpc: String,
-    /// Request identifier (null for notifications).
+    /// 请求标识符（通知时为 null）。
     pub id: Option<serde_json::Value>,
-    /// The method name (e.g. `"initialize"`, `"tools/call"`).
+    /// 方法名（例如 `"initialize"`、`"tools/call"`）。
     pub method: String,
-    /// Method parameters -- defaults to `null` when absent.
+    /// 方法参数 -- 缺失时默认为 `null`。
     #[serde(default = "serde_json::Value::default")]
     pub params: serde_json::Value,
 }
 
-/// A JSON-RPC 2.0 response sent back to the client.
+/// 返回给客户端的 JSON-RPC 2.0 响应。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JsonRpcResponse {
-    /// Protocol version -- always `"2.0"`.
+    /// 协议版本 -- 始终为 `"2.0"`。
     pub jsonrpc: String,
-    /// Echoed request identifier.
+    /// 回显的请求标识符。
     pub id: Option<serde_json::Value>,
-    /// Successful result value.
+    /// 成功时的结果值。
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result: Option<serde_json::Value>,
-    /// Error object (mutually exclusive with `result`).
+    /// 错误对象（与 `result` 互斥）。
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<JsonRpcError>,
 }
 
-/// A JSON-RPC 2.0 error object.
+/// JSON-RPC 2.0 错误对象。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JsonRpcError {
-    /// Numeric error code.
+    /// 数字错误码。
     pub code: i32,
-    /// Human-readable error message.
+    /// 人类可读的错误消息。
     pub message: String,
-    /// Optional additional error data.
+    /// 可选的附加错误数据。
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<serde_json::Value>,
 }
 
 // ---------------------------------------------------------------------------
-// MCP protocol method names
+// MCP 协议方法名
 // ---------------------------------------------------------------------------
 
-/// `initialize` -- handshake between client and server.
+/// `initialize` -- 客户端与服务器之间的握手。
 pub const METHOD_INITIALIZE: &str = "initialize";
 
-/// `notifications/initialized` -- client confirms initialization (notification, no id).
+/// `notifications/initialized` -- 客户端确认初始化完成（通知，无 id）。
 pub const METHOD_NOTIFICATION_INITIALIZED: &str = "notifications/initialized";
 
-/// `tools/list` -- returns the list of available tools.
+/// `tools/list` -- 返回可用工具列表。
 pub const METHOD_TOOLS_LIST: &str = "tools/list";
 
-/// `tools/call` -- invokes a specific tool.
+/// `tools/call` -- 调用特定工具。
 pub const METHOD_TOOLS_CALL: &str = "tools/call";
 
-/// `ping` -- liveness check.
+/// `ping` -- 存活检查。
 pub const METHOD_PING: &str = "ping";
 
 // ---------------------------------------------------------------------------
-// JSON-RPC standard error codes
+// JSON-RPC 标准错误码
 // ---------------------------------------------------------------------------
 
-/// Parse error -- invalid JSON.
+/// 解析错误 -- 无效的 JSON。
 pub const ERROR_PARSE: i32 = -32700;
 
-/// Invalid Request -- not a valid JSON-RPC 2.0 request.
+/// 无效请求 -- 不是有效的 JSON-RPC 2.0 请求。
 pub const ERROR_INVALID_REQUEST: i32 = -32600;
 
-/// Method not found.
+/// 方法未找到。
 pub const ERROR_METHOD_NOT_FOUND: i32 = -32601;
 
-/// Invalid method parameters.
+/// 无效的方法参数。
 pub const ERROR_INVALID_PARAMS: i32 = -32602;
 
-/// Internal JSON-RPC error.
+/// 内部 JSON-RPC 错误。
 pub const ERROR_INTERNAL: i32 = -32603;
 
 // ---------------------------------------------------------------------------
-// MCP protocol version
+// MCP 协议版本
 // ---------------------------------------------------------------------------
 
-/// The MCP protocol version this server implements.
+/// 此服务器实现的 MCP 协议版本。
 pub const PROTOCOL_VERSION: &str = "2024-11-05";
 
-/// Server name reported during initialization.
+/// 初始化期间报告的服务器名称。
 pub const SERVER_NAME: &str = "easypdf-mcp";
 
-/// Server version reported during initialization.
+/// 初始化期间报告的服务器版本。
 pub const SERVER_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // ---------------------------------------------------------------------------
-// Helpers
+// 辅助函数
 // ---------------------------------------------------------------------------
 
-/// Build a successful JSON-RPC response.
+/// 构建成功的 JSON-RPC 响应。
 #[must_use]
 pub fn success_response(
     id: Option<serde_json::Value>,
@@ -118,7 +118,7 @@ pub fn success_response(
     }
 }
 
-/// Build an error JSON-RPC response.
+/// 构建错误的 JSON-RPC 响应。
 #[must_use]
 pub fn error_response(
     id: Option<serde_json::Value>,

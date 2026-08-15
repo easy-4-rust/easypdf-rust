@@ -1,4 +1,4 @@
-//! Runtime layer for easypdf: MCP server + resident daemon.
+//! easypdf 的运行时层：MCP 服务器 + resident 守护进程。
 
 #![deny(unsafe_code)]
 #![warn(missing_docs)]

@@ -1,18 +1,18 @@
-//! Response parsing trait for HTTP-based OCR engines.
+//! 基于 HTTP 的 OCR 引擎响应解析 trait。
 //!
-//! Each OCR engine implements [`OcrResponseParser`] to describe how to
-//! extract text, confidence, and word boxes from its specific JSON response.
+//! 每个 OCR 引擎实现 [`OcrResponseParser`] 来描述如何从其专用
+//! JSON 响应中提取文本、置信度和词框。
 
 use easypdf_markdown::ocr::OcrResult;
 
 use super::error::Result;
 
-/// Trait for parsing OCR engine JSON responses.
+/// 解析 OCR 引擎 JSON 响应的 trait。
 ///
-/// Each cloud OCR provider returns results in a different format.
-/// Implementors parse the raw JSON into a standardized [`OcrResult`].
+/// 每个云 OCR 提供商以不同格式返回结果。实现者将原始 JSON
+/// 解析为标准化的 [`OcrResult`]。
 ///
-/// # Implementing
+/// # 实现示例
 ///
 /// ```ignore
 /// use easypdf_ocr::http::{
@@ -32,12 +32,11 @@ use super::error::Result;
 /// }
 /// ```
 pub trait OcrResponseParser: Send + Sync {
-    /// Parse the raw JSON response into an [`OcrResult`].
+    /// 将原始 JSON 响应解析为 [`OcrResult`]。
     ///
     /// # Errors
     ///
-    /// Returns `OcrHttpError::InvalidResponse` if the response structure
-    /// does not match expectations, or `OcrHttpError::Engine` if the
-    /// engine returned an application-level error.
+    /// 若响应结构不符合预期，返回 `OcrHttpError::InvalidResponse`；
+    /// 若引擎返回了应用级错误，返回 `OcrHttpError::Engine`。
     fn parse_response(&self, raw: &serde_json::Value) -> Result<OcrResult>;
 }

@@ -1,10 +1,10 @@
-//! Rendering configuration types.
+//! 渲染配置类型。
 
-/// Configuration for PDF page rendering.
+/// PDF 页面渲染配置。
 ///
-/// Controls DPI, output format, background color, and optional dimension
-/// constraints. Use [`RenderConfig::default`] for sensible defaults
-/// (150 DPI, PNG, white background, no size limits).
+/// 控制 DPI、输出格式、背景色和可选的尺寸约束。
+/// 使用 [`RenderConfig::default`] 获取合理默认值
+///（150 DPI、PNG、白色背景、无尺寸限制）。
 ///
 /// # Examples
 ///
@@ -22,15 +22,15 @@
 /// ```
 #[derive(Debug, Clone)]
 pub struct RenderConfig {
-    /// Rendering resolution in dots per inch. Default: 150.
+    /// 渲染分辨率（每英寸点数）。默认值：150。
     pub dpi: u32,
-    /// Output image format. Default: [`ImageFormat::Png`].
+    /// 输出图像格式。默认值：[`ImageFormat::Png`]。
     pub format: ImageFormat,
-    /// Page background color. Default: [`Background::White`].
+    /// 页面背景色。默认值：[`Background::White`]。
     pub background: Background,
-    /// Maximum output width in pixels. `None` means no limit.
+    /// 最大输出宽度（像素）。`None` 表示无限制。
     pub max_width: Option<u32>,
-    /// Maximum output height in pixels. `None` means no limit.
+    /// 最大输出高度（像素）。`None` 表示无限制。
     pub max_height: Option<u32>,
 }
 
@@ -46,22 +46,22 @@ impl Default for RenderConfig {
     }
 }
 
-/// Output image format for rendered pages.
+/// 渲染页面的输出图像格式。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum ImageFormat {
-    /// Portable Network Graphics (lossless).
+    /// 便携式网络图形（无损）。
     Png,
-    /// JPEG (lossy, smaller files).
+    /// JPEG（有损，文件更小）。
     Jpeg,
 }
 
-/// Background color for rendered pages.
+/// 渲染页面的背景色。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Background {
-    /// Solid white background.
+    /// 纯白背景。
     White,
-    /// Transparent background (requires PNG output).
+    /// 透明背景（需要 PNG 输出）。
     Transparent,
 }

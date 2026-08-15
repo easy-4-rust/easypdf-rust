@@ -1,31 +1,29 @@
-//! SSRF (Server-Side Request Forgery) guard for URL validation.
+//! SSRF（服务端请求伪造）URL 验证守卫。
 //!
-//! When a [`PdfInput`](crate::PdfInput) accepts URLs as a source, this
-//! module provides validation to prevent requests to internal or
-//! sensitive network endpoints.
+//! 当 [`PdfInput`](crate::PdfInput) 接受 URL 作为来源时，
+//! 本模块提供验证以防止向内部或敏感网络端点发起请求。
 //!
-//! **Status**: The current [`PdfInput`](crate::PdfInput) only supports
-//! local file paths and in-memory bytes.  The URL validation functions
-//! are provided as a public API for future use and for downstream
-//! crates that may add URL-based input sources.
+//! **状态**：当前的 [`PdfInput`](crate::PdfInput) 仅支持
+//! 本地文件路径和内存字节。URL 验证函数作为公共 API 提供，
+//! 供未来使用和可能添加基于 URL 输入源的下游 crate 使用。
 
 use crate::{PdfError, Result};
 
-/// URL schemes that are allowed for remote PDF fetching.
+/// 允许用于远程 PDF 获取的 URL 协议。
 ///
-/// Only `http` and `https` are considered safe.  All other schemes
-/// (`file://`, `ftp://`, `data:`, etc.) are rejected.
+/// 只有 `http` 和 `https` 被视为安全。所有其他协议
+///（`file://`、`ftp://`、`data:` 等）被拒绝。
 const ALLOWED_SCHEMES: &[&str] = &["http", "https"];
 
-/// Private / loopback IP prefixes (IPv4) that must be rejected.
+/// 必须拒绝的私有/回环 IP 前缀（IPv4）。
 ///
-/// This covers:
-/// - `127.0.0.0/8` (loopback)
-/// - `10.0.0.0/8` (private)
-/// - `172.16.0.0/12` (private)
-/// - `192.168.0.0/16` (private)
-/// - `169.254.0.0/16` (link-local / cloud metadata)
-/// - `0.0.0.0/8` (this network)
+/// 覆盖：
+/// - `127.0.0.0/8`（回环）
+/// - `10.0.0.0/8`（私有）
+/// - `172.16.0.0/12`（私有）
+/// - `192.168.0.0/16`（私有）
+/// - `169.254.0.0/16`（链路本地/云元数据）
+/// - `0.0.0.0/8`（本网络）
 const BLOCKED_HOSTS: &[&str] = &[
     "localhost",
     "0.0.0.0",
@@ -34,19 +32,18 @@ const BLOCKED_HOSTS: &[&str] = &[
     "169.254.169.254",
 ];
 
-/// Validate a URL, rejecting schemes and hosts that could be used for
-/// SSRF attacks.
+/// 验证 URL，拒绝可能用于 SSRF 攻击的协议和主机。
 ///
-/// # Rejection rules
+/// # 拒绝规则
 ///
-/// - Scheme must be `http` or `https`.
-/// - Host must not be empty.
-/// - Host must not be a known private/loopback/metadata hostname.
-/// - Host must not parse as a private/loopback IPv4 address.
+/// - 协议必须是 `http` 或 `https`。
+/// - 主机不能为空。
+/// - 主机不能是已知的私有/回环/元数据主机名。
+/// - 主机不能解析为私有/回环 IPv4 地址。
 ///
 /// # Errors
 ///
-/// Returns [`PdfError::SecurityViolation`] when the URL fails any check.
+/// URL 未通过任何检查时返回 [`PdfError::SecurityViolation`]。
 ///
 /// # Examples
 ///
@@ -56,11 +53,11 @@ const BLOCKED_HOSTS: &[&str] = &[
 /// assert!(validate_url("https://example.com/doc.pdf").is_ok());
 /// assert!(validate_url("http://example.com/doc.pdf").is_ok());
 ///
-/// // Blocked schemes.
+/// // 被拒绝的协议。
 /// assert!(validate_url("file:///etc/passwd").is_err());
 /// assert!(validate_url("ftp://example.com/doc.pdf").is_err());
 ///
-/// // Blocked hosts.
+/// // 被拒绝的主机。
 /// assert!(validate_url("http://localhost/doc.pdf").is_err());
 /// assert!(validate_url("http://169.254.169.254/latest/meta-data").is_err());
 /// ```

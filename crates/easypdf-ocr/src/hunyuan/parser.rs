@@ -1,10 +1,10 @@
-//! Response parser for Tencent Cloud OCR API.
+//! 腾讯云 OCR API 响应解析器。
 //!
-//! Implements [`OcrResponseParser`] for the two response formats:
+//! 为两种响应格式实现 [`OcrResponseParser`]：
 //!
-//! - **General OCR** (`GeneralBasicOCR`, `GeneralAccurateOCR`):
+//! - **通用 OCR**（`GeneralBasicOCR`、`GeneralAccurateOCR`）：
 //!   `Response.TextDetections[].DetectedText`
-//! - **Document extraction** (`SmartStructuralOCR`):
+//! - **文档提取**（`SmartStructuralOCR`）：
 //!   `Response.WordList[].Text`
 
 use crate::http::error::{OcrHttpError, Result};
@@ -13,15 +13,14 @@ use easypdf_markdown::ocr::{OcrResult, WordBox};
 
 use super::config::HunyuanMode;
 
-/// Response parser for Tencent Cloud OCR API.
+/// 腾讯云 OCR API 响应解析器。
 ///
-/// Parses the JSON response from Tencent Cloud OCR into a standard
-/// [`OcrResult`]. Supports both general OCR and document extraction
-/// response formats.
+/// 将腾讯云 OCR 的 JSON 响应解析为标准 [`OcrResult`]。
+/// 支持通用 OCR 和文档提取两种响应格式。
 ///
-/// # Response Formats
+/// # 响应格式
 ///
-/// ## General OCR (`GeneralBasicOCR`, `GeneralAccurateOCR`)
+/// ## 通用 OCR（`GeneralBasicOCR`、`GeneralAccurateOCR`）
 ///
 /// ```json
 /// {
@@ -34,7 +33,7 @@ use super::config::HunyuanMode;
 /// }
 /// ```
 ///
-/// ## Document Extraction (`SmartStructuralOCR`)
+/// ## 文档提取（`SmartStructuralOCR`）
 ///
 /// ```json
 /// {
@@ -52,7 +51,7 @@ pub struct HunyuanOcrParser {
 }
 
 impl HunyuanOcrParser {
-    /// Create a new parser for the given mode.
+    /// 为给定模式创建解析器。
     #[must_use]
     pub fn new(mode: HunyuanMode) -> Self {
         Self { mode }
@@ -61,14 +60,14 @@ impl HunyuanOcrParser {
 
 impl OcrResponseParser for HunyuanOcrParser {
     fn parse_response(&self, raw: &serde_json::Value) -> Result<OcrResult> {
-        // Tencent Cloud wraps all responses in a "Response" object.
+        // 腾讯云将所有响应包装在 "Response" 对象中。
         let response = raw.get("Response").ok_or_else(|| {
             OcrHttpError::InvalidResponse(
                 "missing top-level 'Response' field in Tencent Cloud OCR response".to_owned(),
             )
         })?;
 
-        // Check for error response.
+        // 检查错误响应。
         if let Some(error) = response.get("Error") {
             let code = error
                 .get("Code")
@@ -83,7 +82,7 @@ impl OcrResponseParser for HunyuanOcrParser {
             )));
         }
 
-        // Parse based on mode.
+        // 根据模式解析。
         if self.mode.uses_text_detections() {
             parse_text_detections(response)
         } else {
@@ -92,10 +91,9 @@ impl OcrResponseParser for HunyuanOcrParser {
     }
 }
 
-/// Parse the `TextDetections` response format (`GeneralBasic`, `GeneralAccurate`).
+/// 解析 `TextDetections` 响应格式（`GeneralBasic`、`GeneralAccurate`）。
 ///
-/// Concatenates all `DetectedText` values with newlines and computes
-/// an average confidence score.
+/// 将所有 `DetectedText` 值用换行符连接并计算平均置信度分数。
 #[allow(clippy::cast_possible_truncation)]
 fn parse_text_detections(response: &serde_json::Value) -> Result<OcrResult> {
     let detections = response
@@ -119,7 +117,7 @@ fn parse_text_detections(response: &serde_json::Value) -> Result<OcrResult> {
             .unwrap_or("");
         texts.push(text.to_owned());
 
-        // Collect confidence scores.
+        // 收集置信度分数。
         if let Some(conf) = detection
             .get("Confidence")
             .and_then(serde_json::Value::as_f64)
@@ -128,7 +126,7 @@ fn parse_text_detections(response: &serde_json::Value) -> Result<OcrResult> {
             confidence_count += 1;
         }
 
-        // Collect word boxes from Polygon coordinates (if available).
+        // 从 Polygon 坐标收集词框（如有）。
         if let Some(polygon) = detection.get("Polygon").and_then(|v| v.as_array())
             && polygon.len() >= 4
             && let (Some(x), Some(y)) = (
@@ -172,9 +170,9 @@ fn parse_text_detections(response: &serde_json::Value) -> Result<OcrResult> {
     })
 }
 
-/// Parse the `WordList` response format (`SmartStructuralOCR`).
+/// 解析 `WordList` 响应格式（`SmartStructuralOCR`）。
 ///
-/// Concatenates all `Text` values from `WordList` entries.
+/// 将 `WordList` 条目中的所有 `Text` 值连接。
 fn parse_word_list(response: &serde_json::Value) -> Result<OcrResult> {
     let word_list = response
         .get("WordList")

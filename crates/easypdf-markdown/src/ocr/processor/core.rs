@@ -9,12 +9,11 @@ use crate::ocr::engine::{OcrEngine, OcrImage};
 
 use super::renderer::{StoredRendererAdapter, render_error_to_pdf};
 
-/// OCR processor for the markdown processor pipeline.
+/// Markdown 处理器管道中的 OCR 处理器。
 ///
-/// Scans the document model for pages that need OCR based on the configured
-/// [`OcrTrigger`] policy. Renders those pages to images, runs OCR via the
-/// configured [`OcrEngine`], and injects the recognized text as new
-/// [`PdfBlock::Paragraph`] blocks.
+/// 扫描文档模型中需要 OCR 的页面（基于配置的 [`OcrTrigger`] 策略），
+/// 将这些页面渲染为图像，通过配置的 [`OcrEngine`] 执行 OCR，
+/// 并将识别文本作为新的 [`PdfBlock::Paragraph`] 块注入。
 ///
 /// # Examples
 ///
@@ -43,10 +42,10 @@ impl std::fmt::Debug for OcrProcessor {
 }
 
 impl OcrProcessor {
-    /// Create a new OCR processor with the given engine and render backend.
+    /// 使用给定引擎和渲染后端创建新的 OCR 处理器。
     ///
-    /// The render backend is used to build a [`PdfRenderer`](crate::render::PdfRenderer)
-    /// from the PDF input path when processing.
+    /// 渲染后端用于在处理时从 PDF 输入路径构建
+    /// [`PdfRenderer`](crate::render::PdfRenderer)。
     #[must_use]
     pub fn new(engine: Box<dyn OcrEngine>, backend: RenderBackend) -> Self {
         Self {
@@ -57,40 +56,40 @@ impl OcrProcessor {
         }
     }
 
-    /// Create a new OCR processor with a mock engine (for testing).
+    /// 使用模拟引擎创建新的 OCR 处理器（用于测试）。
     #[must_use]
     pub fn with_mock_engine() -> Self {
         use crate::ocr::engines::MockOcrEngine;
         Self::new(Box::new(MockOcrEngine::new()), RenderBackend::Text)
     }
 
-    /// Set a pre-built renderer (overrides the backend for rendering).
+    /// 设置预构建的渲染器（覆盖后端渲染方式）。
     ///
-    /// Useful for testing with a mock renderer that does not require a real PDF file.
+    /// 适用于使用不需要真实 PDF 文件的模拟渲染器进行测试。
     #[must_use]
     pub fn with_renderer(mut self, renderer: Box<dyn crate::render::PdfRenderer>) -> Self {
         self.renderer = Some(renderer);
         self
     }
 
-    /// Set the OCR configuration.
+    /// 设置 OCR 配置。
     #[must_use]
     pub fn with_config(mut self, config: OcrConfig) -> Self {
         self.config = config;
         self
     }
 
-    /// Get the renderer to use for page rendering.
+    /// 获取用于页面渲染的渲染器。
     ///
-    /// Uses the pre-built renderer if available, otherwise builds from the input path.
-    /// For bytes input with no pre-built renderer, writes to a temp file.
+    /// 如果存在预构建的渲染器则使用它，否则从输入路径构建。
+    /// 对于字节输入且无预构建渲染器的情况，写入临时文件。
     fn get_renderer<'a>(
         &'a self,
         input: &PdfInput,
     ) -> Result<Box<dyn crate::render::PdfRenderer + 'a>> {
         if let Some(ref renderer) = self.renderer {
-            // A pre-built renderer was injected (e.g., for testing).
-            // Wrap it in a delegating adapter since we can't clone trait objects.
+            // 已注入预构建渲染器（例如用于测试）。
+            // 由于无法克隆 trait 对象，将其包装在委托适配器中。
             return Ok(Box::new(StoredRendererAdapter(renderer.as_ref())));
         }
 
@@ -110,12 +109,12 @@ impl OcrProcessor {
         }
     }
 
-    /// Determine whether a page needs OCR based on the trigger policy.
+    /// 根据触发策略判断页面是否需要 OCR。
     fn page_needs_ocr(&self, page: &PdfPageModel) -> bool {
         match self.config.trigger {
             OcrTrigger::Always => true,
             OcrTrigger::OnEmptyPage => {
-                // OCR if the page has no paragraph or heading blocks.
+                // 如果页面没有段落或标题块则执行 OCR。
                 !page.blocks().iter().any(|b| {
                     matches!(
                         b.block_type(),
@@ -142,9 +141,9 @@ impl OcrProcessor {
                         )
                     })
                     .count();
-                // Threshold comparison: text_count / total < threshold.
-                // Rewrite as integer: text_count * 1000 < total * (threshold * 1000).
-                // Page counts are always small, so multiplication won't overflow.
+                // 阈值比较：text_count / total < threshold。
+                // 改写为整数运算：text_count * 1000 < total * (threshold * 1000)。
+                // 页面计数始终很小，乘法不会溢出。
                 #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
                 let threshold_permille = (f64::from(threshold) * 1000.0).round() as usize;
                 text_count.saturating_mul(1000) < total.saturating_mul(threshold_permille)
@@ -152,7 +151,7 @@ impl OcrProcessor {
         }
     }
 
-    /// Render a page and run OCR on it.
+    /// 渲染页面并对其执行 OCR。
     fn ocr_page(
         &self,
         renderer: &dyn crate::render::PdfRenderer,
@@ -177,7 +176,7 @@ impl OcrProcessor {
         let text = ocr_result.text;
         let confidence = ocr_result.confidence;
 
-        // Filter by minimum text length.
+        // 按最小文本长度过滤。
         if text.trim().len() < self.config.min_text_length {
             return Ok((String::new(), confidence));
         }
@@ -209,7 +208,7 @@ impl PdfMarkdownProcessor for OcrProcessor {
             match self.ocr_page(renderer.as_ref(), page.index().value()) {
                 Ok((text, confidence)) => {
                     if text.is_empty() {
-                        // OCR returned no usable text.
+                        // OCR 未返回可用文本。
                         warnings.push(MarkdownWarning::OcrUnavailable {
                             page_index: page.index(),
                         });
@@ -217,7 +216,7 @@ impl PdfMarkdownProcessor for OcrProcessor {
                         continue;
                     }
 
-                    // Check confidence threshold.
+                    // 检查置信度阈值。
                     if let Some(conf) = confidence
                         && conf < self.config.min_confidence
                     {
@@ -230,19 +229,19 @@ impl PdfMarkdownProcessor for OcrProcessor {
                         });
                     }
 
-                    // Build new page with OCR text injected.
+                    // 构建注入 OCR 文本后的新页面。
                     let mut new_page = PdfPageModel::new(page.index());
                     if let (Some(w), Some(h)) = (page.width_pt(), page.height_pt()) {
                         new_page = new_page.with_dimensions(w, h);
                     }
                     new_page = new_page.with_rotation(page.rotation());
 
-                    // Preserve existing blocks.
+                    // 保留现有块。
                     for block in page.blocks() {
                         new_page = new_page.with_block(block.clone());
                     }
 
-                    // Inject OCR text as a new paragraph.
+                    // 将 OCR 文本作为新段落注入。
                     let ocr_source = SourceLocation::new(page.index(), confidence.unwrap_or(0.5));
                     new_page = new_page.with_block(PdfBlock::paragraph(text, ocr_source));
 

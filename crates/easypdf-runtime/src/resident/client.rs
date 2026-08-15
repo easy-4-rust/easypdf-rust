@@ -1,8 +1,8 @@
-//! Client for connecting to a resident PDF daemon.
+//! Resident 守护进程客户端。
 //!
-//! Supports both Unix socket and TCP transports. Use [`ResidentClient::connect`]
-//! for Unix sockets, [`ResidentClient::connect_tcp`] for TCP, or
-//! [`ResidentClient::auto_connect`] for platform-appropriate defaults.
+//! 支持 Unix socket 和 TCP 两种传输方式。使用 [`ResidentClient::connect`]
+//! 连接 Unix socket，[`ResidentClient::connect_tcp`] 连接 TCP，
+//! 或 [`ResidentClient::auto_connect`] 自动选择平台默认方式。
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::SocketAddr;
@@ -14,23 +14,22 @@ use super::protocol::{
     SessionId,
 };
 
-/// Address of the server to connect to.
+/// 要连接的服务器地址。
 #[derive(Debug, Clone)]
 pub enum TransportAddr {
-    /// Unix domain socket path.
+    /// Unix 域 socket 路径。
     #[cfg(unix)]
     Unix(PathBuf),
-    /// TCP socket address (always `127.0.0.1:port`).
+    /// TCP socket 地址（始终为 `127.0.0.1:port`）。
     Tcp(SocketAddr),
 }
 
-/// Client for communicating with a resident PDF daemon.
+/// 用于与 resident PDF 守护进程通信的客户端。
 ///
-/// Each method call sends a single request and waits for the response.
-/// The client does not hold a persistent connection; instead, each `send()`
-/// opens a fresh connection for a single request-response exchange.
+/// 每次方法调用发送一个请求并等待响应。
+/// 客户端不保持持久连接；每次 `send()` 为单次请求-响应交换打开一个新连接。
 ///
-/// # Examples
+/// # 示例
 ///
 /// ```no_run
 /// use easypdf_runtime::resident::{ResidentClient, OpenMode};
@@ -48,17 +47,17 @@ pub struct ResidentClient {
 }
 
 impl ResidentClient {
-    /// Connect to a resident daemon at the given Unix socket path.
+    /// 连接到指定 Unix socket 路径的 resident 守护进程。
     ///
-    /// # Platform behavior
+    /// # 平台行为
     ///
-    /// On Unix: verifies the socket file exists. On non-Unix platforms:
-    /// always returns [`ResidentError::PlatformUnsupported`].
+    /// 在 Unix 上：验证 socket 文件是否存在。在非 Unix 平台上：
+    /// 始终返回 [`ResidentError::PlatformUnsupported`]。
     ///
     /// # Errors
     ///
-    /// - [`ResidentError::ServerNotRunning`] if the socket does not exist.
-    /// - [`ResidentError::PlatformUnsupported`] on non-Unix platforms.
+    /// - 如果 socket 不存在，返回 [`ResidentError::ServerNotRunning`]。
+    /// - 在非 Unix 平台上返回 [`ResidentError::PlatformUnsupported`]。
     pub fn connect(socket_path: impl AsRef<Path>) -> Result<Self> {
         #[cfg(unix)]
         {
@@ -79,13 +78,12 @@ impl ResidentClient {
         }
     }
 
-    /// Connect to a resident daemon at the given TCP address.
+    /// 连接到指定 TCP 地址的 resident 守护进程。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::ServerNotRunning`] if the connection fails.
+    /// 如果连接失败，返回 [`ResidentError::ServerNotRunning`]。
     pub fn connect_tcp(addr: SocketAddr) -> Result<Self> {
-        // Verify the server is reachable
         let _ = std::net::TcpStream::connect_timeout(&addr, std::time::Duration::from_secs(3))
             .map_err(|_| ResidentError::ServerNotRunning(PathBuf::from(addr.to_string())))?;
         Ok(Self {
@@ -93,30 +91,29 @@ impl ResidentClient {
         })
     }
 
-    /// Connect to a resident daemon by reading the port from the port file.
+    /// 通过端口文件连接到 resident 守护进程。
     ///
-    /// This is the TCP equivalent of connecting via a Unix socket path.
-    /// The server writes its port to a well-known file; this method reads
-    /// it and connects.
+    /// 这是 TCP 方式下等价于通过 Unix socket 路径连接的方法。
+    /// 服务器将其端口号写入一个已知文件；此方法读取该文件并连接。
     ///
     /// # Errors
     ///
-    /// - [`ResidentError::ServerNotRunning`] if the port file does not exist.
-    /// - [`ResidentError::Protocol`] if the port file is malformed.
+    /// - 如果端口文件不存在，返回 [`ResidentError::ServerNotRunning`]。
+    /// - 如果端口文件格式错误，返回 [`ResidentError::Protocol`]。
     pub fn connect_tcp_from_port_file() -> Result<Self> {
         let port = super::port::read_port_file()?;
         let addr = SocketAddr::from(([127, 0, 0, 1], port));
         Self::connect_tcp(addr)
     }
 
-    /// Connect using the platform-appropriate default.
+    /// 使用平台默认方式连接。
     ///
-    /// - **Unix**: connects to the default socket path.
-    /// - **Non-Unix**: reads the port file and connects via TCP.
+    /// - **Unix**：连接到默认 socket 路径。
+    /// - **非 Unix**：读取端口文件并通过 TCP 连接。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError::ServerNotRunning`] if no daemon is found.
+    /// 如果未找到守护进程，返回 [`ResidentError::ServerNotRunning`]。
     pub fn auto_connect() -> Result<Self> {
         #[cfg(unix)]
         {
@@ -128,23 +125,23 @@ impl ResidentClient {
         }
     }
 
-    /// Check whether a resident daemon is running at the given socket path.
+    /// 检查指定 socket 路径是否有 resident 守护进程正在运行。
     #[must_use]
     pub fn is_running(socket_path: impl AsRef<Path>) -> bool {
         socket_path.as_ref().exists()
     }
 
-    /// Check whether a resident daemon is running at the given TCP address.
+    /// 检查指定 TCP 地址是否有 resident 守护进程正在运行。
     #[must_use]
     pub fn is_running_tcp(addr: &SocketAddr) -> bool {
         std::net::TcpStream::connect_timeout(addr, std::time::Duration::from_millis(500)).is_ok()
     }
 
-    /// Open a PDF document in the daemon.
+    /// 在守护进程中打开一个 PDF 文档。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn open(&self, path: &str, mode: OpenMode) -> Result<SessionId> {
         let response = self.send(&Request::Open {
             path: path.to_string(),
@@ -155,11 +152,16 @@ impl ResidentClient {
             .ok_or_else(|| ResidentError::Protocol("server returned no session id".into()))
     }
 
-    /// Extract text from pages of an open session.
+    /// 从打开的会话中提取指定页面的文本。
+    ///
+    /// # 参数
+    ///
+    /// * `session` - 会话标识符。
+    /// * `pages` - 页面范围（0 起始），`None` 表示所有页面。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn extract_text(&self, session: SessionId, pages: Option<PageRange>) -> Result<String> {
         let response = self.send(&Request::ExtractText {
             session_id: session,
@@ -173,11 +175,11 @@ impl ResidentClient {
         }
     }
 
-    /// Extract metadata from an open session.
+    /// 从打开的会话中提取文档元数据。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn extract_metadata(&self, session: SessionId) -> Result<PdfMetadataDto> {
         let response = self.send(&Request::ExtractMetadata {
             session_id: session,
@@ -190,11 +192,11 @@ impl ResidentClient {
         }
     }
 
-    /// Get the page count of an open session.
+    /// 获取打开会话的总页数。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn page_count(&self, session: SessionId) -> Result<usize> {
         let response = self.send(&Request::PageCount {
             session_id: session,
@@ -207,11 +209,11 @@ impl ResidentClient {
         }
     }
 
-    /// Rotate a page in an open session.
+    /// 旋转打开会话中的某个页面。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn rotate_page(&self, session: SessionId, page: usize, rotation: u16) -> Result<()> {
         let response = self.send(&Request::RotatePage {
             session_id: session,
@@ -221,11 +223,16 @@ impl ResidentClient {
         check_ok(response)
     }
 
-    /// Save the document in an open session.
+    /// 保存打开会话中的文档。
+    ///
+    /// # 参数
+    ///
+    /// * `session` - 会话标识符。
+    /// * `path` - 可选的输出路径，`None` 表示保存到原始路径。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn save(&self, session: SessionId, path: Option<&str>) -> Result<String> {
         let response = self.send(&Request::Save {
             session_id: session,
@@ -239,11 +246,11 @@ impl ResidentClient {
         }
     }
 
-    /// Close a session.
+    /// 关闭一个会话。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn close(&self, session: SessionId) -> Result<()> {
         let response = self.send(&Request::Close {
             session_id: session,
@@ -251,42 +258,42 @@ impl ResidentClient {
         check_ok(response)
     }
 
-    /// Ping the server to check liveness.
+    /// 向服务器发送 ping 以检查存活状态。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn ping(&self) -> Result<()> {
         let response = self.send(&Request::Ping)?;
         check_ok(response)
     }
 
-    /// Ask the server to shut down gracefully.
+    /// 请求服务器优雅关闭。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the request fails.
+    /// 如果请求失败，返回 [`ResidentError`]。
     pub fn shutdown(&self) -> Result<()> {
         let response = self.send(&Request::Shutdown)?;
         check_ok(response)
     }
 
-    // --- Private helpers ---
+    // --- 私有辅助方法 ---
 
     fn send(&self, request: &Request) -> Result<Response> {
         let mut conn: Box<dyn super::transport::Connection> = self.connect_transport()?;
 
-        // Set read/write timeouts
+        // 设置读写超时
         conn.set_read_timeout(std::time::Duration::from_secs(30))?;
 
-        // Send request as JSON line
+        // 将请求序列化为 JSON 行发送
         let mut json = serde_json::to_string(&request)
             .map_err(|e| ResidentError::Protocol(format!("serialize failed: {e}")))?;
         json.push('\n');
         conn.write_all(json.as_bytes())?;
         conn.flush()?;
 
-        // Read response line
+        // 读取响应行
         let mut buf_reader = BufReader::new(conn);
         let mut line = String::new();
         buf_reader.read_line(&mut line)?;

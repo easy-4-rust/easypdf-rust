@@ -1,29 +1,27 @@
-//! PDF reading and text extraction (lopdf backend).
+//! PDF 读取与文本提取（lopdf 后端）。
 //!
-//! Provides [`PdfReader`] for parsing PDF documents and extracting text,
-//! metadata, and page information.
+//! 提供 [`PdfReader`] 用于解析 PDF 文档并提取文本、元数据和页面信息。
 //!
-//! # Reading strategies
+//! # 读取策略
 //!
-//! The [`ReadStrategy`] enum selects how the PDF is parsed:
+//! [`ReadStrategy`] 枚举选择 PDF 的解析方式：
 //!
-//! - [`Full`](ReadStrategy::Full) -- loads the entire document into memory
-//!   (default, best for small files).
-//! - [`Lazy`](ReadStrategy::Lazy) -- parses the page tree only; page content
-//!   is loaded on demand (best for large files).
-//! - [`Streaming`](ReadStrategy::Streaming) -- scans content streams without
-//!   building a full object tree (best for very large files or constrained
-//!   environments).
+//! - [`Full`](ReadStrategy::Full) -- 将整个文档加载到内存
+//!   （默认，适合小型文件）。
+//! - [`Lazy`](ReadStrategy::Lazy) -- 仅解析页面树；页面内容按需加载
+//!   （适合大型文件）。
+//! - [`Streaming`](ReadStrategy::Streaming) -- 扫描内容流而不构建完整的
+//!   对象树（适合超大型文件或受限环境）。
 //!
-//! Use [`ReadStrategy::auto`] to pick the optimal strategy based on file size,
-//! or pass an explicit strategy to [`PdfReader::open_with_strategy`].
+//! 使用 [`ReadStrategy::auto`] 根据文件大小自动选择最优策略，
+//! 或向 [`PdfReader::open_with_strategy`] 传入显式策略。
 //!
 //! # Examples
 //!
 //! ```no_run
 //! use easypdf_reader::{PdfReader, ReadStrategy};
 //!
-//! // Auto-select strategy based on file size:
+//! // 根据文件大小自动选择策略：
 //! let reader = PdfReader::open_with_strategy("large.pdf", ReadStrategy::Lazy)?;
 //! let text = reader.extract_text()?;
 //! # Ok::<(), easypdf_core::PdfError>(())

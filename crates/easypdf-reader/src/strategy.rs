@@ -1,17 +1,16 @@
-//! PDF reading strategies: full, lazy, and streaming.
+//! PDF 读取策略：全量、懒加载和流式。
 //!
-//! Mirrors the `ExcelReadExecutorKind` enum dispatch pattern from
-//! easyexcel-rust: the caller (or auto-detection) selects the optimal
-//! parsing strategy based on document size.
+//! 对应 `ExcelReadExecutorKind` 枚举分发模式：调用方（或自动检测）
+//! 根据文档大小选择最优的解析策略。
 
 use std::collections::HashMap;
 
 use easypdf_core::{PdfError, Result};
 
-/// PDF reading strategy enum (analogous to `ExcelReadExecutorKind`).
+/// PDF 读取策略枚举。
 ///
-/// Selects how the PDF document is parsed and loaded into memory.
-/// Use [`ReadStrategy::auto`] to pick the best strategy based on file size.
+/// 选择 PDF 文档的解析和内存加载方式。
+/// 使用 [`ReadStrategy::auto`] 根据文件大小自动选择最佳策略。
 ///
 /// # Examples
 ///
@@ -27,39 +26,37 @@ use easypdf_core::{PdfError, Result};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum ReadStrategy {
-    /// Full in-memory loading (default, suitable for small documents).
+    /// 全量内存加载（默认，适用于小型文档）。
     ///
-    /// Loads the entire PDF via `lopdf::Document::load_mem` -- fast random
-    /// access to all objects, but the full document must fit in memory.
+    /// 通过 `lopdf::Document::load_mem` 将整个 PDF 加载到内存 --
+    /// 支持对所有对象的快速随机访问，但要求整个文档能放入内存。
     Full,
 
-    /// Lazy page-level parsing (suitable for large documents).
+    /// 懒加载页面级解析（适用于大型文档）。
     ///
-    /// Parses only the trailer, cross-reference table, and page tree
-    /// structure. Individual page content streams are loaded on demand
-    /// and cached after first access.
+    /// 仅解析 trailer、交叉引用表和页面树结构。各页面的内容流
+    /// 按需加载并在首次访问后缓存。
     Lazy,
 
-    /// Streaming scan (suitable for very large documents, text-only).
+    /// 流式扫描（适用于超大型文档，仅限文本提取）。
     ///
-    /// Does not build a complete object tree. Scans the PDF byte stream
-    /// for content streams and triggers the listener incrementally.
+    /// 不构建完整的对象树。扫描 PDF 字节流中的内容流并增量触发
+    /// 监听器回调。
     ///
-    /// Accuracy is lower than [`Full`](Self::Full) or [`Lazy`](Self::Lazy)
-    /// because cross-reference resolution and font encoding (CMap/ToUnicode)
-    /// are skipped.
+    /// 精度低于 [`Full`](Self::Full) 或 [`Lazy`](Self::Lazy)，
+    /// 因为交叉引用解析和字体编码（CMap/ToUnicode）被跳过。
     Streaming,
 }
 
 impl ReadStrategy {
-    /// File-size threshold (bytes) below which `Full` is chosen.
+    /// 选择 `Full` 策略的文件大小阈值（字节）。
     const FULL_THRESHOLD: u64 = 5_000_000; // 5 MB
-    /// File-size threshold (bytes) below which `Lazy` is chosen.
+    /// 选择 `Lazy` 策略的文件大小阈值（字节）。
     const LAZY_THRESHOLD: u64 = 100_000_000; // 100 MB
 
-    /// Automatically select the best strategy based on file size.
+    /// 根据文件大小自动选择最佳策略。
     ///
-    /// | File size | Strategy |
+    /// | 文件大小 | 策略 |
     /// |-----------|----------|
     /// | 0..5 MB | [`Full`](ReadStrategy::Full) |
     /// | 5..100 MB | [`Lazy`](ReadStrategy::Lazy) |
@@ -75,35 +72,33 @@ impl ReadStrategy {
         }
     }
 
-    /// Returns `true` if this strategy loads the entire document upfront.
+    /// 当此策略在启动时加载整个文档时返回 `true`。
     #[must_use]
     pub const fn is_full(&self) -> bool {
         matches!(self, Self::Full)
     }
 
-    /// Returns `true` if this strategy defers page content loading.
+    /// 当此策略延迟加载页面内容时返回 `true`。
     #[must_use]
     pub const fn is_lazy(&self) -> bool {
         matches!(self, Self::Lazy | Self::Streaming)
     }
 }
 
-/// Parsed page content cached by the lazy loader.
+/// 懒加载器缓存的已解析页面内容。
 #[derive(Debug, Clone)]
 pub(crate) struct ParsedPage {
-    /// Extracted text for this page.
+    /// 此页面提取的文本。
     pub text: String,
 }
 
-/// Lazy page-level loader.
+/// 懒加载页面级加载器。
 ///
-/// Parses only the page tree structure upfront; individual page content
-/// streams are loaded on demand and cached after first access. This avoids
-/// materializing the full object tree for large documents.
+/// 仅在启动时解析页面树结构；各页面的内容流按需加载并在首次访问后
+/// 缓存。这避免了为大型文档物化完整的对象树。
 ///
-/// The loader borrows the already-loaded [`lopdf::Document`] (which holds
-/// the trailer and xref table) and builds a flat list of page object IDs
-/// without reading any content streams.
+/// 加载器借用已加载的 [`lopdf::Document`]（持有 trailer 和 xref 表），
+/// 并在不读取任何内容流的情况下构建页面对象 ID 的扁平列表。
 pub(crate) struct LazyPageLoader<'a> {
     doc: &'a lopdf::Document,
     page_object_ids: Vec<lopdf::ObjectId>,
@@ -111,15 +106,14 @@ pub(crate) struct LazyPageLoader<'a> {
 }
 
 impl<'a> LazyPageLoader<'a> {
-    /// Build a lazy loader from a parsed `lopdf::Document`.
+    /// 从已解析的 `lopdf::Document` 构建懒加载器。
     ///
-    /// This walks the page tree to collect page object IDs but does **not**
-    /// read any content streams.
+    /// 遍历页面树以收集页面对象 ID，但**不**读取任何内容流。
     #[must_use]
     pub fn new(doc: &'a lopdf::Document) -> Self {
         let pages_map = doc.get_pages();
         let mut page_object_ids = Vec::with_capacity(pages_map.len());
-        // `get_pages()` returns BTreeMap<u32, ObjectId> sorted by page number.
+        // `get_pages()` 返回按页码排序的 BTreeMap<u32, ObjectId>。
         for (_page_num, obj_id) in pages_map {
             page_object_ids.push(obj_id);
         }
@@ -130,22 +124,21 @@ impl<'a> LazyPageLoader<'a> {
         }
     }
 
-    /// Total number of pages (available without loading content).
+    /// 总页数（无需加载内容即可获取）。
     #[must_use]
-    #[allow(dead_code)] // used in tests; future streaming strategy will call this in lib
+    #[allow(dead_code)] // 在测试中使用；未来的流式策略也会调用
     pub fn page_count(&self) -> usize {
         self.page_object_ids.len()
     }
 
-    /// Extract text for a single page (0-based index), with caching.
+    /// 提取单个页面的文本（从 0 开始的索引），带缓存。
     ///
-    /// The first call for a given page reads and decompresses the content
-    /// stream; subsequent calls return the cached result.
+    /// 对某个页面的首次调用会读取并解压内容流；后续调用返回缓存结果。
     ///
     /// # Errors
     ///
-    /// Returns [`PdfError::Parse`] when the page content cannot be decoded,
-    /// or [`PdfError::InvalidPage`] when the index is out of bounds.
+    /// 当页面内容无法解码时返回 [`PdfError::Parse`]；
+    /// 当索引越界时返回 [`PdfError::InvalidPage`]。
     pub fn page_text(&mut self, page_index: usize) -> Result<String> {
         if let Some(cached) = self.cached_pages.get(&page_index) {
             return Ok(cached.text.clone());
@@ -155,7 +148,7 @@ impl<'a> LazyPageLoader<'a> {
             return Err(PdfError::InvalidPage(page_index));
         }
 
-        // lopdf page numbers are 1-based.
+        // lopdf 页码从 1 开始。
         let page_number = u32::try_from(page_index)
             .map_err(|_| PdfError::Parse("page index overflow".to_string()))?
             + 1;
@@ -170,11 +163,11 @@ impl<'a> LazyPageLoader<'a> {
         Ok(text)
     }
 
-    /// Extract text for multiple pages (0-based indices).
+    /// 提取多个页面的文本（从 0 开始的索引）。
     ///
     /// # Errors
     ///
-    /// Returns an error if any page cannot be extracted.
+    /// 当任意页面无法提取时返回错误。
     pub fn pages_text(&mut self, indices: &[usize]) -> Result<Vec<(usize, String)>> {
         let mut results = Vec::with_capacity(indices.len());
         for &idx in indices {

@@ -1,6 +1,6 @@
-//! Unix domain socket transport (Linux / macOS).
+//! Unix 域 socket 传输（Linux / macOS）。
 //!
-//! Only compiled on `cfg(unix)` platforms.
+//! 仅在 `cfg(unix)` 平台上编译。
 
 use std::io::{Read, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
@@ -9,52 +9,52 @@ use std::path::{Path, PathBuf};
 use super::error::Result;
 use super::transport::{Connection, Transport};
 
-/// A Unix domain socket listener.
+/// Unix 域 socket 监听器。
 ///
-/// Created by [`UnixTransport::bind`]. Implements [`Transport`] so it can be
-/// passed to `with_transport`.
+/// 由 [`UnixTransport::bind`] 创建。实现了 [`Transport`] trait，
+/// 因此可以传递给 `with_transport`。
 pub struct UnixTransport {
     listener: UnixListener,
     path: PathBuf,
 }
 
 impl UnixTransport {
-    /// Bind to the given Unix socket path.
+    /// 绑定到指定的 Unix socket 路径。
     ///
-    /// Removes any stale socket file at `path` before binding. Sets socket
-    /// file permissions to the given `mode` (default `0o600`).
+    /// 绑定前移除 `path` 处的过期 socket 文件。将 socket 文件权限
+    /// 设置为给定的 `mode`（默认 `0o600`）。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind(path: impl AsRef<Path>) -> Result<Self> {
         Self::bind_with_mode(path, 0o600)
     }
 
-    /// Bind with an explicit permission mode.
+    /// 使用显式权限模式绑定。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_with_mode(path: impl AsRef<Path>, mode: u32) -> Result<Self> {
         use std::os::unix::fs::PermissionsExt;
 
         let path = path.as_ref().to_path_buf();
 
-        // Remove stale socket file
+        // 移除过期 socket 文件
         if path.exists() {
             std::fs::remove_file(&path)?;
         }
 
         let listener = UnixListener::bind(&path)?;
 
-        // Set socket permissions
+        // 设置 socket 权限
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(mode))?;
 
         Ok(Self { listener, path })
     }
 
-    /// The socket file path.
+    /// socket 文件路径。
     #[must_use]
     pub fn path(&self) -> &Path {
         &self.path
@@ -89,17 +89,17 @@ impl Drop for UnixTransport {
 
 // --- UnixConnection ---
 
-/// A Unix domain socket stream, wrapping [`UnixStream`].
+/// Unix 域 socket 流，包装 [`UnixStream`]。
 pub struct UnixConnection {
     stream: UnixStream,
 }
 
 impl UnixConnection {
-    /// Connect to a Unix socket at the given path.
+    /// 连接到指定路径的 Unix socket。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if the connection fails.
+    /// 如果连接失败，返回 `ResidentError::Io`。
     pub fn connect(path: impl AsRef<Path>) -> Result<Self> {
         let stream = UnixStream::connect(path)?;
         Ok(Self { stream })
@@ -134,8 +134,7 @@ impl Connection for UnixConnection {
     }
 
     fn peer_addr(&self) -> String {
-        // UnixStream doesn't have a meaningful peer_addr display;
-        // use a placeholder.
+        // UnixStream 没有有意义的 peer_addr 显示；使用占位符。
         "unix-peer".to_string()
     }
 }

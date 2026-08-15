@@ -1,55 +1,54 @@
-//! Image encoding utilities for OCR HTTP requests.
+//! OCR HTTP 请求的图像编码工具。
 //!
-//! Different OCR APIs expect images in different formats:
-//! - **Base64 inline**: image bytes encoded as a base64 string in the JSON body
-//! - **Multipart**: image bytes uploaded as a form-data file field
-//! - **Remote URL**: a URL pointing to an already-uploaded image
+//! 不同的 OCR API 期望不同格式的图像：
+//! - **Base64 内联**：图像字节编码为 base64 字符串放在 JSON 请求体中
+//! - **Multipart**：图像字节作为表单文件字段上传
+//! - **远程 URL**：指向已上传图像的 URL
 
 use base64::Engine;
 use easypdf_markdown::ocr::OcrImage;
 
 use super::error::{OcrHttpError, Result};
 
-/// Strategy for encoding an image in an HTTP request.
+/// HTTP 请求中图像的编码策略。
 #[derive(Debug, Clone)]
 pub enum ImageEncoding {
-    /// Encode image as a base64 string inline in the JSON request body.
+    /// 将图像编码为 base64 字符串内联在 JSON 请求体中。
     ///
-    /// Used by GLM-OCR, DeepSeek-OCR, and other APIs that accept
-    /// `image_url: { url: "data:image/png;base64,..." }`.
+    /// GLM-OCR、DeepSeek-OCR 及其他接受
+    /// `image_url: { url: "data:image/png;base64,..." }` 的 API 使用此方式。
     Base64Inline,
 
-    /// Upload image as multipart/form-data.
+    /// 以 multipart/form-data 方式上传图像。
     ///
-    /// Used by Baidu OCR APIs (Qianfan, PP-OCRv6) that accept file uploads.
+    /// 接受文件上传的百度 OCR API（千帆、PP-OCRv6）使用此方式。
     Multipart {
-        /// The form field name for the image file (e.g., `"image"`).
+        /// 图像文件的表单字段名（如 `"image"`）。
         field_name: String,
     },
 
-    /// Reference an image by URL (user must upload to their own storage first).
+    /// 通过 URL 引用图像（用户需先上传至自己的存储）。
     RemoteUrl,
 }
 
-/// Encoded image ready for inclusion in an HTTP request.
+/// 已编码的图像，可直接包含在 HTTP 请求中。
 #[derive(Debug, Clone)]
 pub struct EncodedImage {
-    /// Image format hint (`"png"` or `"jpeg"`).
+    /// 图像格式提示（`"png"` 或 `"jpeg"`）。
     pub format: String,
-    /// Base64-encoded image data (populated for `Base64Inline`).
+    /// Base64 编码的图像数据（`Base64Inline` 时填充）。
     pub base64: Option<String>,
-    /// URL reference (populated for `RemoteUrl`).
+    /// URL 引用（`RemoteUrl` 时填充）。
     pub url: Option<String>,
-    /// Raw image bytes (populated for `Multipart`).
+    /// 原始图像字节（`Multipart` 时填充）。
     pub bytes: Option<Vec<u8>>,
 }
 
-/// Encode an `OcrImage` according to the given encoding strategy.
+/// 按照给定编码策略编码 `OcrImage`。
 ///
 /// # Errors
 ///
-/// Returns `OcrHttpError::InvalidResponse` if the pixel data cannot be
-/// encoded to PNG.
+/// 若像素数据无法编码为 PNG，返回 `OcrHttpError::InvalidResponse`。
 pub fn encode_for_request(image: &OcrImage, encoding: &ImageEncoding) -> Result<EncodedImage> {
     match encoding {
         ImageEncoding::Base64Inline => {
@@ -80,11 +79,11 @@ pub fn encode_for_request(image: &OcrImage, encoding: &ImageEncoding) -> Result<
     }
 }
 
-/// Encode the RGBA pixel data as PNG bytes.
+/// 将 RGBA 像素数据编码为 PNG 字节。
 ///
 /// # Errors
 ///
-/// Returns `OcrHttpError::InvalidResponse` if the pixel data cannot be encoded.
+/// 若像素数据无法编码，返回 `OcrHttpError::InvalidResponse`。
 pub fn encode_to_png(image: &OcrImage) -> Result<Vec<u8>> {
     let rgba_img = image::RgbaImage::from_raw(image.width, image.height, image.pixels.clone())
         .ok_or_else(|| {

@@ -1,41 +1,37 @@
-//! Security guards that reject malicious inputs before they reach the parser.
+//! 在恶意输入到达解析器之前拒绝它们的安全守卫。
 //!
-//! Inspired by the `GuardDecompressionBomb` and `GuardElementExplosion`
-//! patterns in [OfficeCLI](https://github.com/nickvdyck/officecli).
+//! 灵感来自 [OfficeCLI](https://github.com/nickvdyck/officecli) 中的
+//! `GuardDecompressionBomb` 和 `GuardElementExplosion` 模式。
 //!
-//! These functions are cheap pre-flight checks that inspect metadata
-//! (sizes, counts) without inflating any data.
+//! 这些函数是轻量级的预检操作，只检查元数据（大小、数量）
+//! 而不展开任何数据。
 
 use crate::{PdfError, Result};
 
 use crate::ResourceLimits;
 
-/// Absolute decompressed size (bytes) below which the ratio check is
-/// always skipped.
+/// 绝对解压后大小（字节），低于此值时始终跳过比率检查。
 ///
-/// Streams that decompress to less than this value are considered safe
-/// regardless of their compression ratio.  This avoids false positives
-/// on very small, benign data (e.g., a 100-byte XML snippet that
-/// decompresses to 8 KB).
+/// 解压后小于此值的流无论压缩比如何都被视为安全。
+/// 这避免了对非常小的良性数据的误报（例如，100 字节的
+/// XML 片段解压到 8 KB）。
 const ABSOLUTE_SAFE_DECOMPRESSED_SIZE: u64 = 10 * 1024;
 
-/// Reject a stream whose decompressed size or compression ratio exceeds the
-/// configured limits.
+/// 拒绝解压后大小或压缩比超出配置限制的流。
 ///
-/// This is a lightweight pre-flight check: it compares declared sizes only
-/// and never inflates any bytes.
+/// 这是轻量级的预检操作：只比较声明的大小，
+/// 不展开任何字节。
 ///
-/// # Parameters
+/// # 参数
 ///
-/// * `compressed_size`   -- byte count of the compressed data.
-/// * `decompressed_size` -- byte count after decompression (from headers or
-///   prior inspection).
-/// * `limits`            -- the active [`ResourceLimits`].
+/// * `compressed_size`——压缩数据的字节数。
+/// * `decompressed_size`——解压后的字节数（来自头部或先前检查）。
+/// * `limits`——当前的 [`ResourceLimits`]。
 ///
 /// # Errors
 ///
-/// Returns [`PdfError::SecurityViolation`] when either the absolute
-/// decompressed size or the compression ratio exceeds the limit.
+/// 绝对解压后大小或压缩比超出限制时返回
+/// [`PdfError::SecurityViolation`]。
 ///
 /// # Examples
 ///
@@ -44,10 +40,10 @@ const ABSOLUTE_SAFE_DECOMPRESSED_SIZE: u64 = 10 * 1024;
 /// use easypdf_core::ResourceLimits;
 ///
 /// let limits = ResourceLimits::default();
-/// // 10:1 ratio on 100 KB compressed -- within default 100:1 limit.
+/// // 100 KB 压缩数据 10:1 比率——在默认 100:1 限制内。
 /// assert!(guard_decompression_bomb(100_000, 1_000_000, &limits).is_ok());
 ///
-/// // 200:1 ratio on 100 KB compressed -- exceeds default 100:1 limit.
+/// // 100 KB 压缩数据 200:1 比率——超出默认 100:1 限制。
 /// assert!(guard_decompression_bomb(100_000, 20_000_000, &limits).is_err());
 /// ```
 pub fn guard_decompression_bomb(
@@ -87,16 +83,15 @@ pub fn guard_decompression_bomb(
     Ok(())
 }
 
-/// Reject a document whose element count exceeds the configured limit.
+/// 拒绝元素数量超出配置限制的文档。
 ///
-/// A crafted PDF packed with millions of tiny objects stays well under
-/// byte/ratio limits yet materialises into huge in-memory structures.
-/// This guard catches such element-explosion attacks.
+/// 精心构造的 PDF 装满数百万个小对象，完全在字节/比率限制之内，
+/// 但会展开为巨大的内存结构。此守卫捕获此类元素爆炸攻击。
 ///
 /// # Errors
 ///
-/// Returns [`PdfError::SecurityViolation`] when `element_count` exceeds
-/// `limits.max_element_count()`.
+/// `element_count` 超出 `limits.max_element_count()` 时返回
+/// [`PdfError::SecurityViolation`]。
 ///
 /// # Examples
 ///

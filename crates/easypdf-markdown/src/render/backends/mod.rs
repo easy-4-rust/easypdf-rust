@@ -1,4 +1,4 @@
-//! Rendering backend implementations.
+//! 渲染后端实现。
 
 pub mod text_backend;
 

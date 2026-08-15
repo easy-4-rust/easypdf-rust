@@ -1,4 +1,4 @@
-//! Automatic flow-based layout decoupled from PDF writing backends.
+//! 与 PDF 写入后端解耦的自动流式布局。
 
 mod direction;
 mod flow_layout;

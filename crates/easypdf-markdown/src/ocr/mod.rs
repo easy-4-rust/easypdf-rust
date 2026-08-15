@@ -1,23 +1,23 @@
-//! OCR processor for `easypdf-markdown`: scanned PDF text extraction.
+//! `easypdf-markdown` 的 OCR 处理器：扫描件 PDF 文本提取。
 //!
-//! This module provides an [`OcrProcessor`] that implements
-//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor) to extract
-//! text from image-heavy or scanned PDF pages via OCR. It is designed as the
-//! last-resort fallback in the markdown processor pipeline.
+//! 本模块提供 [`OcrProcessor`]，它实现了
+//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor)，通过 OCR 从
+//! 图片密集型或扫描件 PDF 页面中提取文本。它被设计为 Markdown 处理器管道中
+//! 的最后回退手段。
 //!
-//! # Architecture
+//! # 架构
 //!
 //! ```text
-//! PdfInput -> PdfRenderer -> page image -> OcrEngine -> text -> PdfBlock::Paragraph
+//! PdfInput -> PdfRenderer -> 页面图像 -> OcrEngine -> 文本 -> PdfBlock::Paragraph
 //! ```
 //!
-//! The [`OcrEngine`] trait abstracts over different OCR backends:
+//! [`OcrEngine`] trait 抽象了不同的 OCR 后端：
 //!
-//! - [`MockOcrEngine`](crate::ocr::engines::MockOcrEngine) -- returns fixed text (default, for testing)
-//! - `ocrs` feature -- pure Rust OCR via the [`ocrs`](https://crates.io/crates/ocrs) crate
-//! - `llm` feature -- LLM Vision API via [`rig-core`](https://crates.io/crates/rig-core)
+//! - [`MockOcrEngine`](crate::ocr::engines::MockOcrEngine) -- 返回固定文本（默认，用于测试）
+//! - `ocrs` feature -- 通过 [`ocrs`](https://crates.io/crates/ocrs) crate 的纯 Rust OCR
+//! - `llm` feature -- 通过 [`rig-core`](https://crates.io/crates/rig-core) 的 LLM Vision API
 //!
-//! # Quick start
+//! # 快速开始
 //!
 //! ```
 //! use easypdf_markdown::ocr::{
@@ -26,7 +26,7 @@
 //! };
 //!
 //! let processor = OcrProcessor::with_mock_engine();
-//! // or with custom config:
+//! // 或使用自定义配置：
 //! let processor = OcrProcessor::with_mock_engine()
 //!     .with_config(OcrConfig {
 //!         trigger: OcrTrigger::Always,

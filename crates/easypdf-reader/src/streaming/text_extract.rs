@@ -1,7 +1,7 @@
-//! CMap-aware text extraction from decompressed PDF content streams.
+//! 从解压后的 PDF 内容流中进行 `CMap` 感知的文本提取。
 //!
-//! Provides [`extract_text_with_cmap`] and supporting parse functions for
-//! PDF text operators (`Tj`, `'`, `"`, `TJ`) with proper `CMap` decoding.
+//! 提供 [`extract_text_with_cmap`] 及其辅助解析函数，用于
+//! PDF 文本算子（`Tj`、`'`、`"`、`TJ`）的正确 `CMap` 解码。
 
 use std::collections::HashMap;
 
@@ -12,15 +12,14 @@ use super::cmap::CMap;
 // CMap-aware text extraction
 // ---------------------------------------------------------------------------
 
-/// Extract text from a decompressed content stream using `CMap` mappings.
+/// 使用 `CMap` 映射从解压后的内容流中提取文本。
 ///
-/// When `cmaps` is non-empty the extractor tracks the current font via `Tf`
-/// operators and translates character codes through the font's `CMap`.  When
-/// no `CMap` is available for the current font (or `cmaps` is empty) it
-/// falls back to the legacy Latin-1 / UTF-8 byte interpretation.
+/// 当 `cmaps` 非空时，提取器通过 `Tf` 算子跟踪当前字体，
+/// 并通过字体的 `CMap` 转换字符码。当当前字体没有可用的 `CMap`
+/// （或 `cmaps` 为空）时，回退到传统的 Latin-1 / UTF-8 字节解释。
 ///
-/// Hex strings `<...>` are also decoded for CJK fonts that use hex-encoded
-/// CID strings.
+/// 十六进制字符串 `<...>` 也会被解码，用于使用十六进制编码
+/// CID 字符串的 CJK 字体。
 pub(super) fn extract_text_with_cmap(content: &[u8], cmaps: &HashMap<String, CMap>) -> String {
     let mut text = String::new();
     let len = content.len();
@@ -112,10 +111,9 @@ pub(super) fn extract_text_with_cmap(content: &[u8], cmaps: &HashMap<String, CMa
     text
 }
 
-/// Scan backwards from a `Tf` operator to find the font name set by a prior
-/// `/name size Tf` instruction.
+/// 从 `Tf` 算子向后扫描以查找先前 `/name size Tf` 指令设置的字体名。
 ///
-/// Works correctly even when the font name ends with digits (e.g. `/F1`).
+/// 即使字体名以数字结尾（如 `/F1`）也能正确工作。
 fn extract_current_font_name(content: &[u8], tf_pos: usize) -> Option<String> {
     // Pattern: ... /FontName 12 Tf
     // Strategy: scan backward to find '/', then scan forward to extract the
@@ -154,11 +152,11 @@ fn extract_current_font_name(content: &[u8], tf_pos: usize) -> Option<String> {
     None
 }
 
-/// Decode raw bytes using the `CMap` for `font_name`, if available.
+/// 使用 `font_name` 对应的 `CMap` 解码原始字节（如可用）。
 ///
-/// Multi-byte character codes (common in CJK fonts) are tried as 2-byte
-/// big-endian codes first, then single-byte.  When no `CMap` is found the
-/// bytes are decoded as lossy UTF-8 (the legacy behaviour).
+/// 多字节字符码（CJK 字体常见）先尝试作为 2 字节大端码解码，
+/// 再尝试单字节。未找到 `CMap` 时，字节按有损 UTF-8 解码
+/// （传统行为）。
 fn decode_bytes_with_cmap(
     bytes: &[u8],
     font_name: Option<&str>,
@@ -208,7 +206,7 @@ fn decode_bytes_with_cmap(
     result
 }
 
-/// Parse a PDF string literal and return raw bytes (no lossy UTF-8 conversion).
+/// 解析 PDF 字符串字面量并返回原始字节（不进行有损 UTF-8 转换）。
 pub(super) fn parse_pdf_string_raw(data: &[u8], pos: usize) -> Option<(Vec<u8>, usize)> {
     if data[pos] != b'(' {
         return None;
@@ -269,9 +267,9 @@ pub(super) fn parse_pdf_string_raw(data: &[u8], pos: usize) -> Option<(Vec<u8>, 
     Some((bytes, i))
 }
 
-/// Parse a hex string `<XXXX>` at position `pos`.
+/// 在位置 `pos` 解析十六进制字符串 `<XXXX>`。
 ///
-/// Returns the decoded bytes and the position after the closing `>`.
+/// 返回解码后的字节和关闭 `>` 之后的位置。
 pub(super) fn parse_hex_string(data: &[u8], pos: usize) -> Option<(Vec<u8>, usize)> {
     if data[pos] != b'<' {
         return None;
@@ -353,19 +351,18 @@ fn parse_tj_array_with_cmap(
 // Legacy text extraction (test-only)
 // ---------------------------------------------------------------------------
 
-/// Extract text from a decompressed PDF content stream (legacy, no `CMap`).
+/// 从解压后的 PDF 内容流中提取文本（传统模式，无 `CMap`）。
 ///
-/// This is the backward-compatible entry point that delegates to
-/// [`extract_text_with_cmap`] with an empty `CMap` table.  New code should
-/// call [`extract_text_with_cmap`] directly.
+/// 这是向后兼容的入口，委托给 [`extract_text_with_cmap`] 并传入空的
+/// `CMap` 表。新代码应直接调用 [`extract_text_with_cmap`]。
 #[cfg(test)]
 pub(super) fn extract_text_from_content_stream(content: &[u8]) -> String {
     extract_text_with_cmap(content, &HashMap::new())
 }
 
-/// Parse a PDF string literal starting at `pos` (the opening `(`).
+/// 从位置 `pos`（开头的 `(`）解析 PDF 字符串字面量。
 ///
-/// Returns the unescaped string content and the position after the closing `)`.
+/// 返回反转义后的字符串内容和关闭 `)` 之后的位置。
 pub(super) fn parse_pdf_string(data: &[u8], pos: usize) -> Option<(String, usize)> {
     if data[pos] != b'(' {
         return None;
@@ -429,9 +426,9 @@ pub(super) fn parse_pdf_string(data: &[u8], pos: usize) -> Option<(String, usize
     Some((s, i))
 }
 
-/// Parse a TJ array starting at `pos` (the opening `[`).
+/// 从位置 `pos`（开头的 `[`）解析 TJ 数组。
 ///
-/// Returns a list of string contents extracted from the array.
+/// 返回从数组中提取的字符串内容列表。
 #[cfg(test)]
 pub(super) fn parse_tj_array(data: &[u8], pos: usize) -> Option<(Vec<String>, usize)> {
     if data[pos] != b'[' {

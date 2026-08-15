@@ -1,11 +1,12 @@
-//! Resident daemon for easypdf -- keeps PDF documents open in memory.
+//! easypdf 常驻守护进程 -- 在内存中保持 PDF 文档打开状态。
 //!
-//! Provides a long-running daemon process that maintains open PDF
-//! sessions in memory, exposing operations over IPC.
+//! 提供一个长时间运行的守护进程，在内存中维护已打开的 PDF 会话，
+//! 通过 IPC（Unix socket 或 TCP）对外暴露操作接口。
 
 pub mod client;
 pub mod config;
 pub mod error;
+pub mod launch;
 pub mod port;
 pub mod protocol;
 pub mod server;
@@ -19,6 +20,7 @@ pub mod unix;
 pub use client::ResidentClient;
 pub use config::{AutosaveMode, ResidentConfig};
 pub use error::{ResidentError, Result};
+pub use launch::{default_socket_path, serve, socket_path_for_file, try_attach};
 pub use protocol::{
     OpenMode, PageRange, PdfMetadataDto, Request, Response, ResponseData, SessionId,
 };
@@ -28,75 +30,6 @@ pub use tcp::TcpTransport;
 pub use transport::{Connection, Transport};
 #[cfg(unix)]
 pub use unix::UnixTransport;
-
-/// Compute the default socket path.
-///
-/// Uses the system temp directory with a fixed name. For per-file isolation,
-/// use [`socket_path_for_file`].
-///
-/// Only meaningful on Unix platforms.
-#[must_use]
-pub fn default_socket_path() -> std::path::PathBuf {
-    std::env::temp_dir().join("easypdf-resident.sock")
-}
-
-/// Compute a per-file socket path based on the PDF file path.
-///
-/// Hashes the absolute path to produce a unique socket name,
-/// preventing collisions between different documents.
-///
-/// Only meaningful on Unix platforms.
-#[must_use]
-pub fn socket_path_for_file(pdf_path: &std::path::Path) -> std::path::PathBuf {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-
-    let abs_path = std::fs::canonicalize(pdf_path).unwrap_or_else(|_| pdf_path.to_path_buf());
-    let mut hasher = DefaultHasher::new();
-    abs_path.to_string_lossy().hash(&mut hasher);
-    let hash = hasher.finish();
-    std::env::temp_dir().join(format!("easypdf-{hash:x}.sock"))
-}
-
-/// Start a resident server in the foreground (blocking).
-///
-/// This is a convenience function that creates and runs a server with
-/// default configuration. For custom configuration, use [`ResidentServer`]
-/// directly.
-///
-/// On Unix this uses the given socket path (or the default). On non-Unix
-/// platforms it falls back to TCP localhost.
-///
-/// # Errors
-///
-/// Returns [`ResidentError`] if the server cannot bind or run.
-pub fn serve(socket_path: Option<&std::path::Path>) -> Result<()> {
-    let path = socket_path.map_or_else(default_socket_path, std::path::Path::to_path_buf);
-    let server = ResidentServer::bind(&path)?;
-    eprintln!("easypdf-resident listening on {}", server.transport_addr());
-    server.run()
-}
-
-/// Try to attach to a running resident daemon.
-///
-/// Returns `Some(client)` if a daemon is running at the default socket path
-/// (Unix) or port file (TCP), or `None` if no daemon is found.
-#[must_use]
-pub fn try_attach() -> Option<ResidentClient> {
-    #[cfg(unix)]
-    {
-        let path = default_socket_path();
-        if ResidentClient::is_running(&path) {
-            ResidentClient::connect(&path).ok()
-        } else {
-            None
-        }
-    }
-    #[cfg(not(unix))]
-    {
-        ResidentClient::auto_connect().ok()
-    }
-}
 
 #[cfg(test)]
 mod tests {

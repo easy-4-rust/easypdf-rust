@@ -1,13 +1,13 @@
-//! Byte-level search utilities for raw PDF scanning.
+//! 用于原始 PDF 扫描的字节级搜索工具。
 //!
-//! Provides [`find_keyword`] for locating byte sequences and [`find_endstream`]
-//! for finding the `endstream` keyword with proper boundary checks.
+//! 提供 [`find_keyword`] 用于定位字节序列，[`find_endstream`] 用于
+//! 在正确的边界检查下查找 `endstream` 关键字。
 
 // ---------------------------------------------------------------------------
 // Byte-level search
 // ---------------------------------------------------------------------------
 
-/// Find the byte offset of `keyword` in `data` starting at `from`.
+/// 在 `data` 中从 `from` 开始查找 `keyword` 的字节偏移量。
 pub(super) fn find_keyword(data: &[u8], from: usize, keyword: &[u8]) -> Option<usize> {
     if keyword.is_empty() || from >= data.len() || data.len() < keyword.len() {
         return None;
@@ -17,12 +17,11 @@ pub(super) fn find_keyword(data: &[u8], from: usize, keyword: &[u8]) -> Option<u
     (from..=end).find(|&i| data[i..i + klen] == *keyword)
 }
 
-/// Find the byte offset of `endstream` preceded by a newline and followed by
-/// a non-alphanumeric character (whitespace, EOF, or a symbol), starting from
-/// `from`.  Returns the offset of `endstream` itself (not the preceding `\n`).
+/// 从 `from` 开始查找以换行符开头、后跟非字母数字字符（空白、EOF 或符号）
+/// 的 `endstream` 的字节偏移量。返回 `endstream` 本身的偏移量（不是前面的 `\n`）。
 ///
-/// This avoids false matches where the byte sequence `endstream` appears
-/// inside binary stream data (e.g., compressed `FlateDecode` payloads).
+/// 这避免了字节序列 `endstream` 出现在二进制流数据
+/// （如压缩的 `FlateDecode` 载荷）中的误匹配。
 pub(super) fn find_endstream(data: &[u8], from: usize) -> Option<usize> {
     if from >= data.len() {
         return None;
@@ -77,7 +76,7 @@ pub(super) fn find_endstream(data: &[u8], from: usize) -> Option<usize> {
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-/// Skip PDF whitespace bytes.
+/// 跳过 PDF 空白字节。
 pub(super) fn skip_whitespace(data: &[u8], mut pos: usize) -> usize {
     while pos < data.len() && matches!(data[pos], b' ' | b'\t' | b'\n' | b'\r' | b'\x00') {
         pos += 1;
@@ -85,7 +84,7 @@ pub(super) fn skip_whitespace(data: &[u8], mut pos: usize) -> usize {
     pos
 }
 
-/// Decode a single octal digit.
+/// 解码单个八进制数字。
 pub(super) fn decode_octal_digit(b: u8) -> Option<u8> {
     match b {
         b'0'..=b'7' => Some(b - b'0'),
@@ -93,7 +92,7 @@ pub(super) fn decode_octal_digit(b: u8) -> Option<u8> {
     }
 }
 
-/// Convert a hex ASCII byte to its 0-15 value.
+/// 将十六进制 ASCII 字节转换为其 0-15 的值。
 pub(super) fn hex_digit_value(b: u8) -> Option<u8> {
     match b {
         b'0'..=b'9' => Some(b - b'0'),
@@ -103,7 +102,7 @@ pub(super) fn hex_digit_value(b: u8) -> Option<u8> {
     }
 }
 
-/// Convert a `usize` to `u64`, saturating at `u64::MAX`.
+/// 将 `usize` 转换为 `u64`，溢出时饱和到 `u64::MAX`。
 pub(super) fn usize_to_u64(value: usize) -> u64 {
     u64::try_from(value).unwrap_or(u64::MAX)
 }

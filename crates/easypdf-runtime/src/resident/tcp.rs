@@ -1,8 +1,7 @@
-//! TCP localhost transport (cross-platform, primary on Windows).
+//! TCP localhost 传输（跨平台，Windows 上的主传输方式）。
 //!
-//! Binds exclusively to `127.0.0.1` to prevent remote connections.
-//! On Windows this is the default transport; on Unix it can be used
-//! for testing or cross-network scenarios.
+//! 仅绑定到 `127.0.0.1` 以阻止远程连接。
+//! 在 Windows 上这是默认传输；在 Unix 上可用于测试或跨网络场景。
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
@@ -10,49 +9,47 @@ use std::net::{SocketAddr, TcpListener, TcpStream};
 use super::error::Result;
 use super::transport::{Connection, Transport};
 
-/// A TCP listener bound to `127.0.0.1`.
+/// 绑定到 `127.0.0.1` 的 TCP 监听器。
 ///
-/// Created by [`TcpTransport::bind_localhost`] or [`TcpTransport::bind_port`].
-/// Implements [`Transport`] so it can be passed to
-/// `with_transport`.
+/// 由 [`TcpTransport::bind_localhost`] 或 [`TcpTransport::bind_port`] 创建。
+/// 实现了 [`Transport`] trait，因此可以传递给 `with_transport`。
 pub struct TcpTransport {
     listener: TcpListener,
     port: u16,
 }
 
 impl TcpTransport {
-    /// Bind to `127.0.0.1` on a random available port.
+    /// 绑定到 `127.0.0.1` 的随机可用端口。
     ///
-    /// The assigned port can be retrieved via [`port()`](TcpTransport::port).
+    /// 分配的端口可通过 [`port()`](TcpTransport::port) 获取。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails.
+    /// 如果绑定失败，返回 `ResidentError::Io`。
     pub fn bind_localhost() -> Result<Self> {
         let listener = TcpListener::bind("127.0.0.1:0")?;
         let port = listener.local_addr()?.port();
         Ok(Self { listener, port })
     }
 
-    /// Bind to `127.0.0.1` on a specific port.
+    /// 绑定到 `127.0.0.1` 的指定端口。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if binding fails
-    /// (e.g. port already in use).
+    /// 如果绑定失败（例如端口已被占用），返回 `ResidentError::Io`。
     pub fn bind_port(port: u16) -> Result<Self> {
         let addr = SocketAddr::from(([127, 0, 0, 1], port));
         let listener = TcpListener::bind(addr)?;
         Ok(Self { listener, port })
     }
 
-    /// The port this transport is listening on.
+    /// 此传输正在监听的端口。
     #[must_use]
     pub fn port(&self) -> u16 {
         self.port
     }
 
-    /// The full socket address this transport is listening on.
+    /// 此传输正在监听的完整 socket 地址。
     #[must_use]
     pub fn addr(&self) -> SocketAddr {
         SocketAddr::from(([127, 0, 0, 1], self.port))
@@ -62,7 +59,7 @@ impl TcpTransport {
 impl Transport for TcpTransport {
     fn accept(&self) -> Result<Box<dyn Connection>> {
         let (stream, _addr) = self.listener.accept()?;
-        // Set default read timeout for accepted connections
+        // 为接受的连接设置默认读取超时
         let _ = stream.set_read_timeout(Some(std::time::Duration::from_secs(30)));
         Ok(Box::new(TcpConnection { stream }))
     }
@@ -77,23 +74,23 @@ impl Transport for TcpTransport {
     }
 
     fn close(&self) {
-        // TcpListener is closed on drop; nothing extra to clean up.
+        // TcpListener 在 drop 时关闭；无需额外清理。
     }
 }
 
 // --- TcpConnection ---
 
-/// A TCP stream, wrapping [`TcpStream`].
+/// TCP 流，包装 [`TcpStream`]。
 pub struct TcpConnection {
     stream: TcpStream,
 }
 
 impl TcpConnection {
-    /// Connect to a TCP address.
+    /// 连接到指定的 TCP 地址。
     ///
     /// # Errors
     ///
-    /// Returns `ResidentError::Io` if the connection fails.
+    /// 如果连接失败，返回 `ResidentError::Io`。
     pub fn connect(addr: &SocketAddr) -> Result<Self> {
         let stream = TcpStream::connect(addr)?;
         Ok(Self { stream })

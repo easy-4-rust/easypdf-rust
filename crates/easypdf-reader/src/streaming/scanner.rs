@@ -1,8 +1,7 @@
-//! PDF byte-stream scanner.
+//! PDF 字节流扫描器。
 //!
-//! Provides [`StreamScanner`] which scans raw PDF bytes for content streams,
-//! decompresses them, and extracts text operators without building a full
-//! `lopdf::Document` object tree.
+//! 提供 [`StreamScanner`]，扫描原始 PDF 字节中的内容流、解压它们，
+//! 并在不构建完整 `lopdf::Document` 对象树的情况下提取文本算子。
 
 use std::collections::HashMap;
 use std::io::Read;
@@ -35,32 +34,30 @@ pub(super) struct StreamRange {
 // StreamScanner
 // ---------------------------------------------------------------------------
 
-/// PDF byte-stream scanner.
+/// PDF 字节流扫描器。
 ///
-/// Does **not** build a `lopdf::Document`.  Instead it directly scans the raw
-/// bytes for content streams, decompresses them, and extracts text operators.
+/// **不**构建 `lopdf::Document`。直接扫描原始字节中的内容流、
+/// 解压它们并提取文本算子。
 pub(crate) struct StreamScanner<'a> {
     data: &'a [u8],
     limits: ResourceLimits,
 }
 
 impl<'a> StreamScanner<'a> {
-    /// Create a new scanner over the given raw PDF bytes.
+    /// 在给定的原始 PDF 字节上创建新的扫描器。
     #[must_use]
     pub fn new(data: &'a [u8], limits: ResourceLimits) -> Self {
         Self { data, limits }
     }
 
-    /// Scan all streams, extract text, and feed it to the listener.
+    /// 扫描所有流、提取文本并馈送给监听器。
     ///
-    /// Streams are processed sequentially.  For each stream whose `/Filter`
-    /// indicates `FlateDecode`, the data is decompressed before text
-    /// extraction.  Streams without `FlateDecode` are scanned as-is.
+    /// 流按顺序处理。对于 `/Filter` 指示 `FlateDecode` 的流，
+    /// 数据在文本提取前被解压。没有 `FlateDecode` 的流按原样扫描。
     ///
     /// # Errors
     ///
-    /// Returns an error when decompression fails or a resource limit is
-    /// exceeded.
+    /// 当解压失败或超出资源限制时返回错误。
     pub fn scan<L: PdfReadListener + ?Sized>(&self, listener: &mut L) -> Result<StreamScanResult> {
         // Pre-scan: collect CMap tables from font ToUnicode streams.
         let cmaps = find_font_cmaps(self.data, &self.limits);
@@ -106,27 +103,26 @@ impl<'a> StreamScanner<'a> {
         Ok(result)
     }
 
-    /// Heuristic page count by counting `/Type /Page` entries.
+    /// 通过统计 `/Type /Page` 条目进行启发式页数计算。
     ///
-    /// This scans the raw bytes for the pattern `/Type/Page` or
-    /// `/Type /Page` (with optional whitespace).  It is a fast approximation
-    /// and may over-count if the pattern appears inside stream data or
-    /// strings.
+    /// 扫描原始字节中的 `/Type/Page` 或 `/Type /Page` 模式
+    /// （允许可选空白）。这是快速近似值，如果模式出现在流数据
+    /// 或字符串中可能会多计。
     #[must_use]
     pub fn page_count(&self) -> usize {
         count_page_entries(self.data)
     }
 
-    /// Extract metadata by scanning for `/Info` dictionary keys.
+    /// 通过扫描 `/Info` 字典键提取元数据。
     ///
-    /// This is a best-effort scan of the raw bytes and may return partial
-    /// or empty metadata for encrypted or unusual PDFs.
+    /// 这是对原始字节的尽力扫描，对于加密或异常的 PDF 可能返回
+    /// 部分或空的元数据。
     #[must_use]
     pub fn extract_metadata_quick(&self) -> PdfMetadata {
         extract_metadata_from_bytes(self.data)
     }
 
-    /// Decompress a `FlateDecode` stream with bomb protection.
+    /// 解压带炸弹防护的 `FlateDecode` 流。
     pub(super) fn decompress_stream(&self, compressed: &[u8]) -> Result<Vec<u8>> {
         // Pre-check: guard against decompression bomb using compressed size.
         // We pass 0 for decompressed size because we don't know it yet.
@@ -144,8 +140,7 @@ impl<'a> StreamScanner<'a> {
         Ok(output)
     }
 
-    /// Check whether the stream at `range` has `/Filter /FlateDecode` in its
-    /// preceding dictionary.
+    /// 检查 `range` 处的流在其前置字典中是否有 `/Filter /FlateDecode`。
     pub(super) fn has_flatedecode_filter(&self, range: &StreamRange) -> bool {
         // Scan backwards from `data_start` (which is right after "stream\n")
         // to find the enclosing `<< ... >>` dict.  Look for `/Filter`.

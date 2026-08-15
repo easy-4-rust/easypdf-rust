@@ -1,61 +1,60 @@
-//! Error types for HTTP-based OCR engines.
+//! 基于 HTTP 的 OCR 引擎错误类型。
 
-/// Errors that can occur during HTTP-based OCR operations.
+/// 基于 HTTP 的 OCR 操作中可能发生的错误。
 ///
-/// Covers transport failures, authentication issues, server errors,
-/// and response parsing problems.
+/// 涵盖传输失败、认证问题、服务器错误和响应解析问题。
 #[derive(Debug, thiserror::Error)]
 pub enum OcrHttpError {
-    /// HTTP transport error (connection refused, timeout, DNS failure, etc.).
+    /// HTTP 传输错误（连接被拒绝、超时、DNS 失败等）。
     #[error("HTTP transport error: {0}")]
     Transport(#[from] reqwest::Error),
 
-    /// Authentication failed (invalid API key, expired token, bad signature).
+    /// 认证失败（无效 API 密钥、令牌过期、签名错误）。
     #[error("Authentication failed: {0}")]
     Auth(String),
 
-    /// The server rejected the request (malformed body, missing fields, etc.).
+    /// 服务器拒绝了请求（请求体格式错误、缺少字段等）。
     #[error("Bad request: {message} (code: {code})")]
     BadRequest {
-        /// Error code from the server.
+        /// 服务器返回的错误码。
         code: i32,
-        /// Human-readable error message.
+        /// 人类可读的错误消息。
         message: String,
     },
 
-    /// Rate limit exceeded; caller should retry after the given delay.
+    /// 超出速率限制；调用方应在指定延迟后重试。
     #[error("Rate limit exceeded; retry after {retry_after_secs}s")]
     RateLimit {
-        /// Suggested retry delay in seconds.
+        /// 建议的重试延迟（秒）。
         retry_after_secs: u64,
     },
 
-    /// Server returned a 5xx error.
+    /// 服务器返回了 5xx 错误。
     #[error("Server error: status={status}, body={body}")]
     ServerError {
-        /// HTTP status code.
+        /// HTTP 状态码。
         status: u16,
-        /// Response body (truncated to 500 chars for display).
+        /// 响应体（显示时截断至 500 字符）。
         body: String,
     },
 
-    /// The server response could not be parsed.
+    /// 服务器响应无法解析。
     #[error("Invalid response: {0}")]
     InvalidResponse(String),
 
-    /// The OCR engine returned an application-level error.
+    /// OCR 引擎返回了应用级错误。
     #[error("OCR engine error: {0}")]
     Engine(String),
 
-    /// Maximum retry attempts exhausted.
+    /// 已耗尽最大重试次数。
     #[error("Max retries ({max}) exceeded")]
     MaxRetriesExceeded {
-        /// The maximum number of retries that was configured.
+        /// 配置的最大重试次数。
         max: u32,
     },
 }
 
-/// Convenience result type for OCR HTTP operations.
+/// OCR HTTP 操作的便捷 Result 类型。
 pub type Result<T> = std::result::Result<T, OcrHttpError>;
 
 #[cfg(test)]

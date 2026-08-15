@@ -1,10 +1,10 @@
-//! Shape drawing methods for PdfWriter.
+//! PdfWriter 的图形绘制方法。
 
 use crate::writer::PdfWriter;
 use printpdf::{Line, LinePoint, Op, Point, Pt};
 
 impl PdfWriter {
-    /// Draw a line segment on the current page (points from bottom-left).
+    /// 在当前页面上绘制线段（坐标从左下角开始）。
     pub fn draw_line(&mut self, x1: f64, y1: f64, x2: f64, y2: f64, line_width: f64) {
         let line = Line {
             points: vec![
@@ -31,7 +31,7 @@ impl PdfWriter {
         self.current_page_ops.push(Op::DrawLine { line });
     }
 
-    /// Draw a rectangle outline on the current page.
+    /// 在当前页面上绘制矩形轮廓。
     pub fn draw_rect_stroke(&mut self, x: f64, y: f64, w: f64, h: f64, line_width: f64) {
         let rect = printpdf::Rect::from_wh(Pt(w as f32), Pt(h as f32));
         let line = rect.to_line();
@@ -54,7 +54,7 @@ impl PdfWriter {
             .push(Op::DrawLine { line: translated });
     }
 
-    /// Draw a circle outline using 4 cubic bezier curves (error < 0.027%).
+    /// 使用 4 条三次贝塞尔曲线绘制圆形轮廓（误差 < 0.027%）。
     pub fn draw_circle(&mut self, cx: f64, cy: f64, radius: f64, line_width: f64) {
         const K: f64 = 0.552_284_749_8;
         let (r, k) = (radius, K * radius);

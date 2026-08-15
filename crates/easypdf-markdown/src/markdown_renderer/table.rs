@@ -1,3 +1,6 @@
+//! Markdown 表格渲染辅助函数。
+
+/// 渲染 GFM（GitHub Flavored Markdown）表格。
 pub(super) fn render_gfm_table(headers: &[String], rows: &[Vec<String>]) -> String {
     if headers.is_empty() {
         return render_plain_table(headers, rows);
@@ -9,6 +12,7 @@ pub(super) fn render_gfm_table(headers: &[String], rows: &[Vec<String>]) -> Stri
     lines.join("\n")
 }
 
+/// 渲染单行表格（单元格用 `|` 分隔）。
 fn table_row(cells: &[String]) -> String {
     let cells = cells
         .iter()
@@ -17,6 +21,7 @@ fn table_row(cells: &[String]) -> String {
     format!("| {} |", cells.join(" | "))
 }
 
+/// 渲染纯文本表格（单元格用制表符分隔）。
 pub(super) fn render_plain_table(headers: &[String], rows: &[Vec<String>]) -> String {
     std::iter::once(headers)
         .chain(rows.iter().map(Vec::as_slice))

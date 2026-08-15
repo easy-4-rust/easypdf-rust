@@ -1,39 +1,39 @@
-//! PDF manipulation -- merge, split, rotate, and reorder pages.
+//! PDF 操作 -- 合并、拆分、旋转和重排页面。
 //!
-//! Backed by the `lopdf` crate for low-level page operations.
+//! 底层使用 `lopdf` crate 进行低层页面操作。
 
 use easypdf_core::AtomicFileOutput;
 use easypdf_core::Rotation;
 use easypdf_core::error::{PdfError, Result};
 use std::path::Path;
 
-/// A manipulator for performing operations on existing PDF documents.
+/// 对现有 PDF 文档执行操作的操作器。
 ///
-/// Supports merging, splitting, rotating, and reordering pages.
+/// 支持合并、拆分、旋转和重排页面。
 pub struct PdfManipulator {
     doc: lopdf::Document,
 }
 
 impl PdfManipulator {
-    /// Open a PDF file for manipulation.
+    /// 打开 PDF 文件进行操作。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the file cannot be opened or is not a valid PDF.
+    /// 当文件无法打开或不是有效的 PDF 时返回 `PdfError::Parse`。
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let doc = lopdf::Document::load(path).map_err(|e| PdfError::Parse(e.to_string()))?;
         Ok(Self { doc })
     }
 
-    /// Merge multiple PDF files into a new document and save.
+    /// 将多个 PDF 文件合并为一个新文档并保存。
     ///
-    /// This is the simplest way to merge; it creates a new document and
-    /// copies all pages from all input files into it.
+    /// 这是最简单的合并方式；创建一个新文档并将所有输入文件的
+    /// 所有页面复制到其中。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if any source file cannot be read.
-    /// Returns `PdfError::Io` if the output file cannot be written.
+    /// 当任何源文件无法读取时返回 `PdfError::Parse`。
+    /// 当输出文件无法写入时返回 `PdfError::Io`。
     pub fn merge_files(paths: &[impl AsRef<Path>], output: impl AsRef<Path>) -> Result<()> {
         if paths.is_empty() {
             return Err(PdfError::Other("No input files specified".into()));
@@ -63,11 +63,11 @@ impl PdfManipulator {
         save_document_atomically(base_doc, output)
     }
 
-    /// Rotate a specific page (1-based index).
+    /// 旋转指定页面（从 1 开始的索引）。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::InvalidPage` if the page number is out of bounds.
+    /// 当页码越界时返回 `PdfError::InvalidPage`。
     pub fn rotate_page(&mut self, page_number: usize, rotation: Rotation) -> Result<()> {
         let pages = self.doc.get_pages();
         let page_id = pages
@@ -101,11 +101,11 @@ impl PdfManipulator {
         Ok(())
     }
 
-    /// Reorder pages according to the given permutation (0-based indices).
+    /// 按给定排列顺序重排页面（从 0 开始的索引）。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::InvalidPage` if any index is out of bounds.
+    /// 当任何索引越界时返回 `PdfError::InvalidPage`。
     pub fn reorder_pages(&mut self, order: &[usize]) -> Result<()> {
         let pages = self.doc.get_pages();
         let old_order: Vec<_> = pages.values().copied().collect();
@@ -119,7 +119,7 @@ impl PdfManipulator {
             new_order.push(page_id);
         }
 
-        // Update the page tree: modify the catalog's /Pages -> /Kids array
+        // 更新页面树：修改 catalog 的 /Pages -> /Kids 数组
         let count = i64::try_from(new_order.len()).unwrap_or(i64::MAX);
         if let Some(pages_dict) = self
             .doc
@@ -139,11 +139,11 @@ impl PdfManipulator {
         Ok(())
     }
 
-    /// Extract a range of pages (0-based) as a new document.
+    /// 提取指定范围的页面（从 0 开始）为新文档。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::InvalidPage` if the range is out of bounds.
+    /// 当范围越界时返回 `PdfError::InvalidPage`。
     pub fn extract_pages(&self, range: std::ops::Range<usize>) -> Result<lopdf::Document> {
         let pages: Vec<lopdf::ObjectId> = self.doc.page_iter().collect();
         let selected = range
@@ -168,14 +168,13 @@ impl PdfManipulator {
         Ok(new_doc)
     }
 
-    /// Add a simple text watermark overlay to all pages.
+    /// 为所有页面添加简单的文本水印叠加层。
     ///
-    /// The watermark text is injected as raw PDF content stream operators
-    /// at the end of each page's content.
+    /// 水印文本作为原始 PDF 内容流算子注入到每个页面内容的末尾。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the page content cannot be modified.
+    /// 当页面内容无法修改时返回 `PdfError::Parse`。
     pub fn add_text_watermark(
         &mut self,
         text: &str,
@@ -184,7 +183,7 @@ impl PdfManipulator {
     ) -> Result<&mut Self> {
         let page_ids: Vec<lopdf::ObjectId> = self.doc.page_iter().collect();
         for page_id in page_ids {
-            // Build raw PDF content stream for centered watermark text
+            // 构建居中文本的原始 PDF 内容流
             let content = format!(
                 "q BT /F1 {font_size} Tf 0.5 0.5 0.5 rg 1 0 0 1 200 400 Tm ({text}) Tj ET Q"
             );
@@ -195,36 +194,36 @@ impl PdfManipulator {
         Ok(self)
     }
 
-    /// Get the number of pages in the document.
+    /// 获取文档中的页数。
     #[must_use]
     pub fn page_count(&self) -> usize {
         self.doc.get_pages().len()
     }
 
-    /// Save the manipulated document to a file.
+    /// 将操作后的文档保存到文件。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Io` if the file cannot be written.
+    /// 当文件无法写入时返回 `PdfError::Io`。
     pub fn save(self, path: impl AsRef<Path>) -> Result<()> {
         save_document_atomically(self.doc, path)
     }
 
-    /// Consume and return the inner `lopdf::Document` for advanced use.
+    /// 消费并返回内部的 `lopdf::Document`，供高级用途使用。
     #[must_use]
     pub fn into_inner(self) -> lopdf::Document {
         self.doc
     }
 
-    /// Add an Optional Content Group (PDF layer) to the document.
+    /// 向文档添加可选内容组（PDF 图层）。
     ///
-    /// Layers allow content to be selectively shown or hidden in PDF viewers.
+    /// 图层允许在 PDF 查看器中选择性显示或隐藏内容。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the catalog cannot be modified.
+    /// 当无法修改 catalog 时返回 `PdfError::Parse`。
     pub fn add_layer(&mut self, name: &str) -> Result<lopdf::ObjectId> {
-        // Create OCG dictionary
+        // 创建 OCG 字典
         let mut ocg = lopdf::Dictionary::new();
         ocg.set("Type", lopdf::Object::Name(b"OCG".to_vec()));
         ocg.set(
@@ -233,7 +232,7 @@ impl PdfManipulator {
         );
         let ocg_id = self.doc.add_object(lopdf::Object::Dictionary(ocg));
 
-        // Add to /OCProperties in catalog
+        // 添加到 catalog 的 /OCProperties
         if let Ok(catalog) = self.doc.catalog_mut() {
             let mut ocprops = lopdf::Dictionary::new();
             ocprops.set(
@@ -255,7 +254,7 @@ impl PdfManipulator {
         Ok(ocg_id)
     }
 
-    /// Validate PDF/A-1b compliance (F11).
+    /// 验证 PDF/A-1b 合规性。
     #[must_use]
     pub fn validate_pdfa(&self) -> Vec<String> {
         let mut issues = Vec::new();
@@ -284,7 +283,7 @@ impl PdfManipulator {
     }
 }
 
-// --- Internal helpers ---
+// --- 内部辅助函数 ---
 
 fn root_pages_id(document: &lopdf::Document) -> Result<lopdf::ObjectId> {
     document
@@ -500,7 +499,7 @@ mod tests {
 
     // --- Additional coverage tests ---
 
-    /// Create a 3-page test PDF.
+    /// 创建 3 页测试 PDF。
     fn make_three_page_pdf(path: &std::path::Path) {
         let mut doc = lopdf::Document::new();
         let mut page_ids = Vec::new();

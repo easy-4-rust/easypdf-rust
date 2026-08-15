@@ -1,13 +1,12 @@
-//! OAuth 2.0 token management for Baidu Cloud.
+//! 百度云 OAuth 2.0 令牌管理。
 //!
-//! Baidu Cloud uses OAuth 2.0 client-credentials flow to obtain access tokens.
-//! Tokens are cached and reused until they expire. The [`TokenManager`] handles
-//! the exchange and caching transparently.
+//! 百度云使用 OAuth 2.0 客户端凭证流程获取访问令牌。
+//! 令牌被缓存并在过期前复用。[`TokenManager`] 透明地处理交换和缓存。
 //!
-//! # Token Lifetime
+//! # 令牌生命周期
 //!
-//! Baidu access tokens are valid for approximately 30 days (2,592,000 seconds).
-//! The [`TokenManager`] refreshes the token when it is within 1 hour of expiry.
+//! 百度访问令牌有效期约 30 天（2,592,000 秒）。
+//! [`TokenManager`] 在令牌距过期 1 小时内自动刷新。
 
 use std::time::{Duration, Instant};
 
@@ -15,24 +14,24 @@ use parking_lot::Mutex;
 
 use super::config::{BaiduError, BaiduResult};
 
-/// Default token lifetime assumed by Baidu Cloud: 30 days in seconds.
+/// 百度云默认令牌生命周期：30 天（秒）。
 const DEFAULT_TOKEN_LIFETIME_SECS: u64 = 2_592_000;
-/// Refresh threshold: refresh 1 hour before expiry.
+/// 刷新阈值：过期前 1 小时刷新。
 const REFRESH_MARGIN_SECS: u64 = 3_600;
 
-/// Cached OAuth token with its expiry time.
+/// 带过期时间的缓存 OAuth 令牌。
 #[derive(Debug, Clone)]
 struct CachedToken {
-    /// The access token string.
+    /// 访问令牌字符串。
     token: String,
-    /// When the token was obtained (for expiry tracking).
+    /// 令牌获取时间（用于过期跟踪）。
     obtained_at: Instant,
-    /// Token lifetime in seconds.
+    /// 令牌生命周期（秒）。
     lifetime_secs: u64,
 }
 
 impl CachedToken {
-    /// Check if the token is still valid (not within refresh margin).
+    /// 检查令牌是否仍然有效（不在刷新阈值内）。
     fn is_valid(&self) -> bool {
         let elapsed = self.obtained_at.elapsed();
         let threshold = Duration::from_secs(self.lifetime_secs.saturating_sub(REFRESH_MARGIN_SECS));
@@ -40,10 +39,9 @@ impl CachedToken {
     }
 }
 
-/// Thread-safe OAuth token manager for Baidu Cloud.
+/// 百度云线程安全的 OAuth 令牌管理器。
 ///
-/// Caches the access token and refreshes it automatically. Uses
-/// `parking_lot::Mutex` for contention-free locking.
+/// 缓存访问令牌并自动刷新。使用 `parking_lot::Mutex` 实现无竞争锁定。
 ///
 /// # Examples
 ///
@@ -58,13 +56,13 @@ impl CachedToken {
 /// let token = mgr.get_token()?;
 /// ```
 pub struct TokenManager {
-    /// OAuth token endpoint URL.
+    /// OAuth 令牌端点 URL。
     token_url: String,
-    /// API key (client ID).
+    /// API 密钥（客户端 ID）。
     api_key: String,
-    /// Secret key (client secret).
+    /// 密钥（客户端密钥）。
     secret_key: String,
-    /// Cached token.
+    /// 缓存的令牌。
     cache: Mutex<Option<CachedToken>>,
 }
 
@@ -80,9 +78,9 @@ impl std::fmt::Debug for TokenManager {
 }
 
 impl TokenManager {
-    /// Create a new token manager.
+    /// 创建令牌管理器。
     ///
-    /// The token is not fetched until [`get_token`](Self::get_token) is called.
+    /// 令牌在调用 [`get_token`](Self::get_token) 时才获取。
     #[must_use]
     pub fn new(token_url: String, api_key: String, secret_key: String) -> Self {
         Self {
@@ -93,13 +91,13 @@ impl TokenManager {
         }
     }
 
-    /// Get a valid access token, refreshing if necessary.
+    /// 获取有效的访问令牌，必要时刷新。
     ///
     /// # Errors
     ///
-    /// Returns [`BaiduError::Auth`] if the token exchange fails.
+    /// 若令牌交换失败，返回 [`BaiduError::Auth`]。
     pub fn get_token(&self) -> BaiduResult<String> {
-        // Fast path: check cache under lock.
+        // 快速路径：在锁下检查缓存。
         {
             let cache = self.cache.lock();
             if let Some(ref cached) = *cache
@@ -109,7 +107,7 @@ impl TokenManager {
             }
         }
 
-        // Slow path: fetch a new token.
+        // 慢速路径：获取新令牌。
         let token = self.fetch_token()?;
         let cached = CachedToken {
             token: token.clone(),
@@ -120,7 +118,7 @@ impl TokenManager {
         Ok(token)
     }
 
-    /// Exchange API key + secret for an access token via OAuth client credentials.
+    /// 通过 OAuth 客户端凭证将 API Key + Secret 交换为访问令牌。
     fn fetch_token(&self) -> BaiduResult<String> {
         let client = reqwest::blocking::Client::new();
         let resp = client
@@ -144,7 +142,7 @@ impl TokenManager {
             .json()
             .map_err(|e| BaiduError::Auth(format!("OAuth response parse error: {e}")))?;
 
-        // Check for error in the response.
+        // 检查响应中的错误。
         if let Some(err_code) = body.get("error") {
             let desc = body
                 .get("error_description")
@@ -159,7 +157,7 @@ impl TokenManager {
             .ok_or_else(|| BaiduError::Auth("OAuth response missing access_token".to_owned()))
     }
 
-    /// Invalidate the cached token, forcing a refresh on the next call.
+    /// 使缓存的令牌失效，强制下次调用时刷新。
     pub fn invalidate(&self) {
         *self.cache.lock() = None;
     }

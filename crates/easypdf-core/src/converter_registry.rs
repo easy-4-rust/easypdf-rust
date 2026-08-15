@@ -1,7 +1,7 @@
-//! Type-erased converter registry for [`PdfConverter`] instances.
+//! [`PdfConverter`] 实例的类型擦除转换器注册表。
 //!
-//! Provides [`ConverterRegistry`] which maps Rust types to their
-//! [`PdfConverter`] implementations using [`TypeId`] for runtime dispatch.
+//! 提供 [`ConverterRegistry`]，使用 [`TypeId`] 进行运行时分发，
+//! 将 Rust 类型映射到其 [`PdfConverter`] 实现。
 //!
 //! # Examples
 //!
@@ -23,27 +23,27 @@ use crate::error::{PdfError, Result};
 use crate::traits::PdfConverter;
 
 // ---------------------------------------------------------------------------
-// Type-erased converter trait
+// 类型擦除转换器 trait
 // ---------------------------------------------------------------------------
 
-/// Internal trait that erases the generic parameter of [`PdfConverter<T>`].
+/// 擦除 [`PdfConverter<T>`] 泛型参数的内部 trait。
 trait ErasedConverter: Send {
-    /// Convert a value to its PDF string representation.
+    /// 将值转换为其 PDF 字符串表示。
     ///
     /// # Errors
     ///
-    /// Returns an error when the value cannot be represented.
+    /// 值无法表示时返回错误。
     fn erased_to_pdf_string(&self, value: &dyn Any) -> Result<String>;
 
-    /// Convert a PDF string representation back to a Rust value.
+    /// 将 PDF 字符串表示转换回 Rust 值。
     ///
     /// # Errors
     ///
-    /// Returns an error when the string cannot be parsed.
+    /// 字符串无法解析时返回错误。
     fn erased_from_pdf_string(&self, s: &str) -> Result<Box<dyn Any>>;
 }
 
-/// Adapter that wraps a `PdfConverter<T>` to erase its type parameter.
+/// 包装 `PdfConverter<T>` 以擦除其类型参数的适配器。
 struct ConverterAdapter<T> {
     inner: Box<dyn PdfConverter<T>>,
 }
@@ -69,22 +69,20 @@ impl<T: 'static> ErasedConverter for ConverterAdapter<T> {
 // ConverterRegistry
 // ---------------------------------------------------------------------------
 
-/// A runtime registry that maps Rust types to their [`PdfConverter`]
-/// implementations.
+/// 将 Rust 类型映射到其 [`PdfConverter`] 实现的运行时注册表。
 ///
-/// Converters are stored in a type-erased form keyed by [`TypeId`]. At most
-/// one converter per type `T` may be registered; later registrations for the
-/// same type replace earlier ones.
+/// 转换器以类型擦除的形式存储，以 [`TypeId`] 为键。每种类型 `T`
+/// 最多注册一个转换器；后续注册会替换先前的。
 ///
-/// Use [`ConverterRegistry::with_defaults`] to obtain a registry pre-populated
-/// with converters for common types (`String`, `i64`, `f64`, `bool`,
-/// `chrono::DateTime<chrono::Utc>`).
+/// 使用 [`ConverterRegistry::with_defaults`] 获取预填充了常见类型
+///（`String`、`i64`、`f64`、`bool`、`chrono::DateTime<chrono::Utc>`）
+/// 转换器的注册表。
 pub struct ConverterRegistry {
     converters: HashMap<TypeId, Box<dyn ErasedConverter>>,
 }
 
 impl ConverterRegistry {
-    /// Create an empty registry with no converters.
+    /// 创建没有转换器的空注册表。
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -92,10 +90,10 @@ impl ConverterRegistry {
         }
     }
 
-    /// Create a registry pre-populated with converters for common types.
+    /// 创建预填充了常见类型转换器的注册表。
     ///
-    /// Includes converters for: `String`, `i64`, `f64`, `bool`,
-    /// `chrono::DateTime<chrono::Utc>`.
+    /// 包含以下类型的转换器：`String`、`i64`、`f64`、`bool`、
+    /// `chrono::DateTime<chrono::Utc>`。
     #[must_use]
     pub fn with_defaults() -> Self {
         let mut registry = Self::new();
@@ -107,38 +105,38 @@ impl ConverterRegistry {
         registry
     }
 
-    /// Register a converter for type `T`.
+    /// 为类型 `T` 注册转换器。
     ///
-    /// If a converter for `T` was already registered, it is replaced.
+    /// 如果已为 `T` 注册了转换器，则替换之。
     pub fn register<T: 'static>(&mut self, converter: Box<dyn PdfConverter<T>>) {
         let erased: Box<dyn ErasedConverter> = Box::new(ConverterAdapter { inner: converter });
         self.converters.insert(TypeId::of::<T>(), erased);
     }
 
-    /// Return whether a converter is registered for type `T`.
+    /// 返回是否为类型 `T` 注册了转换器。
     #[must_use]
     pub fn has<T: 'static>(&self) -> bool {
         self.converters.contains_key(&TypeId::of::<T>())
     }
 
-    /// Return the number of registered converters.
+    /// 返回已注册转换器的数量。
     #[must_use]
     pub fn len(&self) -> usize {
         self.converters.len()
     }
 
-    /// Return whether the registry is empty.
+    /// 返回注册表是否为空。
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.converters.is_empty()
     }
 
-    /// Convert a value of type `T` to its PDF string representation.
+    /// 将类型 `T` 的值转换为其 PDF 字符串表示。
     ///
     /// # Errors
     ///
-    /// Returns [`PdfError::UnsupportedFeature`] if no converter is registered
-    /// for `T`, or propagates the converter's error.
+    /// 未为 `T` 注册转换器时返回 [`PdfError::UnsupportedFeature`]，
+    /// 或传播转换器的错误。
     pub fn to_pdf_string<T: 'static>(&self, value: &T) -> Result<String> {
         let converter = self.converters.get(&TypeId::of::<T>()).ok_or_else(|| {
             PdfError::UnsupportedFeature(format!(
@@ -149,12 +147,12 @@ impl ConverterRegistry {
         converter.erased_to_pdf_string(value as &dyn Any)
     }
 
-    /// Convert a PDF string representation back to a value of type `T`.
+    /// 将 PDF 字符串表示转换回类型 `T` 的值。
     ///
     /// # Errors
     ///
-    /// Returns [`PdfError::UnsupportedFeature`] if no converter is registered
-    /// for `T`, or propagates the converter's error.
+    /// 未为 `T` 注册转换器时返回 [`PdfError::UnsupportedFeature`]，
+    /// 或传播转换器的错误。
     pub fn from_pdf_string<T: 'static>(&self, s: &str) -> Result<T> {
         let converter = self.converters.get(&TypeId::of::<T>()).ok_or_else(|| {
             PdfError::UnsupportedFeature(format!(
@@ -179,10 +177,10 @@ impl Default for ConverterRegistry {
 }
 
 // ---------------------------------------------------------------------------
-// Built-in converters
+// 内置转换器
 // ---------------------------------------------------------------------------
 
-/// Converter for `String` -- identity transformation.
+/// `String` 的转换器——恒等变换。
 struct StringConverter;
 
 impl PdfConverter<String> for StringConverter {
@@ -195,7 +193,7 @@ impl PdfConverter<String> for StringConverter {
     }
 }
 
-/// Converter for `i64`.
+/// `i64` 的转换器。
 struct I64Converter;
 
 impl PdfConverter<i64> for I64Converter {
@@ -209,7 +207,7 @@ impl PdfConverter<i64> for I64Converter {
     }
 }
 
-/// Converter for `f64`.
+/// `f64` 的转换器。
 struct F64Converter;
 
 impl PdfConverter<f64> for F64Converter {
@@ -223,7 +221,7 @@ impl PdfConverter<f64> for F64Converter {
     }
 }
 
-/// Converter for `bool` -- "true"/"false".
+/// `bool` 的转换器——"true"/"false"。
 struct BoolConverter;
 
 impl PdfConverter<bool> for BoolConverter {
@@ -240,7 +238,7 @@ impl PdfConverter<bool> for BoolConverter {
     }
 }
 
-/// Converter for `chrono::DateTime<chrono::Utc>` -- RFC 3339 format.
+/// `chrono::DateTime<chrono::Utc>` 的转换器——RFC 3339 格式。
 struct ChronoUtcConverter;
 
 impl PdfConverter<chrono::DateTime<chrono::Utc>> for ChronoUtcConverter {

@@ -1,30 +1,30 @@
-//! Enumerations used throughout `easypdf-rust`.
+//! `easypdf-rust` 中使用的枚举类型。
 
-/// Standard page sizes in PDF points (1 point = 1/72 inch).
+/// 标准页面尺寸（PDF 点，1 点 = 1/72 英寸）。
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PageSize {
-    /// A0 (2384 × 3370 pt)
+    /// A0（2384 x 3370 点）
     A0,
-    /// A1 (1684 × 2384 pt)
+    /// A1（1684 x 2384 点）
     A1,
-    /// A2 (1191 × 1684 pt)
+    /// A2（1191 x 1684 点）
     A2,
-    /// A3 (842 × 1191 pt)
+    /// A3（842 x 1191 点）
     A3,
-    /// A4 (595 × 842 pt)
+    /// A4（595 x 842 点）
     A4,
-    /// A5 (420 × 595 pt)
+    /// A5（420 x 595 点）
     A5,
-    /// US Letter (612 × 792 pt)
+    /// US Letter（612 x 792 点）
     Letter,
-    /// US Legal (612 × 1008 pt)
+    /// US Legal（612 x 1008 点）
     Legal,
-    /// Custom page size in points (width, height).
+    /// 自定义页面尺寸（宽度、高度，单位为点）。
     Custom(f64, f64),
 }
 
 impl PageSize {
-    /// Returns the dimensions of this page size as `(width, height)` in PDF points.
+    /// 返回此页面尺寸的 `(宽度, 高度)`，单位为 PDF 点。
     #[must_use]
     pub const fn dimensions(self) -> (f64, f64) {
         match self {
@@ -41,61 +41,61 @@ impl PageSize {
     }
 }
 
-/// Page orientation.
+/// 页面方向。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Orientation {
-    /// Portrait (height > width).
+    /// 纵向（高度 > 宽度）。
     #[default]
     Portrait,
-    /// Landscape (width > height).
+    /// 横向（宽度 > 高度）。
     Landscape,
 }
 
-/// Rotation angle in degrees (clockwise).
+/// 旋转角度（顺时针，单位为度）。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Rotation {
-    /// No rotation.
+    /// 不旋转。
     None,
-    /// Rotate 90° clockwise.
+    /// 顺时针旋转 90 度。
     Clockwise90,
-    /// Rotate 180°.
+    /// 旋转 180 度。
     Clockwise180,
-    /// Rotate 270° clockwise (equivalent to 90° counter-clockwise).
+    /// 顺时针旋转 270 度（等价于逆时针 90 度）。
     Clockwise270,
 }
 
-/// Horizontal text alignment.
+/// 水平文本对齐方式。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TextAlignment {
-    /// Align text to the left.
+    /// 文本左对齐。
     #[default]
     Left,
-    /// Center text horizontally.
+    /// 文本水平居中。
     Center,
-    /// Align text to the right.
+    /// 文本右对齐。
     Right,
-    /// Justify text (stretch to fill the line width).
+    /// 文本两端对齐（拉伸以填满行宽）。
     Justify,
 }
 
-/// Vertical alignment.
+/// 垂直对齐方式。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum VerticalAlignment {
-    /// Align to the top.
+    /// 顶部对齐。
     #[default]
     Top,
-    /// Center vertically.
+    /// 垂直居中。
     Middle,
-    /// Align to the bottom.
+    /// 底部对齐。
     Bottom,
 }
 
-/// Supported image formats for embedding in PDFs.
+/// 支持嵌入 PDF 的图片格式。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFormat {
-    /// JPEG image.
+    /// JPEG 图片。
     Jpeg,
-    /// PNG image.
+    /// PNG 图片。
     Png,
 }
 

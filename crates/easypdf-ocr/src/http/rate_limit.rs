@@ -1,37 +1,36 @@
-//! Rate limiting via token bucket algorithm.
+//! 基于令牌桶算法的限流。
 //!
-//! Provides a thread-safe token bucket that blocks until a token is available.
-//! Used to enforce per-second request limits for cloud OCR APIs.
+//! 提供线程安全的令牌桶，阻塞直到令牌可用。
+//! 用于对云端 OCR API 实施每秒请求限制。
 #![cfg_attr(test, allow(clippy::float_cmp))]
 
 use std::time::Instant;
 
 use parking_lot::Mutex;
 
-/// Rate limit configuration.
+/// 限流配置。
 #[derive(Debug, Clone)]
 pub struct RateLimitConfig {
-    /// Maximum sustained requests per second.
+    /// 最大持续每秒请求数。
     pub requests_per_second: f64,
-    /// Maximum burst size (number of tokens that can accumulate).
+    /// 最大突发大小（可累积的令牌数）。
     pub burst: u32,
 }
 
-/// Thread-safe token bucket rate limiter.
+/// 线程安全的令牌桶限流器。
 ///
-/// Tokens are added at a constant rate up to `capacity`. Each call to
-/// [`acquire`](TokenBucket::acquire) consumes one token, blocking if none
-/// are available.
+/// 令牌以恒定速率添加，直到达到 `capacity`。每次调用
+/// [`acquire`](TokenBucket::acquire) 消耗一个令牌，若无可用令牌则阻塞。
 ///
-/// Uses `parking_lot::Mutex` to avoid poisoning issues.
+/// 使用 `parking_lot::Mutex` 避免中毒问题。
 pub struct TokenBucket {
-    /// Token generation rate (tokens per second).
+    /// 令牌生成速率（每秒令牌数）。
     rate: f64,
-    /// Maximum token capacity.
+    /// 最大令牌容量。
     capacity: f64,
-    /// Current number of available tokens.
+    /// 当前可用令牌数。
     tokens: Mutex<f64>,
-    /// Last time tokens were refilled.
+    /// 上次令牌补充时间。
     last: Mutex<Instant>,
 }
 
@@ -45,7 +44,7 @@ impl std::fmt::Debug for TokenBucket {
 }
 
 impl TokenBucket {
-    /// Create a new token bucket from the given configuration.
+    /// 根据给定配置创建令牌桶。
     #[must_use]
     pub fn new(config: &RateLimitConfig) -> Self {
         Self {
@@ -56,9 +55,9 @@ impl TokenBucket {
         }
     }
 
-    /// Block until a token is available, then consume it.
+    /// 阻塞直到令牌可用，然后消耗一个令牌。
     ///
-    /// This method sleeps in a loop, refilling tokens based on elapsed time.
+    /// 此方法在循环中休眠，根据经过的时间补充令牌。
     pub fn acquire(&self) {
         loop {
             let wait = {

@@ -1,8 +1,13 @@
+use super::renderer::push_section;
 use super::*;
+use crate::{ImagePolicy, MarkdownProfile, TablePolicy};
 use easypdf_core::{
     ImageData, ImageFormat, ListItem, PageIndex, PdfBlock, PdfDocumentModel, PdfMetadata,
     PdfPageModel, SourceLocation,
 };
+
+use super::escaping::{escape_target, escape_text, normalize_text};
+use super::table::render_plain_table;
 
 fn loc(page: usize) -> SourceLocation {
     SourceLocation::new(PageIndex::new(page), 1.0)

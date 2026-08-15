@@ -1,10 +1,13 @@
-//! CMS `SignedData` construction and parsing (RFC 5652).
+//! CMS `SignedData` 构造与解析（RFC 5652）。
 use super::der::{DerReader, concat, der_ctx, der_int, der_octets, der_seq, der_set};
 use super::{
     OID_DATA_DER, OID_SHA256_DER, OID_SHA256_WITH_RSA_DER, OID_SIGNED_DATA_DER, OID_SIGNED_DATA_VAL,
 };
 use crate::crypto::CryptoError;
 
+/// 构造 CMS `SignedData` 信封（DER 编码）。
+///
+/// 包含证书、签名值、颁发者和序列号信息，符合 RFC 5652 规范。
 pub(super) fn build_cms_signed_data(
     cert_der: &[u8],
     signature: &[u8],
@@ -38,11 +41,15 @@ pub(super) fn build_cms_signed_data(
     ]))
 }
 
+/// 从 CMS `SignedData` 中解析出的证书和签名字节。
 pub(super) struct ParsedCms {
+    /// DER 编码的签名者证书。
     pub(super) certificate_der: Vec<u8>,
+    /// 原始签名值。
     pub(super) signature: Vec<u8>,
 }
 
+/// 解析 CMS `SignedData` 信封，提取签名者证书和签名值。
 pub(super) fn parse_cms_signed_data(der: &[u8]) -> Result<ParsedCms, CryptoError> {
     let mut reader = DerReader::new(der);
     let ci_bytes = reader.read_sequence()?;
@@ -106,16 +113,22 @@ pub(super) fn parse_cms_signed_data(der: &[u8]) -> Result<ParsedCms, CryptoError
     })
 }
 
+/// 从 X.509 证书中提取的基本信息。
 #[derive(Debug, Clone)]
 pub(super) struct CertificateInfo {
+    /// 主题通用名称（CN）。
     pub(super) cn: Option<String>,
+    /// 颁发者可分辨名称。
     pub(super) issuer: String,
+    /// 证书有效期起始。
     pub(super) not_before: String,
+    /// 证书有效期截止。
     pub(super) not_after: String,
 }
 
+/// 解析 X.509 证书（DER 编码），返回证书信息和公钥。
 pub(super) fn parse_x509_cert(cert_der: &[u8]) -> Result<(CertificateInfo, Vec<u8>), CryptoError> {
-    use x509_parser::prelude::*;
+    use x509_parser::{certificate::X509Certificate, prelude::FromDer};
     let (_, cert) = X509Certificate::from_der(cert_der)
         .map_err(|e| CryptoError::InvalidCertificate(format!("X.509 parse error: {e}")))?;
     let cn = cert
@@ -137,6 +150,7 @@ pub(super) fn parse_x509_cert(cert_der: &[u8]) -> Result<(CertificateInfo, Vec<u
     Ok((info, public_key_der))
 }
 
+/// 解析 DER 编码的 RSA 私钥（PKCS#8 或 PKCS#1 格式）。
 pub(super) fn parse_private_key(der: &[u8]) -> Result<ring::signature::RsaKeyPair, CryptoError> {
     if let Ok(key) = ring::signature::RsaKeyPair::from_pkcs8(der) {
         return Ok(key);

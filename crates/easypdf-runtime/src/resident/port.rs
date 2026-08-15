@@ -1,48 +1,45 @@
-//! Port file discovery for TCP transport (Windows fallback).
+//! TCP 传输的端口文件发现机制（Windows 回退方案）。
 //!
-//! On Windows (or when using TCP transport), the server writes its port
-//! number to a file so that clients can discover it. The file is placed
-//! in the system temp directory.
+//! 在 Windows（或使用 TCP 传输时），服务器将其端口号写入文件，
+//! 以便客户端发现。文件放置在系统临时目录中。
 //!
-//! On Unix this module is available but unused when the default Unix
-//! socket transport is active.
+//! 在 Unix 上，此模块可用但当默认的 Unix socket 传输激活时不使用。
 
 use std::path::PathBuf;
 
 use super::error::{ResidentError, Result};
 
-/// Filename for the port discovery file.
+/// 端口发现文件的文件名。
 const PORT_FILE_NAME: &str = "easypdf-resident.port";
 
-/// Return the path to the port file in the system temp directory.
+/// 返回系统临时目录中端口文件的路径。
 #[must_use]
 pub fn port_file_path() -> PathBuf {
     std::env::temp_dir().join(PORT_FILE_NAME)
 }
 
-/// Write the server's port number to the port file.
+/// 将服务器端口号写入端口文件。
 ///
-/// Called by the server after binding to a TCP port so that clients
-/// can discover which port to connect to.
+/// 由服务器在绑定到 TCP 端口后调用，以便客户端可以发现
+/// 要连接的端口。
 ///
 /// # Errors
 ///
-/// Returns [`ResidentError::Io`] if the file cannot be written.
+/// 如果文件无法写入，返回 [`ResidentError::Io`]。
 pub fn write_port_file(port: u16) -> Result<()> {
     let path = port_file_path();
     std::fs::write(&path, port.to_string())?;
     Ok(())
 }
 
-/// Read the server's port number from the port file.
+/// 从端口文件读取服务器端口号。
 ///
-/// Called by the client to discover which TCP port the server is
-/// listening on.
+/// 由客户端调用以发现服务器正在监听的 TCP 端口。
 ///
 /// # Errors
 ///
-/// - [`ResidentError::ServerNotRunning`] if the port file does not exist.
-/// - [`ResidentError::Protocol`] if the file contents are not a valid port number.
+/// - 如果端口文件不存在，返回 [`ResidentError::ServerNotRunning`]。
+/// - 如果文件内容不是有效的端口号，返回 [`ResidentError::Protocol`]。
 pub fn read_port_file() -> Result<u16> {
     let path = port_file_path();
     let content = std::fs::read_to_string(&path)
@@ -57,7 +54,7 @@ pub fn read_port_file() -> Result<u16> {
     Ok(port)
 }
 
-/// Remove the port file (best-effort cleanup).
+/// 移除端口文件（尽力清理）。
 pub fn remove_port_file() {
     let _ = std::fs::remove_file(port_file_path());
 }

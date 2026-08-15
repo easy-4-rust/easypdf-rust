@@ -1,16 +1,15 @@
-//! Pure Rust OCR backend using the `ocrs` crate.
+//! 使用 `ocrs` crate 的纯 Rust OCR 后端。
 //!
-//! Requires the `ocrs` feature flag. Uses the `ocrs` crate's built-in
-//! detection and recognition ONNX models for text extraction.
+//! 需要 `ocrs` feature 标志。使用 `ocrs` crate 内置的
+//! 检测和识别 ONNX 模型进行文本提取。
 
 use easypdf_core::CapabilityLevel;
 
 use crate::ocr::engine::{OcrEngine, OcrImage, OcrResult, WordBox};
 
-/// Pure Rust OCR engine backed by the `ocrs` crate.
+/// 基于 `ocrs` crate 的纯 Rust OCR 引擎。
 ///
-/// Uses ONNX-based text detection and recognition models. No external
-/// system dependencies are required.
+/// 使用基于 ONNX 的文本检测和识别模型，无需外部系统依赖。
 ///
 /// # Examples
 ///
@@ -33,22 +32,22 @@ impl std::fmt::Debug for OcrsEngine {
 }
 
 impl OcrsEngine {
-    /// Create a new ocrs engine with default model parameters.
+    /// 使用默认模型参数创建新的 ocrs 引擎。
     ///
     /// # Errors
     ///
-    /// Returns an error if the ONNX models cannot be loaded or initialized.
+    /// 当 ONNX 模型无法加载或初始化时返回错误。
     pub fn new() -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let params = ocrs::OcrEngineParams::default();
         let engine = ocrs::OcrEngine::new(params)?;
         Ok(Self { engine })
     }
 
-    /// Create a new ocrs engine with custom parameters.
+    /// 使用自定义参数创建新的 ocrs 引擎。
     ///
     /// # Errors
     ///
-    /// Returns an error if the ONNX models cannot be loaded or initialized.
+    /// 当 ONNX 模型无法加载或初始化时返回错误。
     pub fn with_params(
         params: ocrs::OcrEngineParams,
     ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
@@ -62,7 +61,7 @@ impl OcrEngine for OcrsEngine {
         &self,
         image: &OcrImage,
     ) -> std::result::Result<OcrResult, Box<dyn std::error::Error + Send + Sync>> {
-        // Convert RGBA pixels to RGB for ocrs (HWC order).
+        // 将 RGBA 像素转换为 RGB（HWC 排列）供 ocrs 使用。
         let rgb_pixels: Vec<u8> = image
             .pixels
             .chunks_exact(4)
@@ -73,10 +72,10 @@ impl OcrEngine for OcrsEngine {
         let img_source = ocrs::ImageSource::from_bytes(&rgb_pixels, (image.width, image.height))?;
         let ocr_input = self.engine.prepare_input(img_source)?;
 
-        // Use the convenience API: detect + recognize + collect as string.
+        // 使用便捷 API：检测 + 识别 + 收集为字符串。
         let text = self.engine.get_text(&ocr_input)?;
 
-        // For word-level details, detect words and build bounding boxes.
+        // 获取词级详情，检测词并构建边界框。
         let word_boxes = match self.engine.detect_words(&ocr_input) {
             Ok(rects) => rects
                 .iter()
@@ -90,7 +89,7 @@ impl OcrEngine for OcrsEngine {
                         r.height() as u32,
                     );
                     WordBox {
-                        text: String::new(), // ocrs doesn't provide per-word text
+                        text: String::new(), // ocrs 不提供逐词文本
                         x: cx,
                         y: cy,
                         width: rw,

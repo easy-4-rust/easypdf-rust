@@ -1,60 +1,60 @@
-//! Error types for the resident daemon.
+//! Resident 守护进程的错误类型。
 
 use std::io;
 use std::path::PathBuf;
 
-/// Error type for resident daemon operations.
+/// Resident 守护进程操作的错误类型。
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum ResidentError {
-    /// I/O error (socket, file access).
+    /// I/O 错误（socket、文件访问）。
     #[error("I/O error: {0}")]
     Io(#[from] io::Error),
 
-    /// IPC protocol error (malformed message, serialization failure).
+    /// IPC 协议错误（消息格式错误、序列化失败）。
     #[error("protocol error: {0}")]
     Protocol(String),
 
-    /// The server returned an error response.
+    /// 服务器返回了错误响应。
     #[error("server error [{code}]: {message}")]
     Server {
-        /// Machine-readable error code.
+        /// 机器可读的错误码。
         code: String,
-        /// Human-readable error message.
+        /// 人类可读的错误消息。
         message: String,
     },
 
-    /// The session was not found (stale or invalid session id).
+    /// 会话未找到（过期或无效的会话 ID）。
     #[error("session {0} not found")]
     SessionNotFound(u64),
 
-    /// The maximum number of sessions has been reached.
+    /// 已达到最大会话数上限。
     #[error("maximum sessions ({max}) reached")]
     MaxSessionsReached {
-        /// Configured maximum.
+        /// 配置的最大值。
         max: usize,
     },
 
-    /// The socket path already exists (another server may be running).
+    /// socket 路径已存在（可能有另一个服务器正在运行）。
     #[error("socket already exists: {0}")]
     SocketAlreadyExists(PathBuf),
 
-    /// The server is not running at the given socket path.
+    /// 指定 socket 路径上没有服务器在运行。
     #[error("server not running at {0}")]
     ServerNotRunning(PathBuf),
 
-    /// PDF processing error propagated from the reader/writer/manipulator.
+    /// 从读取器/写入器/操作器传播的 PDF 处理错误。
     #[error("PDF error: {0}")]
     Pdf(#[from] easypdf_core::error::PdfError),
 
-    /// The request timed out.
+    /// 请求超时。
     #[error("request timed out")]
     Timeout,
 
-    /// The requested transport is not supported on this platform.
+    /// 请求的传输方式在当前平台上不受支持。
     #[error("operation not supported on this platform: {0}")]
     PlatformUnsupported(String),
 }
 
-/// Convenience `Result` type for resident operations.
+/// Resident 操作的便捷 `Result` 类型别名。
 pub type Result<T, E = ResidentError> = std::result::Result<T, E>;

@@ -1,4 +1,4 @@
-//! Image and SVG writing methods for PdfWriter.
+//! PdfWriter 的图片和 SVG 写入方法。
 
 use crate::writer::PdfWriter;
 use easypdf_core::PdfImage;
@@ -6,12 +6,12 @@ use easypdf_core::error::{PdfError, Result};
 use printpdf::{Op, Pt, RawImage, XObjectTransform};
 
 impl PdfWriter {
-    /// Write an image at (x, y) with dimensions (w, h) in points.
-    /// If w=h=0, uses natural pixel size at 72 DPI.
+    /// 在点坐标 (x, y) 处写入尺寸为 (w, h) 的图片。
+    /// 如果 w=h=0，则使用 72 DPI 下的原始像素尺寸。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Io` if the image cannot be written.
+    /// 当图片无法写入时返回 `PdfError::Io`。
     pub fn write_image(
         &mut self,
         image: &PdfImage,
@@ -45,7 +45,7 @@ impl PdfWriter {
         Ok(())
     }
 
-    /// Write an SVG at (x, y) with dimensions (w, h) in points.
+    /// 在点坐标 (x, y) 处写入尺寸为 (w, h) 的 SVG。
     pub fn write_svg(
         &mut self,
         svg_data: &str,

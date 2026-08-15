@@ -1,67 +1,66 @@
-//! Priority-based write handler execution chain.
+//! 基于优先级的写入处理程序执行链。
 //!
-//! Provides [`WriteHandlerChain`] which manages [`PdfWriteHandler`] instances
-//! sorted by priority. Handlers with lower priority values execute first.
+//! 提供 [`WriteHandlerChain`]，管理按优先级排序的 [`PdfWriteHandler`]
+//! 实例。优先级值越小的处理程序越先执行。
 //!
-//! # Priority Constants
+//! # 优先级常量
 //!
-//! - [`PRIORITY_HIGH`] (0.0) -- styles, layout, must execute first.
-//! - [`PRIORITY_NORMAL`] (10.0) -- default priority for most handlers.
-//! - [`PRIORITY_LOW`] (20.0) -- page numbers, watermarks, post-processing.
+//! - [`PRIORITY_HIGH`]（0.0）——样式、布局，必须最先执行。
+//! - [`PRIORITY_NORMAL`]（10.0）——大多数处理程序的默认优先级。
+//! - [`PRIORITY_LOW`]（20.0）——页码、水印、后处理。
 
 use crate::error::Result;
 use crate::traits::PdfWriteHandler;
 
-/// High priority (0.0) -- styles, layout, and handlers that must run first.
+/// 高优先级（0.0）——样式、布局和必须最先运行的处理程序。
 pub const PRIORITY_HIGH: f64 = 0.0;
 
-/// Normal priority (10.0) -- the default for most handlers.
+/// 普通优先级（10.0）——大多数处理程序的默认值。
 pub const PRIORITY_NORMAL: f64 = 10.0;
 
-/// Low priority (20.0) -- page numbers, watermarks, and post-processing.
+/// 低优先级（20.0）——页码、水印和后处理。
 pub const PRIORITY_LOW: f64 = 20.0;
 
-/// A [`PdfWriteHandler`] paired with its execution priority.
+/// 与其执行优先级配对的 [`PdfWriteHandler`]。
 ///
-/// Lower priority values execute first. Handlers with equal priority
-/// preserve registration order (stable sort).
+/// 优先级值越小越先执行。优先级相同的处理程序
+/// 保持注册顺序（稳定排序）。
 pub struct WriteHandlerRegistration {
-    /// The handler instance.
+    /// 处理程序实例。
     handler: Box<dyn PdfWriteHandler>,
-    /// Execution priority (lower runs first).
+    /// 执行优先级（值越小越先执行）。
     priority: f64,
 }
 
 impl WriteHandlerRegistration {
-    /// Create a new registration with the given handler and priority.
+    /// 使用给定的处理程序和优先级创建新的注册。
     #[must_use]
     pub fn new(handler: Box<dyn PdfWriteHandler>, priority: f64) -> Self {
         Self { handler, priority }
     }
 
-    /// Return the priority of this registration.
+    /// 返回此注册的优先级。
     #[must_use]
     pub const fn priority(&self) -> f64 {
         self.priority
     }
 
-    /// Borrow the handler.
+    /// 借用处理程序。
     #[must_use]
     pub fn handler(&self) -> &dyn PdfWriteHandler {
         self.handler.as_ref()
     }
 
-    /// Borrow the handler mutably.
+    /// 可变借用处理程序。
     pub fn handler_mut(&mut self) -> &mut dyn PdfWriteHandler {
         self.handler.as_mut()
     }
 }
 
-/// An ordered chain of [`PdfWriteHandler`] instances sorted by priority.
+/// 按优先级排序的 [`PdfWriteHandler`] 实例有序链。
 ///
-/// Handlers are invoked in ascending priority order (lowest first) at each
-/// lifecycle stage. The chain uses stable sorting so handlers with equal
-/// priority preserve their registration order.
+/// 在每个生命周期阶段，处理程序按优先级升序（最小的最先）调用。
+/// 链使用稳定排序，因此优先级相同的处理程序保持注册顺序。
 ///
 /// # Examples
 ///
@@ -78,7 +77,7 @@ impl WriteHandlerRegistration {
 /// let mut chain = WriteHandlerChain::new();
 /// chain.register(Box::new(WatermarkHandler), PRIORITY_NORMAL);
 /// chain.register(Box::new(StyleHandler), PRIORITY_HIGH);
-/// // StyleHandler runs before WatermarkHandler because HIGH < NORMAL.
+/// // StyleHandler 在 WatermarkHandler 之前运行，因为 HIGH < NORMAL。
 /// ```
 pub struct WriteHandlerChain {
     registrations: Vec<WriteHandlerRegistration>,
@@ -86,7 +85,7 @@ pub struct WriteHandlerChain {
 }
 
 impl WriteHandlerChain {
-    /// Create an empty handler chain.
+    /// 创建空的处理程序链。
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -95,28 +94,28 @@ impl WriteHandlerChain {
         }
     }
 
-    /// Register a handler with the given priority.
+    /// 使用给定优先级注册处理程序。
     ///
-    /// The chain will be re-sorted before the next lifecycle call.
+    /// 链将在下次生命周期调用前重新排序。
     pub fn register(&mut self, handler: Box<dyn PdfWriteHandler>, priority: f64) {
         self.registrations
             .push(WriteHandlerRegistration::new(handler, priority));
         self.sorted = false;
     }
 
-    /// Return the number of registered handlers.
+    /// 返回已注册处理程序的数量。
     #[must_use]
     pub fn len(&self) -> usize {
         self.registrations.len()
     }
 
-    /// Return whether the chain has no handlers.
+    /// 返回链是否没有处理程序。
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.registrations.is_empty()
     }
 
-    /// Ensure registrations are sorted by priority (ascending, stable).
+    /// 确保注册按优先级排序（升序、稳定）。
     fn ensure_sorted(&mut self) {
         if !self.sorted {
             self.registrations.sort_by(|a, b| {
@@ -128,11 +127,11 @@ impl WriteHandlerChain {
         }
     }
 
-    /// Invoke `before_document` on all handlers in priority order.
+    /// 按优先级顺序在所有处理程序上调用 `before_document`。
     ///
     /// # Errors
     ///
-    /// Returns the first error from any handler; subsequent handlers are skipped.
+    /// 返回任何处理程序的第一个错误；后续处理程序被跳过。
     pub fn before_document(&mut self) -> Result<()> {
         self.ensure_sorted();
         for reg in &mut self.registrations {
@@ -141,11 +140,11 @@ impl WriteHandlerChain {
         Ok(())
     }
 
-    /// Invoke `before_page` on all handlers in priority order.
+    /// 按优先级顺序在所有处理程序上调用 `before_page`。
     ///
     /// # Errors
     ///
-    /// Returns the first error from any handler; subsequent handlers are skipped.
+    /// 返回任何处理程序的第一个错误；后续处理程序被跳过。
     pub fn before_page(&mut self, page_number: usize) -> Result<()> {
         self.ensure_sorted();
         for reg in &mut self.registrations {
@@ -154,11 +153,11 @@ impl WriteHandlerChain {
         Ok(())
     }
 
-    /// Invoke `after_page` on all handlers in priority order.
+    /// 按优先级顺序在所有处理程序上调用 `after_page`。
     ///
     /// # Errors
     ///
-    /// Returns the first error from any handler; subsequent handlers are skipped.
+    /// 返回任何处理程序的第一个错误；后续处理程序被跳过。
     pub fn after_page(&mut self, page_number: usize) -> Result<()> {
         self.ensure_sorted();
         for reg in &mut self.registrations {
@@ -167,11 +166,11 @@ impl WriteHandlerChain {
         Ok(())
     }
 
-    /// Invoke `after_document` on all handlers in priority order.
+    /// 按优先级顺序在所有处理程序上调用 `after_document`。
     ///
     /// # Errors
     ///
-    /// Returns the first error from any handler; subsequent handlers are skipped.
+    /// 返回任何处理程序的第一个错误；后续处理程序被跳过。
     pub fn after_document(&mut self) -> Result<()> {
         self.ensure_sorted();
         for reg in &mut self.registrations {

@@ -1,4 +1,4 @@
-//! Backend selection for PDF rendering.
+//! PDF 渲染后端选择。
 
 use std::path::Path;
 
@@ -7,23 +7,22 @@ use super::error::RenderError;
 use super::error::Result;
 use super::traits::PdfRenderer;
 
-/// Available rendering backends.
+/// 可用的渲染后端。
 ///
-/// Use [`RenderBackend::build_renderer`] to construct a concrete
-/// [`PdfRenderer`] from a PDF file path. Use
-/// [`is_available`](Self::is_available) to check whether a backend's
-/// runtime dependencies (e.g., dynamic libraries) are present.
+/// 使用 [`RenderBackend::build_renderer`] 从 PDF 文件路径构建具体的
+/// [`PdfRenderer`]。使用 [`is_available`](Self::is_available) 检查
+/// 后端的运行时依赖（如动态库）是否存在。
 ///
 /// # Examples
 ///
 /// ```no_run
 /// use easypdf_markdown::render::RenderBackend;
 ///
-/// // Check if pdfium is available before using it:
+/// // 使用前检查 pdfium 是否可用：
 /// if RenderBackend::Pdfium.is_available() {
 ///     let renderer = RenderBackend::Pdfium.build_renderer("doc.pdf".as_ref())?;
 /// } else {
-///     // Fall back to text renderer:
+///     // 回退到文本渲染器：
 ///     let renderer = RenderBackend::Text.build_renderer("doc.pdf".as_ref())?;
 /// }
 /// # Ok::<(), easypdf_markdown::render::RenderError>(())
@@ -31,28 +30,25 @@ use super::traits::PdfRenderer;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum RenderBackend {
-    /// Google `PDFium` backend (highest quality).
+    /// Google `PDFium` 后端（最高质量）。
     ///
-    /// Requires the `pdfium` feature and the `libpdfium` dynamic library
-    /// to be available at runtime.
+    /// 需要 `pdfium` feature 且运行时需要 `libpdfium` 动态库。
     Pdfium,
 
-    /// Pure-Rust text fallback backend.
+    /// 纯 Rust 文本回退后端。
     ///
-    /// Extracts text via `easypdf-reader` and renders it as a simple
-    /// white-background, black-text image. Quality is low but no
-    /// external dependencies are needed.
+    /// 通过 `easypdf-reader` 提取文本并渲染为简单的白底黑字图像。
+    /// 质量较低但无需外部依赖。
     Text,
 }
 
 impl RenderBackend {
-    /// Construct a [`PdfRenderer`] for the given PDF file.
+    /// 为给定 PDF 文件构建 [`PdfRenderer`]。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::BackendUnavailable`] if the backend's runtime
-    /// dependencies are missing, or [`RenderError::Io`] /
-    /// [`RenderError::Parse`] if the PDF cannot be opened.
+    /// 当后端运行时依赖缺失时返回 [`RenderError::BackendUnavailable`]，
+    /// 当 PDF 无法打开时返回 [`RenderError::Io`] 或 [`RenderError::Parse`]。
     pub fn build_renderer(&self, pdf_path: &Path) -> Result<Box<dyn PdfRenderer>> {
         match self {
             Self::Text => {
@@ -72,11 +68,10 @@ impl RenderBackend {
         }
     }
 
-    /// Check whether this backend is available in the current environment.
+    /// 检查此后端在当前环境中是否可用。
     ///
-    /// For the `Text` backend this always returns `true`. For `Pdfium` it
-    /// checks whether the `pdfium` feature is enabled and the dynamic
-    /// library can be loaded.
+    /// `Text` 后端始终返回 `true`。`Pdfium` 后端检查 `pdfium` feature
+    /// 是否启用且动态库是否可加载。
     #[must_use]
     pub fn is_available(&self) -> bool {
         match self {
@@ -88,9 +83,9 @@ impl RenderBackend {
         }
     }
 
-    /// Return the default backend for the current environment.
+    /// 返回当前环境的默认后端。
     ///
-    /// Prefers `Pdfium` if available, otherwise falls back to `Text`.
+    /// 优先使用 `Pdfium`（如可用），否则回退到 `Text`。
     #[must_use]
     pub fn default_backend() -> Self {
         if Self::Pdfium.is_available() {
@@ -126,7 +121,7 @@ mod tests {
 
     #[test]
     fn default_backend_is_text() {
-        // Without pdfium feature, default should be Text
+        // 未启用 pdfium feature 时，默认应为 Text。
         let backend = RenderBackend::default_backend();
         assert_eq!(backend, RenderBackend::Text);
     }

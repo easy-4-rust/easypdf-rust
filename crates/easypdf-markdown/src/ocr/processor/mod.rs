@@ -1,4 +1,4 @@
-//! OCR processor implementing `PdfMarkdownProcessor`.
+//! 实现 `PdfMarkdownProcessor` 的 OCR 处理器。
 
 mod core;
 mod renderer;

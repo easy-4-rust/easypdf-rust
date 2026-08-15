@@ -1,34 +1,34 @@
-//! Heuristic table region detection.
+//! 启发式表格区域检测。
 
 use easypdf_core::PdfBlock;
 
 use super::config::{ColumnSeparator, TableDetectionConfig};
 use super::parser;
 
-/// A detected table region spanning consecutive paragraph blocks.
+/// 跨连续段落块检测到的表格区域。
 pub(crate) struct TableRegion {
-    /// Index of the last block in the region (inclusive).
+    /// 区域中最后一个块的索引（含）。
     pub end_index: usize,
-    /// First row treated as headers.
+    /// 第一行作为表头。
     pub headers: Vec<String>,
-    /// Remaining rows.
+    /// 剩余行。
     pub rows: Vec<Vec<String>>,
 }
 
-/// Try to detect a table region starting at `start` within `blocks`.
+/// 尝试从 `blocks` 中的 `start` 位置开始检测表格区域。
 ///
-/// Scans consecutive `PdfBlock::Paragraph` blocks. If enough consecutive
-/// lines parse as table rows (with at least `min_rows` total rows and
-/// `min_columns` columns), returns a [`TableRegion`].
+/// 扫描连续的 `PdfBlock::Paragraph` 块。如果有足够多的连续行
+/// 被解析为表格行（总行数至少 `min_rows`，列数至少 `min_columns`），
+/// 则返回 [`TableRegion`]。
 ///
-/// Non-paragraph blocks or non-table paragraphs break the scan.
+/// 非段落块或非表格段落会中断扫描。
 pub(crate) fn detect_table_region(
     blocks: &[PdfBlock],
     start: usize,
     config: &TableDetectionConfig,
 ) -> Option<TableRegion> {
-    // The starting block must be a paragraph — try_strategy will check this.
-    // Try each separator strategy to parse the first line.
+    // 起始块必须是段落——try_strategy 会检查这一点。
+    // 尝试每种分隔策略来解析第一行。
     let strategies = match config.separator {
         ColumnSeparator::Pipe => &[ColumnSeparator::Pipe][..],
         ColumnSeparator::Tab => &[ColumnSeparator::Tab][..],
@@ -49,7 +49,7 @@ pub(crate) fn detect_table_region(
     None
 }
 
-/// Try a single separator strategy.
+/// 尝试单一的分隔策略。
 fn try_strategy(
     blocks: &[PdfBlock],
     start: usize,
@@ -71,7 +71,7 @@ fn try_strategy(
     all_rows.push(first_cells);
     let mut last_block_index = start;
 
-    // Scan forward for consecutive table rows.
+    // 向前扫描连续的表格行。
     for (offset, block) in blocks.iter().enumerate().skip(start + 1) {
         match block {
             PdfBlock::Paragraph { text, .. } => {
@@ -85,14 +85,14 @@ fn try_strategy(
                     all_rows.push(cells);
                     last_block_index = offset;
                 } else if parser::is_separator_line(text) {
-                    // Separator row (e.g. `|---|---|`) — skip, don't count.
+                    // 分隔行（如 `|---|---|`）——跳过，不计数。
                     last_block_index = offset;
                 } else {
-                    // Not a table row — stop scanning.
+                    // 非表格行——停止扫描。
                     break;
                 }
             }
-            // Non-paragraph block breaks the table region.
+            // 非段落块中断表格区域。
             _ => break,
         }
     }
@@ -110,7 +110,7 @@ fn try_strategy(
     })
 }
 
-/// Parse a single line with the given strategy.
+/// 使用给定策略解析单行。
 fn parse_with_strategy(text: &str, strategy: ColumnSeparator) -> Option<Vec<String>> {
     match strategy {
         ColumnSeparator::Pipe => parser::parse_pipe_separated(text),
@@ -138,7 +138,7 @@ mod tests {
         TableDetectionConfig::default()
     }
 
-    // -- Pipe detection --
+    // -- 管道检测 --
 
     #[test]
     fn pipe_table_detected() {
@@ -166,7 +166,7 @@ mod tests {
         assert_eq!(region.rows.len(), 2);
     }
 
-    // -- Tab detection --
+    // -- 制表符检测 --
 
     #[test]
     fn tab_table_detected() {
@@ -180,7 +180,7 @@ mod tests {
         assert_eq!(region.rows.len(), 2);
     }
 
-    // -- Whitespace detection --
+    // -- 空格检测 --
 
     #[test]
     fn whitespace_table_detected() {
@@ -194,7 +194,7 @@ mod tests {
         assert_eq!(region.rows.len(), 2);
     }
 
-    // -- Non-table text not detected --
+    // -- 非表格文本不被误检测 --
 
     #[test]
     fn regular_paragraph_not_detected() {
@@ -208,7 +208,7 @@ mod tests {
         assert!(detect_table_region(&blocks, 0, &default_config()).is_none());
     }
 
-    // -- Min rows / min columns filtering --
+    // -- 最小行数/列数过滤 --
 
     #[test]
     fn below_min_columns_rejected() {
@@ -221,21 +221,18 @@ mod tests {
     fn below_min_rows_rejected() {
         let config = TableDetectionConfig::new().with_min_rows(3);
         let blocks = vec![para("| A | B |"), para("| 1 | 2 |")];
-        // Only 2 rows (header + 1 data), config requires 3.
         assert!(detect_table_region(&blocks, 0, &config).is_none());
     }
 
-    // -- Irregular tables --
+    // -- 不规则表格 --
 
     #[test]
     fn irregular_table_rejected_by_default() {
         let blocks = vec![
             para("| A | B | C |"),
-            para("| 1 | 2 |"), // 2 columns vs 3 — breaks scan
+            para("| 1 | 2 |"), // 2 列 vs 3——中断扫描
             para("| 4 | 5 | 6 |"),
         ];
-        // Default config has allow_irregular = false.
-        // The 2-col row breaks the scan after just the header (1 row < min_rows 2).
         assert!(detect_table_region(&blocks, 0, &default_config()).is_none());
     }
 
@@ -251,7 +248,7 @@ mod tests {
         assert_eq!(region.rows.len(), 2);
     }
 
-    // -- Non-paragraph blocks break scan --
+    // -- 非段落块中断扫描 --
 
     #[test]
     fn non_paragraph_breaks_region() {
@@ -260,11 +257,10 @@ mod tests {
             PdfBlock::heading(1, "Title", loc()),
             para("| 1 | 2 |"),
         ];
-        // Heading at index 1 breaks the scan; only 1 row found (below min_rows=2).
         assert!(detect_table_region(&blocks, 0, &default_config()).is_none());
     }
 
-    // -- Starting mid-blocks --
+    // -- 从非零索引开始 --
 
     #[test]
     fn detection_starting_at_nonzero_index() {
@@ -279,13 +275,12 @@ mod tests {
         assert_eq!(region.end_index, 2);
     }
 
-    // -- Specific separator config --
+    // -- 特定分隔策略配置 --
 
     #[test]
     fn pipe_only_config() {
         let config = TableDetectionConfig::new().with_separator(ColumnSeparator::Pipe);
         let blocks = vec![para("Name\tAge"), para("Alice\t30")];
-        // Tab-separated, but config says Pipe only.
         assert!(detect_table_region(&blocks, 0, &config).is_none());
     }
 

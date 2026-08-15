@@ -1,35 +1,17 @@
-//! Zhipu `BigModel` GLM-OCR engine integration for easypdf.
+//! 智谱 `BigModel` GLM-OCR 引擎集成。
 //!
-//! Provides an OCR engine backed by Zhipu AI's GLM-OCR model,
-//! accessible via the `BigModel` platform layout parsing API.
+//! 提供基于智谱 AI 的 GLM-OCR 模型的 OCR 引擎，
+//! 通过 `BigModel` 平台版面解析 API 访问。
 
 pub mod config;
+pub mod factory;
 pub mod parser;
 pub mod request;
 
-use crate::http::error::Result;
-use crate::http::{HttpOcrEngine, build_http_engine};
-
 pub use config::{GlmConfig, GlmOutputFormat};
+pub use factory::create_glm_ocr_engine;
 pub use parser::GlmOcrParser;
 pub use request::GlmOcrRequest;
-
-/// Create a GLM-OCR engine with the given configuration.
-///
-/// This is the primary entry point for constructing a GLM-OCR engine.
-/// It builds an [`HttpOcrEngine`] that uses the Zhipu `BigModel` layout
-/// parsing API for OCR.
-///
-/// # Errors
-///
-/// Returns `OcrHttpError::Transport` if the underlying HTTP client
-/// cannot be initialized.
-pub fn create_glm_ocr_engine(
-    config: GlmConfig,
-) -> Result<HttpOcrEngine<GlmOcrRequest, GlmOcrParser>> {
-    let request = GlmOcrRequest::new(config);
-    build_http_engine(request, GlmOcrParser)
-}
 
 #[cfg(test)]
 mod tests {
@@ -79,11 +61,11 @@ mod tests {
             .build_request_body(&image, &Default::default())
             .unwrap();
 
-        // Verify JSON structure.
+        // 验证 JSON 结构。
         assert_eq!(body["model"], "glm-ocr");
         let file_val = body["file"].as_str().unwrap();
         assert!(file_val.starts_with("data:image/png;base64,"));
-        assert!(file_val.len() > 22); // "data:image/png;base64," + actual data
+        assert!(file_val.len() > 22); // "data:image/png;base64," + 实际数据
         assert_eq!(body["language"], "zh");
         assert_eq!(body["output_format"], "text");
     }

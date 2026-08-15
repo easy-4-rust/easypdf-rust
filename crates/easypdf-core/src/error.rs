@@ -1,61 +1,61 @@
-//! Error types for `easypdf-rust`.
+//! `easypdf-rust` 的错误类型。
 //!
-//! Provides the central `PdfError` enum and a convenience `Result` type alias.
+//! 提供核心 `PdfError` 枚举和便捷的 `Result` 类型别名。
 
 use std::io;
 
-/// Central error type for `easypdf-rust`.
+/// `easypdf-rust` 的核心错误类型。
 ///
-/// Covers I/O, parsing, encryption, and unsupported-feature errors.
+/// 涵盖 I/O、解析、加密和不支持的功能错误。
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum PdfError {
-    /// Wraps a standard I/O error.
+    /// 包装标准 I/O 错误。
     #[error("I/O error: {0}")]
     Io(#[from] io::Error),
 
-    /// A PDF could not be parsed or contains malformed data.
+    /// PDF 无法解析或包含格式错误的数据。
     #[error("PDF parse error: {0}")]
     Parse(String),
 
-    /// A page index is out of bounds.
+    /// 页索引超出范围。
     #[error("Invalid page index: {0}")]
     InvalidPage(usize),
 
-    /// The requested feature is not yet implemented or not supported by the engine.
+    /// 请求的功能尚未实现或不被引擎支持。
     #[error("Unsupported feature: {0}")]
     UnsupportedFeature(String),
 
-    /// The PDF is encrypted and either no password was supplied or the password was wrong.
+    /// PDF 已加密且未提供密码或密码错误。
     #[error("Encryption error: {0}")]
     Encryption(String),
 
-    /// A configured resource limit was exceeded.
+    /// 配置的资源限制被超出。
     #[error("Resource limit exceeded for {resource}: actual {actual}, limit {limit}")]
     ResourceLimitExceeded {
-        /// Resource name.
+        /// 资源名称。
         resource: &'static str,
-        /// Configured limit.
+        /// 配置的限制值。
         limit: u64,
-        /// Observed value.
+        /// 实际观测值。
         actual: u64,
     },
 
-    /// A security guard rejected the input (decompression bomb, SSRF, etc.).
+    /// 安全守卫拒绝了输入（解压炸弹、SSRF 等）。
     #[error("security violation: {0}")]
     SecurityViolation(String),
 
-    /// A digital signature operation failed.
+    /// 数字签名操作失败。
     #[error("signature error: {0}")]
     Signature(String),
 
-    /// Catch-all for other errors.
+    /// 其他错误的兜底变体。
     #[error("{0}")]
     Other(String),
 }
 
 impl PdfError {
-    /// Return a stable machine-readable error code.
+    /// 返回稳定的机器可读错误码。
     #[must_use]
     pub const fn code(&self) -> PdfErrorCode {
         match self {
@@ -72,31 +72,31 @@ impl PdfError {
     }
 }
 
-/// Stable machine-readable PDF error category.
+/// 稳定的机器可读 PDF 错误分类。
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum PdfErrorCode {
-    /// File or stream I/O failure.
+    /// 文件或流 I/O 失败。
     Io,
-    /// Malformed or unsupported PDF syntax.
+    /// 格式错误或不支持的 PDF 语法。
     Parse,
-    /// Invalid page selection.
+    /// 无效的页面选择。
     InvalidPage,
-    /// Feature is not implemented by the selected backend.
+    /// 所选后端未实现该功能。
     UnsupportedFeature,
-    /// Encryption or password failure.
+    /// 加密或密码失败。
     Encryption,
-    /// Configured resource limit exceeded.
+    /// 配置的资源限制被超出。
     ResourceLimitExceeded,
-    /// A security guard rejected the input.
+    /// 安全守卫拒绝了输入。
     SecurityViolation,
-    /// Digital signature failure.
+    /// 数字签名失败。
     Signature,
-    /// Uncategorized failure.
+    /// 未分类的失败。
     Other,
 }
 
-/// Convenience `Result` type that uses [`PdfError`] as the error variant.
+/// 使用 [`PdfError`] 作为错误变体的便捷 `Result` 类型。
 pub type Result<T, E = PdfError> = std::result::Result<T, E>;
 
 #[cfg(test)]

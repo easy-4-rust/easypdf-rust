@@ -1,8 +1,8 @@
-//! Main `PdfWriter` struct and core PDF writing methods.
+//! 主 `PdfWriter` 结构体与核心 PDF 写入方法。
 //!
-//! Backed by `printpdf` for PDF construction. Supports two write backends:
-//! - **In-memory** (default): the entire document is built in memory.
-//! - **Spill**: finalized pages are serialized to temp files, bounding peak memory.
+//! 底层使用 `printpdf` 进行 PDF 构建。支持两种写入后端：
+//! - **内存模式**（默认）：整个文档在内存中构建。
+//! - **溢出模式**：已完成的页面序列化到临时文件，限制峰值内存。
 
 use easypdf_core::AtomicFileOutput;
 use easypdf_core::error::{PdfError, Result};
@@ -25,24 +25,24 @@ const PT_TO_MM: f64 = 25.4 / 72.0;
 /// Default margin in points for auto-positioned text.
 const DEFAULT_MARGIN: f64 = 72.0;
 
-/// A writer for creating new PDF documents.
+/// 用于创建新 PDF 文档的写入器。
 ///
-/// Builds pages from operations, then serializes the document to bytes.
-/// Supports multiple pages, images, custom fonts, and shapes.
+/// 从操作构建页面，然后将文档序列化为字节。支持多页面、图片、
+/// 自定义字体和图形。
 ///
-/// # Write backends
+/// # 写入后端
 ///
-/// Use [`WriteBackend`] to choose between in-memory and page-level spill modes.
-/// For large documents, the spill backend bounds peak memory by serializing
-/// finalized pages to temporary files.
+/// 使用 [`WriteBackend`] 在内存模式和页面级溢出模式之间选择。
+/// 对于大型文档，溢出后端通过将已完成的页面序列化到临时文件来
+/// 限制峰值内存。
 ///
-/// # Handler chain
+/// # 处理器链
 ///
-/// Handlers are managed by a priority-sorted [`WriteHandlerChain`]. The
-/// [`register_handler`](Self::register_handler) method uses
-/// [`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL); use
-/// [`register_handler_with_priority`](Self::register_handler_with_priority)
-/// for custom priorities.
+/// 处理器由按优先级排序的 [`WriteHandlerChain`] 管理。
+/// [`register_handler`](Self::register_handler) 方法使用
+/// [`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)；
+/// 使用 [`register_handler_with_priority`](Self::register_handler_with_priority)
+/// 设置自定义优先级。
 ///
 /// # Examples
 ///
@@ -50,10 +50,10 @@ const DEFAULT_MARGIN: f64 = 72.0;
 /// use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
 /// use easypdf_core::*;
 ///
-/// // Simple construction (backward-compatible).
+/// // 简单构造（向后兼容）。
 /// let w = PdfWriter::new("title");
 ///
-/// // Builder with spill backend.
+/// // 使用溢出后端的构建器。
 /// let w = PdfWriterBuilder::new("Big Report")
 ///     .backend(WriteBackend::auto(500))
 ///     .build()
@@ -90,10 +90,10 @@ pub struct PdfWriter {
 }
 
 impl PdfWriter {
-    /// Create a new PDF document (writes to file via `finish`).
+    /// 创建新的 PDF 文档（通过 `finish` 写入文件）。
     ///
-    /// Uses the default in-memory backend. For advanced configuration,
-    /// use [`PdfWriterBuilder`](crate::PdfWriterBuilder).
+    /// 使用默认的内存后端。如需高级配置，
+    /// 请使用 [`PdfWriterBuilder`](crate::PdfWriterBuilder)。
     #[must_use]
     pub fn new(title: &str) -> Self {
         Self {
@@ -114,7 +114,7 @@ impl PdfWriter {
         }
     }
 
-    /// Create a new PDF document that writes to a generic writer (hutool pattern).
+    /// 创建写入通用 writer 的新 PDF 文档。
     #[must_use]
     pub fn new_from_writer(writer: impl Write + 'static) -> Self {
         let mut s = Self::new("untitled");
@@ -122,11 +122,11 @@ impl PdfWriter {
         s
     }
 
-    /// Internal constructor used by [`PdfWriterBuilder`].
+    /// 由 [`PdfWriterBuilder`] 使用的内部构造函数。
     ///
     /// # Errors
     ///
-    /// Returns an error if the spill backend cannot be initialized.
+    /// 当溢出后端无法初始化时返回错误。
     pub(crate) fn with_config(
         title: &str,
         metadata: PdfMetadata,
@@ -164,24 +164,24 @@ impl PdfWriter {
         })
     }
 
-    /// Set document metadata.
+    /// 设置文档元数据。
     #[must_use]
     pub fn metadata(mut self, metadata: PdfMetadata) -> Self {
         self.metadata = metadata;
         self
     }
 
-    /// Register a write handler with default priority
-    /// ([`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)).
+    /// 注册使用默认优先级的写入处理器
+    /// （[`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)）。
     #[must_use]
     pub fn register_handler(mut self, handler: Box<dyn PdfWriteHandler>) -> Self {
         self.chain.register(handler, PRIORITY_NORMAL);
         self
     }
 
-    /// Register a write handler with a specific execution priority.
+    /// 注册使用指定执行优先级的写入处理器。
     ///
-    /// Lower priority values execute first.
+    /// 优先级值越小越先执行。
     #[must_use]
     pub fn register_handler_with_priority(
         mut self,
@@ -192,13 +192,13 @@ impl PdfWriter {
         self
     }
 
-    /// Register a custom TTF/OTF font from a file path.
+    /// 从文件路径注册自定义 TTF/OTF 字体。
     pub fn register_font_from_path(&mut self, path: &str) -> Result<String> {
         let font_data = std::fs::read(path)?;
         self.register_font_from_bytes(path, &font_data)
     }
 
-    /// Register a custom TTF/OTF font from bytes.
+    /// 从字节数据注册自定义 TTF/OTF 字体。
     pub fn register_font_from_bytes(&mut self, key: &str, font_data: &[u8]) -> Result<String> {
         let mut warnings = Vec::new();
         let parsed = printpdf::ParsedFont::from_bytes(font_data, 0, &mut warnings)
@@ -208,7 +208,7 @@ impl PdfWriter {
         Ok(key.to_string())
     }
 
-    /// Write text using a custom (non-builtin) font.
+    /// 使用自定义（非内置）字体写入文本。
     pub fn write_text_with_custom_font(
         &mut self,
         text: &str,
@@ -240,7 +240,7 @@ impl PdfWriter {
         Ok(())
     }
 
-    /// Add a new page.
+    /// 添加新页面。
     pub fn add_page(&mut self, size: PageSize, orientation: Orientation) -> Result<usize> {
         self.finalize_current_page()?;
         self.ensure_document_started()?;
@@ -298,13 +298,13 @@ impl PdfWriter {
         Ok(())
     }
 
-    /// Get current page number (1-based).
+    /// 获取当前页码（从 1 开始）。
     #[must_use]
     pub const fn current_page_number(&self) -> usize {
         self.current_page_number
     }
 
-    /// Get total finalized pages.
+    /// 获取已完成的总页数。
     #[must_use]
     pub fn page_count(&self) -> usize {
         // Include both in-memory pages and spilled pages.
@@ -312,19 +312,18 @@ impl PdfWriter {
         self.pages.len() + spilled
     }
 
-    /// Return whether this writer is in constant-memory (spill) mode.
+    /// 返回此写入器是否处于常量内存（溢出）模式。
     #[must_use]
     pub fn is_constant_memory(&self) -> bool {
         self.backend.is_constant_memory()
     }
 
-    /// Switch to or from constant-memory mode.
+    /// 切换常量内存模式。
     ///
-    /// When enabled, the backend is set to [`WriteBackend::constant_memory()`]
-    /// which spills every page immediately after finalization. When disabled,
-    /// the backend is set to [`WriteBackend::InMemory`].
+    /// 启用时，后端设置为 [`WriteBackend::constant_memory()`]，每个页面
+    /// 在完成后立即溢出。禁用时，后端设置为 [`WriteBackend::InMemory`]。
     ///
-    /// Note: switching mode mid-document has no effect on already-finalized pages.
+    /// 注意：在文档中间切换模式对已完成的页面无效。
     pub fn set_constant_memory(&mut self, enabled: bool) {
         if enabled {
             if !self.backend.is_constant_memory() {
@@ -341,19 +340,19 @@ impl PdfWriter {
         }
     }
 
-    /// Return the number of registered handlers.
+    /// 返回已注册的处理器数量。
     #[must_use]
     pub fn handler_count(&self) -> usize {
         self.chain.len()
     }
 
-    /// Return the document title from metadata, if set.
+    /// 返回元数据中的文档标题（如已设置）。
     #[must_use]
     pub fn metadata_title(&self) -> Option<&str> {
         self.metadata.title.as_deref()
     }
 
-    /// Write text at (x, y) in PDF points.
+    /// 在 PDF 点坐标 (x, y) 处写入文本。
     pub fn write_text(&mut self, text: &PdfText, x_pt: f64, y_pt: f64) -> Result<()> {
         if let FontFamily::Custom(ref path) = text.font.family
             && let Some(font_id) = self.custom_fonts.get(path.as_ref())
@@ -398,7 +397,7 @@ impl PdfWriter {
         Ok(())
     }
 
-    /// Add auto-positioned text (hutool addText pattern).
+    /// 添加自动定位的文本。
     pub fn add_text(&mut self, font: &PdfFont, text: &str) -> Result<&mut Self> {
         let (x, y) = self.text_cursor;
         self.write_text(&PdfText::new(text).font(font.clone()), x, y)?;
@@ -406,7 +405,7 @@ impl PdfWriter {
         Ok(self)
     }
 
-    /// Add auto-positioned text with explicit color.
+    /// 添加带显式颜色的自动定位文本。
     pub fn add_text_colored(
         &mut self,
         font: &PdfFont,
@@ -419,7 +418,7 @@ impl PdfWriter {
         Ok(self)
     }
 
-    /// Add image from file path (hutool addPicture pattern).
+    /// 从文件路径添加图片。
     pub fn add_image_from_path(
         &mut self,
         path: impl AsRef<Path>,
@@ -433,11 +432,10 @@ impl PdfWriter {
         Ok(self)
     }
 
-    /// Write the document to a file using atomic output with fsync.
+    /// 使用原子输出（fsync）将文档写入文件。
     ///
-    /// Finalizes the current page, fires `after_document` on all handlers,
-    /// collects any spilled pages, constructs the final PDF, and writes it
-    /// atomically (temp-file + fsync + rename).
+    /// 完成当前页面，对所有处理器触发 `after_document`，收集溢出的页面，
+    /// 构建最终 PDF 并以原子方式写入（临时文件 + fsync + 重命名）。
     pub fn finish(mut self, path: impl AsRef<Path>) -> Result<()> {
         if self.current_page_number == 0 {
             self.add_page(PageSize::A4, Orientation::Portrait)?;
@@ -471,7 +469,7 @@ impl PdfWriter {
         AtomicFileOutput::new(path.as_ref()).write_with_fsync(&bytes)
     }
 
-    /// Copy easypdf metadata fields into the printpdf document info.
+    /// 将 easypdf 元数据字段复制到 printpdf 文档信息中。
     fn apply_metadata(&mut self) {
         let info = &mut self.doc.metadata.info;
         if let Some(ref title) = self.metadata.title {
@@ -494,7 +492,7 @@ impl PdfWriter {
         }
     }
 
-    /// Flush to the pre-configured output stream (hutool pattern).
+    /// 刷新到预配置的输出流。
     #[allow(clippy::similar_names)]
     pub fn flush(&mut self) -> Result<()> {
         let mut pages = std::mem::take(&mut self.pages);

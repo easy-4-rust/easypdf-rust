@@ -1,15 +1,15 @@
-//! Cell-level line parsers for each separator strategy.
+//! 单元格级行解析器，每种分隔策略一个。
 
-/// Parse a pipe-separated table line into cells.
+/// 解析管道分隔的表格行为单元格。
 ///
-/// Returns `None` if the line does not contain at least two unescaped `|`
-/// characters, or if the line is a Markdown separator row (e.g. `|---|---|`).
+/// 当行中不包含至少两个未转义的 `|` 字符，或行是 Markdown
+/// 分隔行（如 `|---|---|`）时返回 `None`。
 ///
-/// Handles leading and trailing `|` as delimiters (Markdown table style):
-/// `| a | b |` yields `["a", "b"]`.  Escaped `\|` within cell content is
-/// unescaped to a literal `|`.
+/// 处理前导和尾部 `|` 作为分隔符（Markdown 表格风格）：
+/// `| a | b |` 产生 `["a", "b"]`。单元格内容中转义的 `\|`
+/// 会被反转义为字面 `|`。
 pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
-    // Character-level scan that respects `\|` escapes.
+    // 字符级扫描，尊重 `\|` 转义。
     let mut segments: Vec<String> = Vec::new();
     let mut current = String::new();
     let mut chars = text.chars().peekable();
@@ -17,7 +17,7 @@ pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
 
     while let Some(ch) = chars.next() {
         if ch == '\\' && chars.peek() == Some(&'|') {
-            // Escaped pipe: push the backslash, the '|' is consumed by the peek.
+            // 转义管道符：推入反斜杠，`|` 被 peek 消耗。
             current.push(ch);
             current.push(chars.next().unwrap_or('|'));
         } else if ch == '|' {
@@ -29,12 +29,12 @@ pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
     }
     segments.push(current);
 
-    // Need at least 2 pipes to form a table row (`|a|b|` pattern).
+    // 至少需要 2 个管道符才能形成表格行（`|a|b|` 模式）。
     if pipe_count < 2 {
         return None;
     }
 
-    // Trim leading / trailing empty segments caused by outer `|` delimiters.
+    // 修剪由外部 `|` 分隔符引起的前导/尾部空段。
     let start = usize::from(segments.first().is_some_and(String::is_empty));
     let end = if segments.last().is_some_and(String::is_empty) {
         segments.len() - 1
@@ -48,7 +48,7 @@ pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
 
     let cells: Vec<String> = segments[start..end].iter().map(|s| clean_cell(s)).collect();
 
-    // Skip separator rows like `|---|---|` or `| --- | --- |`.
+    // 跳过分隔行如 `|---|---|` 或 `| --- | --- |`。
     if cells.iter().all(|c| is_separator_cell(c)) {
         return None;
     }
@@ -60,7 +60,7 @@ pub(crate) fn parse_pipe_separated(text: &str) -> Option<Vec<String>> {
     Some(cells)
 }
 
-/// Parse a tab-separated table line into cells.
+/// 解析制表符分隔的表格行为单元格。
 pub(crate) fn parse_tab_separated(text: &str) -> Option<Vec<String>> {
     let cells: Vec<String> = text.split('\t').map(clean_cell).collect();
     let non_empty = cells.iter().filter(|c| !c.is_empty()).count();
@@ -70,9 +70,9 @@ pub(crate) fn parse_tab_separated(text: &str) -> Option<Vec<String>> {
     Some(cells)
 }
 
-/// Parse a whitespace-aligned table line into cells.
+/// 解析空格对齐的表格行为单元格。
 ///
-/// Two or more consecutive spaces are treated as a column boundary.
+/// 两个或更多连续空格视为列边界。
 pub(crate) fn parse_whitespace_aligned(text: &str) -> Option<Vec<String>> {
     let mut boundaries = Vec::new();
     let mut consecutive_spaces: usize = 0;
@@ -91,7 +91,7 @@ pub(crate) fn parse_whitespace_aligned(text: &str) -> Option<Vec<String>> {
             consecutive_spaces = 0;
         }
     }
-    // Trailing spaces — ignore.
+    // 尾部空格——忽略。
 
     if boundaries.is_empty() {
         return None;
@@ -104,12 +104,12 @@ pub(crate) fn parse_whitespace_aligned(text: &str) -> Option<Vec<String>> {
         let segment = &text[last_end..boundary];
         cells.push(clean_cell(segment));
         last_end = boundary;
-        // Skip the spaces to find the next content start.
+        // 跳过空格以找到下一个内容起始位置。
         while last_end < text.len() && text.as_bytes().get(last_end) == Some(&b' ') {
             last_end += 1;
         }
     }
-    // Remaining text after last boundary.
+    // 最后一个边界之后的剩余文本。
     if last_end <= text.len() {
         cells.push(clean_cell(&text[last_end..]));
     }
@@ -122,31 +122,31 @@ pub(crate) fn parse_whitespace_aligned(text: &str) -> Option<Vec<String>> {
     Some(cells)
 }
 
-/// Trim whitespace from a cell and unescape `\|` to `|`.
+/// 修剪单元格空白并将 `\|` 反转义为 `|`。
 fn clean_cell(cell: &str) -> String {
     cell.trim().replace("\\|", "|")
 }
 
-/// Check if a cell looks like a Markdown table separator (e.g., `---`, `:---:`, `---|`).
+/// 检查单元格是否像 Markdown 表格分隔符（如 `---`、`:---:`、`---|`）。
 fn is_separator_cell(cell: &str) -> bool {
     let trimmed = cell.trim();
     if trimmed.is_empty() {
         return false;
     }
-    // A separator cell contains only `-`, `:`, and whitespace.
+    // 分隔符单元格仅包含 `-`、`:` 和空白。
     trimmed.chars().all(|c| c == '-' || c == ':' || c == ' ')
 }
 
-/// Check if a line is a Markdown table separator row (e.g. `|---|---|` or `| --- | --- |`).
+/// 检查一行是否是 Markdown 表格分隔行（如 `|---|---|` 或 `| --- | --- |`）。
 ///
-/// Returns `true` for lines that contain only `|`, `-`, `:`, and whitespace.
-/// Such rows are structural delimiters in Markdown tables, not data.
+/// 对仅包含 `|`、`-`、`:` 和空白的行返回 `true`。
+/// 此类行是 Markdown 表格中的结构分隔符，不是数据。
 pub(crate) fn is_separator_line(text: &str) -> bool {
     let trimmed = text.trim();
     if trimmed.is_empty() {
         return false;
     }
-    // Must contain at least one pipe or dash to be a separator candidate.
+    // 必须至少包含一个管道符或短横线才可能是分隔行。
     if !trimmed.contains('|') && !trimmed.contains('-') {
         return false;
     }
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn pipe_no_leading_trailing() {
-        // Requires at least 2 unescaped pipes.
+        // 至少需要 2 个未转义的管道符。
         let cells = parse_pipe_separated("a | b | c").unwrap();
         assert_eq!(cells, vec!["a", "b", "c"]);
     }
@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn whitespace_single_space_does_not_split() {
-        // Single space should NOT be treated as boundary.
+        // 单个空格不应视为边界。
         assert!(parse_whitespace_aligned("Hello World").is_none());
     }
 

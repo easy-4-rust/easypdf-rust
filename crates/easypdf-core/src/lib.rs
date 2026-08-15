@@ -1,10 +1,10 @@
-#![doc = "Core types, traits, enums, converters, and errors for `easypdf-rust`."]
+#![doc = "`easypdf-rust` 的核心类型、trait、枚举、转换器与错误定义。"]
 #![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![deny(unsafe_code)]
 #![cfg_attr(test, allow(clippy::similar_names))]
 
-// --- Modules ---
+// --- 模块 ---
 pub mod content;
 pub mod converter_registry;
 pub mod enums;
@@ -19,15 +19,15 @@ pub mod page_range;
 pub mod style;
 pub mod traits;
 
-// --- Crypto (encryption + signing) ---
+// --- 加密（加密 + 签名）---
 pub mod crypto;
 
-// --- Merged sub-crates (Wave 1) ---
+// --- 合并的子 crate（第一波）---
 pub mod io;
 pub mod layout;
 pub mod model;
 
-// --- Convenience re-exports ---
+// --- 便捷重导出 ---
 pub use content::{PdfImage, PdfLine, PdfRect, PdfTable, PdfTableCell, PdfText};
 pub use enums::{Orientation, PageSize, Rotation, TextAlignment, VerticalAlignment};
 pub use error::{PdfError, PdfErrorCode, Result};
@@ -43,16 +43,16 @@ pub use traits::{
     PdfFieldDescriptor, PdfModel, PdfModelMetadata, PdfWriteHandler, RenderedElement,
 };
 
-// --- Re-exports from merged model crate ---
+// --- 从合并的 model crate 重导出 ---
 pub use model::{
     ImageData, ImageFormat, ListItem, PdfBlock, PdfBlockType, PdfDocumentModel, PdfPageModel,
     SourceLocation,
 };
 
-// --- Re-exports from merged io crate (flat types) ---
+// --- 从合并的 io crate 重导出（扁平类型）---
 pub use io::{AtomicFileOutput, PdfInput, ResourceLimits};
 
-// --- Re-exports from merged layout crate ---
+// --- 从合并的 layout crate 重导出 ---
 pub use layout::{Direction, FlowLayout, LayoutSink};
 
 #[cfg(test)]

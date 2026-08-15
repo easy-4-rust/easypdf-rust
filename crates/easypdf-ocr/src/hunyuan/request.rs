@@ -1,8 +1,7 @@
-//! Request builder for Tencent Cloud OCR API.
+//! 腾讯云 OCR API 请求构建器。
 //!
-//! Implements [`OcrRequest`] for the Tencent Cloud OCR endpoints,
-//! supporting `GeneralBasicOCR`, `SmartStructuralOCR`, and
-//! `GeneralAccurateOCR` actions.
+//! 为腾讯云 OCR 端点实现 [`OcrRequest`]，
+//! 支持 `GeneralBasicOCR`、`SmartStructuralOCR` 和 `GeneralAccurateOCR` 操作。
 
 use std::collections::HashMap;
 
@@ -14,16 +13,15 @@ use easypdf_markdown::ocr::OcrImage;
 
 use super::config::{HunyuanConfig, HunyuanMode};
 
-/// Request builder for Tencent Cloud OCR API.
+/// 腾讯云 OCR API 请求构建器。
 ///
-/// Constructs the JSON request body and extra headers for the selected
-/// OCR mode. Uses [`AuthMethod::TencentCloud`] for TC3-HMAC-SHA256
-/// signature authentication.
+/// 为选定的 OCR 模式构造 JSON 请求体和额外请求头。
+/// 使用 [`AuthMethod::TencentCloud`] 进行 TC3-HMAC-SHA256 签名认证。
 ///
-/// # API Actions
+/// # API 操作
 ///
-/// | Mode | Action |
-/// |------|--------|
+/// | 模式 | 操作 |
+/// |------|------|
 /// | `GeneralBasic` | `GeneralBasicOCR` |
 /// | `SmartStructural` | `SmartStructuralOCR` |
 /// | `GeneralAccurate` | `GeneralAccurateOCR` |
@@ -33,10 +31,9 @@ pub struct HunyuanOcrRequest {
 }
 
 impl HunyuanOcrRequest {
-    /// Create a new request builder from configuration.
+    /// 从配置创建请求构建器。
     ///
-    /// Constructs the [`AuthMethod::TencentCloud`] variant with the
-    /// provided credentials.
+    /// 使用提供的凭据构造 [`AuthMethod::TencentCloud`] 变体。
     #[must_use]
     pub fn new(config: HunyuanConfig) -> Self {
         let auth = AuthMethod::TencentCloud {
@@ -50,7 +47,7 @@ impl HunyuanOcrRequest {
         Self { config, auth }
     }
 
-    /// Get a reference to the configuration.
+    /// 获取配置的引用。
     #[must_use]
     pub fn config(&self) -> &HunyuanConfig {
         &self.config
@@ -78,12 +75,12 @@ impl OcrRequest for HunyuanOcrRequest {
             "ImageBase64": base64_data,
         });
 
-        // Add optional language hint.
+        // 添加可选的语言提示。
         if let Some(ref lang) = self.config.language {
             body["Language"] = serde_json::Value::String(lang.clone());
         }
 
-        // For SmartStructuralOCR, enable full text return by default.
+        // 对于 SmartStructuralOCR，默认启用全文返回。
         if self.config.mode == HunyuanMode::SmartStructural {
             body["ReturnFullText"] = serde_json::Value::Bool(true);
         }

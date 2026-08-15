@@ -1,7 +1,7 @@
-//! Builder pattern for constructing [`PdfWriter`] with advanced options.
+//! 构建 [`PdfWriter`] 的构建器模式。
 //!
-//! Provides [`PdfWriterBuilder`] for configuring write backend, handler
-//! priorities, and constant-memory mode before constructing a writer.
+//! 提供 [`PdfWriterBuilder`]，用于在构造写入器之前配置写入后端、
+//! 处理器优先级和常量内存模式。
 //!
 //! # Examples
 //!
@@ -22,13 +22,13 @@ use easypdf_core::{PdfMetadata, PdfWriteHandler};
 use crate::backend::WriteBackend;
 use crate::writer::PdfWriter;
 
-/// Builder for constructing a [`PdfWriter`] with advanced configuration.
+/// 用于构造具有高级配置的 [`PdfWriter`] 的构建器。
 ///
-/// Supports:
-/// - **Write backend selection** (in-memory vs page-level spill)
-/// - **Handler priority ordering** via [`WriteHandlerChain`]
-/// - **Constant-memory mode** convenience toggle
-/// - **Temp file compression** for spill mode
+/// 支持：
+/// - **写入后端选择**（内存模式 vs 页面级溢出）
+/// - **处理器优先级排序**（通过 [`WriteHandlerChain`]）
+/// - **常量内存模式**便捷切换
+/// - **临时文件压缩**（溢出模式）
 ///
 /// # Examples
 ///
@@ -52,7 +52,7 @@ pub struct PdfWriterBuilder {
 }
 
 impl PdfWriterBuilder {
-    /// Create a new builder for a PDF document with the given title.
+    /// 创建指定标题的 PDF 文档构建器。
     #[must_use]
     pub fn new(title: impl Into<String>) -> Self {
         Self {
@@ -65,55 +65,53 @@ impl PdfWriterBuilder {
         }
     }
 
-    /// Set document metadata.
+    /// 设置文档元数据。
     #[must_use]
     pub fn metadata(mut self, metadata: PdfMetadata) -> Self {
         self.metadata = metadata;
         self
     }
 
-    /// Set the write backend (in-memory or spill).
+    /// 设置写入后端（内存模式或溢出模式）。
     #[must_use]
     pub fn backend(mut self, backend: WriteBackend) -> Self {
         self.backend = backend;
         self
     }
 
-    /// Enable or disable constant-memory mode.
+    /// 启用或禁用常量内存模式。
     ///
-    /// When enabled, the backend is automatically switched to
-    /// [`WriteBackend::constant_memory()`] which spills every page
-    /// immediately after finalization.
+    /// 启用时，后端自动切换为 [`WriteBackend::constant_memory()`]，
+    /// 每个页面在完成后立即溢出。
     #[must_use]
     pub fn constant_memory(mut self, enabled: bool) -> Self {
         self.constant_memory = enabled;
         self
     }
 
-    /// Set whether spill files should be gzip-compressed.
+    /// 设置溢出文件是否使用 gzip 压缩。
     ///
-    /// Only takes effect when the backend is [`WriteBackend::Spill`].
-    /// Defaults to `true`.
+    /// 仅在后端为 [`WriteBackend::Spill`] 时生效。默认为 `true`。
     #[must_use]
     pub fn compress_temp_files(mut self, compress: bool) -> Self {
         self.compress_temp_files = compress;
         self
     }
 
-    /// Register a write handler with the default priority
-    /// ([`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)).
+    /// 注册使用默认优先级的写入处理器
+    /// （[`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)）。
     #[must_use]
     pub fn register_handler(mut self, handler: Box<dyn PdfWriteHandler>) -> Self {
         self.chain.register(handler, PRIORITY_NORMAL);
         self
     }
 
-    /// Register a write handler with a specific priority.
+    /// 注册使用指定优先级的写入处理器。
     ///
-    /// Lower priority values execute first. See
-    /// [`PRIORITY_HIGH`](easypdf_core::handler_chain::PRIORITY_HIGH),
-    /// [`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL),
-    /// [`PRIORITY_LOW`](easypdf_core::handler_chain::PRIORITY_LOW).
+    /// 优先级值越小越先执行。参见
+    /// [`PRIORITY_HIGH`](easypdf_core::handler_chain::PRIORITY_HIGH)、
+    /// [`PRIORITY_NORMAL`](easypdf_core::handler_chain::PRIORITY_NORMAL)、
+    /// [`PRIORITY_LOW`](easypdf_core::handler_chain::PRIORITY_LOW)。
     #[must_use]
     pub fn register_handler_with_priority(
         mut self,
@@ -124,12 +122,11 @@ impl PdfWriterBuilder {
         self
     }
 
-    /// Build the [`PdfWriter`].
+    /// 构建 [`PdfWriter`]。
     ///
     /// # Errors
     ///
-    /// Returns an error if the spill backend cannot be initialized (e.g.,
-    /// the spill directory cannot be created).
+    /// 当溢出后端无法初始化（例如无法创建溢出目录）时返回错误。
     pub fn build(self) -> Result<PdfWriter> {
         let backend = if self.constant_memory {
             WriteBackend::Spill {

@@ -1,9 +1,12 @@
+//! Markdown 列表渲染辅助函数。
+
 use easypdf_core::ListItem;
 
 use crate::MarkdownProfile;
 
 use super::escaping::escape_text;
 
+/// 将列表项渲染为 Markdown 字符串。
 pub(super) fn render_list(ordered: bool, items: &[ListItem], profile: MarkdownProfile) -> String {
     if profile == MarkdownProfile::Plain {
         return items
@@ -17,7 +20,7 @@ pub(super) fn render_list(ordered: bool, items: &[ListItem], profile: MarkdownPr
     lines.join("\n")
 }
 
-/// Recursively render nested list items.
+/// 递归渲染嵌套列表项。
 fn render_list_items(items: &[ListItem], ordered: bool, depth: usize, out: &mut Vec<String>) {
     let indent = "  ".repeat(depth);
     for (index, item) in items.iter().enumerate() {

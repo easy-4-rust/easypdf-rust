@@ -530,7 +530,7 @@ pub struct easypdf::PdfReadBuilder
 impl easypdf::PdfReadBuilder
 pub fn easypdf::PdfReadBuilder::extract_text(self) -> easypdf_core::error::Result<alloc::string::String>
 pub fn easypdf::PdfReadBuilder::metadata(self) -> easypdf_core::error::Result<easypdf_core::metadata::PdfMetadata>
-pub fn easypdf::PdfReadBuilder::open(self) -> easypdf_core::error::Result<easypdf_reader::reader::PdfReader>
+pub fn easypdf::PdfReadBuilder::open(self) -> easypdf_core::error::Result<easypdf_reader::reader::pdf_reader::PdfReader>
 pub fn easypdf::PdfReadBuilder::page_count(self) -> easypdf_core::error::Result<usize>
 pub fn easypdf::PdfReadBuilder::pages(self, core::ops::range::Range<usize>) -> Self
 pub const fn easypdf::PdfReadBuilder::strategy(self, easypdf_reader::strategy::ReadStrategy) -> Self

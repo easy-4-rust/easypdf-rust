@@ -1,17 +1,17 @@
-//! Style types — colors, fonts, and borders.
+//! 样式类型——颜色、字体和边框。
 
 use std::borrow::Cow;
 
-// --- Color ---
+// --- 颜色 ---
 
-/// Represents a color in various color spaces.
+/// 表示不同颜色空间中的颜色。
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PdfColor {
-    /// RGB color with components in 0.0–1.0 range.
+    /// RGB 颜色，分量范围 0.0–1.0。
     Rgb(f64, f64, f64),
-    /// Grayscale color with component in 0.0–1.0 range.
+    /// 灰度颜色，分量范围 0.0–1.0。
     Gray(f64),
-    /// CMYK color with components in 0.0–1.0 range.
+    /// CMYK 颜色，分量范围 0.0–1.0。
     Cmyk(f64, f64, f64, f64),
 }
 
@@ -22,7 +22,7 @@ impl Default for PdfColor {
 }
 
 impl PdfColor {
-    /// Create an RGB color from 0–255 integer components.
+    /// 从 0–255 整数分量创建 RGB 颜色。
     #[must_use]
     pub fn rgb_u8(r: u8, g: u8, b: u8) -> Self {
         Self::Rgb(
@@ -32,110 +32,110 @@ impl PdfColor {
         )
     }
 
-    /// Black.
+    /// 黑色。
     #[must_use]
     pub const fn black() -> Self {
         Self::Rgb(0.0, 0.0, 0.0)
     }
 
-    /// White.
+    /// 白色。
     #[must_use]
     pub const fn white() -> Self {
         Self::Rgb(1.0, 1.0, 1.0)
     }
 
-    /// Red.
+    /// 红色。
     #[must_use]
     pub const fn red() -> Self {
         Self::Rgb(1.0, 0.0, 0.0)
     }
 
-    /// Green.
+    /// 绿色。
     #[must_use]
     pub const fn green() -> Self {
         Self::Rgb(0.0, 1.0, 0.0)
     }
 
-    /// Blue.
+    /// 蓝色。
     #[must_use]
     pub const fn blue() -> Self {
         Self::Rgb(0.0, 0.0, 1.0)
     }
 
-    /// Light gray (0.8).
+    /// 浅灰色（0.8）。
     #[must_use]
     pub const fn light_gray() -> Self {
         Self::Gray(0.8)
     }
 
-    /// Medium gray (0.5).
+    /// 中灰色（0.5）。
     #[must_use]
     pub const fn gray() -> Self {
         Self::Gray(0.5)
     }
 }
 
-// --- Font ---
+// --- 字体 ---
 
-/// Font family specification.
+/// 字体族规格。
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FontFamily {
-    /// One of the 14 built-in PDF fonts.
+    /// 14 种内置 PDF 字体之一。
     BuiltIn(BuiltInFont),
-    /// A custom font loaded from a TTF/OTF file path.
+    /// 从 TTF/OTF 文件路径加载的自定义字体。
     Custom(Cow<'static, str>),
 }
 
-/// The 14 standard Type 1 fonts guaranteed in every PDF reader.
+/// 保证在每个 PDF 阅读器中可用的 14 种标准 Type 1 字体。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BuiltInFont {
-    /// Times-Roman (serif).
+    /// Times-Roman（衬线体）。
     TimesRoman,
-    /// Times-Bold.
+    /// Times-Bold。
     TimesBold,
-    /// Times-Italic.
+    /// Times-Italic。
     TimesItalic,
-    /// Times-BoldItalic.
+    /// Times-BoldItalic。
     TimesBoldItalic,
-    /// Helvetica (sans-serif).
+    /// Helvetica（无衬线体）。
     Helvetica,
-    /// Helvetica-Bold.
+    /// Helvetica-Bold。
     HelveticaBold,
-    /// Helvetica-Oblique.
+    /// Helvetica-Oblique。
     HelveticaOblique,
-    /// Helvetica-BoldOblique.
+    /// Helvetica-BoldOblique。
     HelveticaBoldOblique,
-    /// Courier (monospace).
+    /// Courier（等宽体）。
     Courier,
-    /// Courier-Bold.
+    /// Courier-Bold。
     CourierBold,
-    /// Courier-Oblique.
+    /// Courier-Oblique。
     CourierOblique,
-    /// Courier-BoldOblique.
+    /// Courier-BoldOblique。
     CourierBoldOblique,
-    /// Symbol.
+    /// Symbol。
     Symbol,
-    /// `ZapfDingbats`.
+    /// `ZapfDingbats`。
     ZapfDingbats,
 }
 
-/// Font style modifiers.
+/// 字体样式修饰符。
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FontStyle {
-    /// Bold weight.
+    /// 粗体。
     pub bold: bool,
-    /// Italic/oblique.
+    /// 斜体/倾斜。
     pub italic: bool,
 }
 
-/// A complete font specification.
+/// 完整的字体规格。
 #[derive(Debug, Clone)]
 pub struct PdfFont {
-    /// Font family name or path.
+    /// 字体族名称或路径。
     pub family: FontFamily,
-    /// Font size in PDF points.
+    /// 字体大小（PDF 点）。
     pub size: f64,
-    /// Bold and/or italic.
+    /// 粗体和/或斜体。
     pub style: FontStyle,
 }
 
@@ -150,7 +150,7 @@ impl Default for PdfFont {
 }
 
 impl PdfFont {
-    /// Helvetica at the given size.
+    /// 使用给定大小的 Helvetica 字体。
     #[must_use]
     pub fn helvetica(size: f64) -> Self {
         Self {
@@ -163,7 +163,7 @@ impl PdfFont {
         }
     }
 
-    /// Times-Roman at the given size.
+    /// 使用给定大小的 Times-Roman 字体。
     #[must_use]
     pub fn times_roman(size: f64) -> Self {
         Self {
@@ -176,7 +176,7 @@ impl PdfFont {
         }
     }
 
-    /// Courier at the given size.
+    /// 使用给定大小的 Courier 字体。
     #[must_use]
     pub fn courier(size: f64) -> Self {
         Self {
@@ -189,21 +189,21 @@ impl PdfFont {
         }
     }
 
-    /// Set the font size.
+    /// 设置字体大小。
     #[must_use]
     pub fn with_size(mut self, size: f64) -> Self {
         self.size = size;
         self
     }
 
-    /// Enable bold.
+    /// 启用粗体。
     #[must_use]
     pub fn bold(mut self) -> Self {
         self.style.bold = true;
         self
     }
 
-    /// Enable italic.
+    /// 启用斜体。
     #[must_use]
     pub fn italic(mut self) -> Self {
         self.style.italic = true;
@@ -211,14 +211,14 @@ impl PdfFont {
     }
 }
 
-// --- Border ---
+// --- 边框 ---
 
-/// A table cell border definition.
+/// 表格单元格边框定义。
 #[derive(Debug, Clone, Copy)]
 pub struct TableBorder {
-    /// Border width in PDF points (0 = no border).
+    /// 边框宽度（PDF 点，0 = 无边框）。
     pub width: f64,
-    /// Border color.
+    /// 边框颜色。
     pub color: PdfColor,
 }
 
@@ -231,20 +231,20 @@ impl Default for TableBorder {
     }
 }
 
-/// Pre-defined table styles.
+/// 预定义表格样式。
 #[derive(Debug, Clone)]
 pub struct TableStyle {
-    /// Header background color.
+    /// 表头背景颜色。
     pub header_bg: Option<PdfColor>,
-    /// Header font.
+    /// 表头字体。
     pub header_font: PdfFont,
-    /// Body font.
+    /// 正文字体。
     pub body_font: PdfFont,
-    /// Cell border.
+    /// 单元格边框。
     pub border: TableBorder,
-    /// Whether to use alternating row colors.
+    /// 是否使用交替行颜色。
     pub striped: bool,
-    /// Alternating row background color (used when `striped` is true).
+    /// 交替行背景颜色（`striped` 为 `true` 时使用）。
     pub stripe_color: PdfColor,
 }
 
@@ -262,7 +262,7 @@ impl Default for TableStyle {
 }
 
 impl TableStyle {
-    /// Create a simple table style with no background colors and thin borders.
+    /// 创建无背景色、细边框的简洁表格样式。
     #[must_use]
     pub fn simple() -> Self {
         Self {
@@ -272,7 +272,7 @@ impl TableStyle {
         }
     }
 
-    /// Create a table style with alternating (striped) row colors.
+    /// 创建带交替（条纹）行颜色的表格样式。
     #[must_use]
     pub fn striped() -> Self {
         Self {

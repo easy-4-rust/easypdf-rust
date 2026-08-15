@@ -1,36 +1,36 @@
-//! Retry and backoff strategies for HTTP OCR requests.
+//! HTTP OCR 请求的重试和退避策略。
 
 use std::time::Duration;
 
-/// Backoff strategy for retry attempts.
+/// 重试尝试的退避策略。
 ///
-/// Determines how long to wait between consecutive retries.
+/// 决定连续重试之间的等待时间。
 #[derive(Debug, Clone)]
 pub enum BackoffStrategy {
-    /// No retries at all.
+    /// 不重试。
     None,
-    /// Fixed delay between retries.
+    /// 重试间固定延迟。
     Fixed(Duration),
-    /// Exponential backoff: `base_ms * 2^attempt`, capped at `max_ms`.
+    /// 指数退避：`base_ms * 2^attempt`，上限为 `max_ms`。
     Exponential {
-        /// Base delay in milliseconds.
+        /// 基础延迟（毫秒）。
         base_ms: u64,
-        /// Maximum delay in milliseconds.
+        /// 最大延迟（毫秒）。
         max_ms: u64,
     },
-    /// Linear backoff: `step_ms * attempt`, capped at `max_ms`.
+    /// 线性退避：`step_ms * attempt`，上限为 `max_ms`。
     Linear {
-        /// Delay increment per attempt in milliseconds.
+        /// 每次尝试的延迟增量（毫秒）。
         step_ms: u64,
-        /// Maximum delay in milliseconds.
+        /// 最大延迟（毫秒）。
         max_ms: u64,
     },
 }
 
 impl BackoffStrategy {
-    /// Calculate the delay before the given retry attempt (0-indexed).
+    /// 计算给定重试尝试（从 0 开始）之前的延迟。
     ///
-    /// For `BackoffStrategy::None`, always returns zero.
+    /// 对于 `BackoffStrategy::None`，始终返回零。
     #[must_use]
     pub fn delay_for(&self, attempt: u32) -> Duration {
         match self {
@@ -48,12 +48,12 @@ impl BackoffStrategy {
     }
 }
 
-/// Check if an HTTP status code is retryable.
+/// 检查 HTTP 状态码是否可重试。
 ///
-/// Returns `true` for:
-/// - 408 Request Timeout
-/// - 429 Too Many Requests
-/// - 500-599 Server errors
+/// 以下状态码返回 `true`：
+/// - 408 请求超时
+/// - 429 请求过多
+/// - 500-599 服务器错误
 #[must_use]
 pub fn is_retryable(status: u16) -> bool {
     matches!(status, 408 | 429 | 500..=599)

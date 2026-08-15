@@ -1,10 +1,9 @@
-//! PDFium-based rendering backend.
+//! 基于 `PDFium` 的渲染后端。
 //!
-//! Uses the [`pdfium_render`] crate to provide high-quality PDF page
-//! rasterization. Requires the `libpdfium` dynamic library to be available
-//! at runtime.
+//! 使用 [`pdfium_render`] crate 提供高质量的 PDF 页面光栅化。
+//! 运行时需要 `libpdfium` 动态库。
 //!
-//! This module is only compiled when the `pdfium` feature is enabled.
+//! 仅在启用 `pdfium` feature 时编译此模块。
 
 use std::path::Path;
 
@@ -14,8 +13,7 @@ use crate::render::config::RenderConfig;
 use crate::render::error::{RenderError, Result};
 use crate::render::traits::{PdfRenderer, RenderedImage};
 
-/// Bind to the pdfium dynamic library, trying the directory of the PDF first,
-/// then falling back to system library paths.
+/// 绑定 pdfium 动态库，先尝试 PDF 所在目录，再回退到系统库路径。
 fn bind_pdfium(
     pdf_dir: &Path,
 ) -> std::result::Result<Box<dyn pdfium_render::prelude::PdfiumLibraryBindings>, PdfiumError> {
@@ -23,10 +21,9 @@ fn bind_pdfium(
         .or_else(|_| Pdfium::bind_to_system_library())
 }
 
-/// High-quality PDF renderer backed by Google `PDFium`.
+/// 基于 Google `PDFium` 的高质量 PDF 渲染器。
 ///
-/// Requires the `pdfium` Cargo feature and the `libpdfium` shared library
-/// to be present at runtime.
+/// 需要 `pdfium` Cargo feature 且运行时需要 `libpdfium` 共享库。
 ///
 /// # Examples
 ///
@@ -47,22 +44,22 @@ pub struct PdfiumRenderer {
 }
 
 impl PdfiumRenderer {
-    /// Probe whether the pdfium dynamic library can be loaded.
+    /// 探测 pdfium 动态库是否可加载。
     ///
     /// # Errors
     ///
-    /// Returns a [`PdfiumError`] if the library cannot be found or loaded.
+    /// 当库无法找到或加载时返回 [`PdfiumError`]。
     pub fn probe() -> std::result::Result<(), PdfiumError> {
         bind_pdfium(Path::new("."))?;
         Ok(())
     }
 
-    /// Open a PDF file for rendering with the pdfium backend.
+    /// 使用 pdfium 后端打开 PDF 文件进行渲染。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError::BackendUnavailable`] if the pdfium library
-    /// cannot be loaded, or [`RenderError::Parse`] if the PDF cannot be opened.
+    /// 当 pdfium 库无法加载时返回 [`RenderError::BackendUnavailable`]，
+    /// 当 PDF 无法打开时返回 [`RenderError::Parse`]。
     pub fn open(path: &Path) -> Result<Self> {
         let pdfium_bind = bind_pdfium(path.parent().unwrap_or(Path::new("."))).map_err(|e| {
             RenderError::BackendUnavailable {
@@ -85,9 +82,9 @@ impl PdfiumRenderer {
         })
     }
 
-    /// Convert a [`RenderConfig`] DPI to a target pixel width for an A4 page.
+    /// 将 [`RenderConfig`] 的 DPI 转换为 A4 页面的目标像素宽度。
     fn target_width(config: &RenderConfig) -> i32 {
-        // A4 width at 72 DPI is 595 points.
+        // A4 在 72 DPI 下宽度为 595 点。
         let scale = f64::from(config.dpi) / 72.0;
         #[allow(clippy::cast_possible_truncation)] // A4 宽度有限，round 后不会截断
         let w = (595.0 * scale).round() as i32;
@@ -108,10 +105,9 @@ impl PdfRenderer for PdfiumRenderer {
             });
         }
 
-        // Bind per call: `Pdfium` holds `Box<dyn PdfiumLibraryBindings>` which is
-        // neither `Send` nor `Sync`, so it cannot be stored in this (Send + Sync)
-        // renderer. The OS caches the already-loaded dynamic library, so repeated
-        // binding is cheap after the first call.
+        // 每次调用时绑定：`Pdfium` 持有 `Box<dyn PdfiumLibraryBindings>`，
+        // 既不是 `Send` 也不是 `Sync`，因此无法存储在此 (Send + Sync) 渲染器中。
+        // 操作系统会缓存已加载的动态库，因此重复绑定在首次调用后代价很低。
         let pdfium_bind = bind_pdfium(self.document_path.parent().unwrap_or(Path::new(".")))
             .map_err(|e| RenderError::BackendUnavailable {
                 name: "pdfium",
@@ -144,7 +140,7 @@ impl PdfRenderer for PdfiumRenderer {
         let width = bitmap.width().cast_unsigned();
         let height = bitmap.height().cast_unsigned();
         let raw = bitmap.as_raw_bytes();
-        // pdfium produces BGRA; convert to RGBA.
+        // pdfium 产生 BGRA；转换为 RGBA。
         let mut rgba = Vec::with_capacity(raw.len());
         for chunk in raw.chunks_exact(4) {
             rgba.push(chunk[2]); // R
@@ -177,15 +173,14 @@ mod tests {
 
     #[test]
     fn test_probe_reports_unavailable_when_no_library() {
-        // This test verifies that probe() does not panic even when
-        // pdfium is not installed. It may succeed or fail depending
-        // on the environment; we just verify it returns a Result.
+        // 此测试验证即使 pdfium 未安装，probe() 也不会 panic。
+        // 根据环境可能成功或失败；仅验证返回 Result。
         let _result = PdfiumRenderer::probe();
     }
 
     #[test]
     fn test_open_nonexistent_returns_error() {
-        // Attempting to open a nonexistent file should fail gracefully.
+        // 尝试打开不存在的文件应优雅失败。
         let result = PdfiumRenderer::open(Path::new("/nonexistent/path/file.pdf"));
         assert!(result.is_err());
     }

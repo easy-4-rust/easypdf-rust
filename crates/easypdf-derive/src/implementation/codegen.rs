@@ -1,4 +1,4 @@
-//! Code generation for `render()` and `field_descriptors()`.
+//! `render()` 和 `field_descriptors()` 的代码生成。
 
 use proc_macro2::TokenStream;
 use quote::quote;

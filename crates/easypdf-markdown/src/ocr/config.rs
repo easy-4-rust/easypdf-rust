@@ -1,8 +1,8 @@
-//! OCR configuration and trigger policies.
+//! OCR 配置与触发策略。
 
-/// Configuration for the OCR processor.
+/// OCR 处理器配置。
 ///
-/// Controls rendering DPI, when OCR is triggered, and quality thresholds.
+/// 控制渲染 DPI、OCR 触发条件和质量阈值。
 ///
 /// # Examples
 ///
@@ -19,23 +19,23 @@
 /// ```
 #[derive(Debug, Clone)]
 pub struct OcrConfig {
-    /// Rendering DPI for page-to-image conversion. Default: 200.
+    /// 页面转图像的渲染 DPI。默认值：200。
     ///
-    /// Higher values improve OCR accuracy but increase memory usage and
-    /// processing time. 200 DPI is a good balance for most documents.
+    /// 值越高 OCR 准确度越好，但内存占用和处理时间也越大。
+    /// 200 DPI 对大多数文档是较好的平衡点。
     pub render_dpi: u32,
 
-    /// When to trigger OCR. Default: [`OcrTrigger::OnEmptyPage`].
+    /// OCR 触发条件。默认值：[`OcrTrigger::OnEmptyPage`]。
     pub trigger: OcrTrigger,
 
-    /// Minimum text length to keep from OCR results. Default: 0 (keep all).
+    /// 从 OCR 结果中保留的最小文本长度。默认值：0（全部保留）。
     ///
-    /// OCR results shorter than this threshold are discarded as noise.
+    /// 短于此阈值的 OCR 结果将被视为噪声而丢弃。
     pub min_text_length: usize,
 
-    /// Minimum confidence threshold. Default: 0.5.
+    /// 最小置信度阈值。默认值：0.5。
     ///
-    /// OCR results with confidence below this value are flagged with a warning.
+    /// 置信度低于此值的 OCR 结果将生成警告。
     pub min_confidence: f32,
 }
 
@@ -50,7 +50,7 @@ impl Default for OcrConfig {
     }
 }
 
-/// When to trigger OCR processing on a page.
+/// OCR 触发条件。
 ///
 /// # Examples
 ///
@@ -63,22 +63,21 @@ impl Default for OcrConfig {
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 #[non_exhaustive]
 pub enum OcrTrigger {
-    /// Always attempt OCR on every page.
+    /// 始终对每一页执行 OCR。
     Always,
 
-    /// Only OCR when a page has no extractable native text blocks.
+    /// 仅在页面缺少可提取的原生文本块时执行 OCR。
     ///
-    /// This is the default and the primary use case: scanned PDFs where the
-    /// text extractor returns empty pages.
+    /// 这是默认值，也是主要用例：扫描件 PDF 中文本提取器返回空页面时触发。
     #[default]
     OnEmptyPage,
 
-    /// OCR when the ratio of text blocks to total blocks is below the threshold.
+    /// 当文本块占总块数的比例低于阈值时执行 OCR。
     ///
-    /// The `threshold` is a value in `0.0..=1.0`. A page is considered text-sparse
-    /// when `(text_block_count / total_block_count) < threshold`.
+    /// `threshold` 取值范围为 `0.0..=1.0`。当
+    /// `(text_block_count / total_block_count) < threshold` 时视为文本稀疏。
     WhenTextSparse {
-        /// Text-to-total block ratio threshold (0.0 to 1.0).
+        /// 文本块与总块数的比例阈值（0.0 到 1.0）。
         threshold: f32,
     },
 }

@@ -1,9 +1,9 @@
-//! Font mapping and font registration logic.
+//! 字体映射与字体注册逻辑。
 
 use easypdf_core::{BuiltInFont, FontFamily, PdfFont};
 use printpdf::BuiltinFont;
 
-/// Map easypdf-core's FontFamily to printpdf's BuiltinFont.
+/// 将 easypdf-core 的 FontFamily 映射到 printpdf 的 BuiltinFont。
 #[must_use]
 pub fn map_builtin_font(font: &PdfFont) -> BuiltinFont {
     match &font.family {

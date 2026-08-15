@@ -1,32 +1,16 @@
-//! Tencent Cloud OCR engine integration for easypdf.
+//! 腾讯云 OCR 引擎集成。
 //!
-//! Provides an OCR engine backed by Tencent Cloud's OCR API with three
-//! recognition modes.
+//! 提供基于腾讯云 OCR API 的引擎，支持三种识别模式。
 
 pub mod config;
+pub mod factory;
 pub mod parser;
 pub mod request;
 
 pub use config::{HunyuanConfig, HunyuanMode};
+pub use factory::create_hunyuan_ocr_engine;
 pub use parser::HunyuanOcrParser;
 pub use request::HunyuanOcrRequest;
-
-use crate::http::HttpOcrEngine;
-use crate::http::build_http_engine;
-use crate::http::error::Result;
-
-/// Create a Tencent Cloud OCR engine with default HTTP configuration.
-///
-/// # Errors
-///
-/// Returns [`OcrHttpError::Transport`](crate::http::OcrHttpError::Transport)
-/// if the underlying HTTP client cannot be built.
-pub fn create_hunyuan_ocr_engine(
-    config: HunyuanConfig,
-) -> Result<HttpOcrEngine<HunyuanOcrRequest, HunyuanOcrParser>> {
-    let mode = config.mode;
-    build_http_engine(HunyuanOcrRequest::new(config), HunyuanOcrParser::new(mode))
-}
 
 #[cfg(test)]
 mod tests {

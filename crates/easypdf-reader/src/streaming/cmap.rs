@@ -1,7 +1,7 @@
-//! `CMap`: character-code to Unicode mapping.
+//! `CMap`：字符码到 Unicode 的映射。
 //!
-//! Provides [`CMap`] for parsing PDF `ToUnicode` `CMap` streams and looking up
-//! character code to Unicode codepoint mappings.
+//! 提供 [`CMap`] 用于解析 PDF `ToUnicode` `CMap` 流并查找
+//! 字符码到 Unicode 码位的映射。
 
 use std::collections::HashMap;
 
@@ -21,15 +21,15 @@ pub(super) struct BfRange {
     start_unicode: u32,
 }
 
-/// PDF `CMap` character-code to Unicode mapping table.
+/// PDF `CMap` 字符码到 Unicode 的映射表。
 ///
-/// Covers the two mapping constructs used by 95 %+ of real-world PDFs:
-/// - `beginbfchar` / `endbfchar` -- individual code-point mappings
-/// - `beginbfrange` / `endbfrange` -- contiguous range mappings
+/// 覆盖了 95% 以上真实 PDF 使用的两种映射构造：
+/// - `beginbfchar` / `endbfchar` -- 单个码位映射
+/// - `beginbfrange` / `endbfrange` -- 连续范围映射
 ///
-/// The full `CMap` specification also includes `begin/cidchar`,
-/// `begin/cidrange`, and `codespacerange`, but those are not needed for
-/// `ToUnicode` extraction and are intentionally omitted for simplicity.
+/// 完整的 `CMap` 规范还包括 `begin/cidchar`、`begin/cidrange`
+/// 和 `codespacerange`，但这些对 `ToUnicode` 提取不需要，
+/// 故有意省略以保持简洁。
 #[derive(Debug, Clone)]
 pub(crate) struct CMap {
     /// Single-character mappings: character code -> Unicode codepoint.
@@ -40,13 +40,12 @@ pub(crate) struct CMap {
 }
 
 impl CMap {
-    /// Parse a `CMap` from raw stream bytes.
+    /// 从原始流字节解析 `CMap`。
     ///
-    /// Only `beginbfchar` and `beginbfrange` sections are extracted; all
-    /// other `CMap` constructs are silently ignored.
+    /// 仅提取 `beginbfchar` 和 `beginbfrange` 段；
+    /// 所有其他 `CMap` 构造被静默忽略。
     ///
-    /// A `CMap` with zero mappings is **not** considered invalid -- it simply
-    /// produces an empty table.
+    /// 零映射的 `CMap` **不**被视为无效 -- 它只是产生空表。
     #[must_use]
     pub fn parse(data: &[u8]) -> Self {
         let text = String::from_utf8_lossy(data);
@@ -55,11 +54,10 @@ impl CMap {
         Self { bfchar, bfrange }
     }
 
-    /// Look up the Unicode codepoint for `code`.
+    /// 查找 `code` 对应的 Unicode 码位。
     ///
-    /// `bfchar` entries are checked first (O(1) hash lookup), then
-    /// `bfrange` entries are scanned linearly.  Returns `None` when no
-    /// mapping exists.
+    /// 先检查 `bfchar` 条目（O(1) 哈希查找），再线性扫描 `bfrange` 条目。
+    /// 无映射时返回 `None`。
     #[must_use]
     pub fn lookup(&self, code: u32) -> Option<u32> {
         // Direct bfchar mapping.
@@ -76,7 +74,7 @@ impl CMap {
         None
     }
 
-    /// Returns `true` when the `CMap` contains zero mappings.
+    /// 当 `CMap` 包含零个映射时返回 `true`。
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.bfchar.is_empty() && self.bfrange.is_empty()

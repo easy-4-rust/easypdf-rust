@@ -1,173 +1,47 @@
-//! Shared HTTP client infrastructure for OCR engine integrations.
+//! OCR 引擎共享 HTTP 客户端基础设施。
 //!
-//! This module provides a common foundation for cloud-based OCR engines used
-//! in the easypdf pipeline. It handles HTTP transport, authentication, retry,
-//! rate limiting, and image encoding, allowing each engine to focus only on
-//! its specific request/response format.
+//! 本模块为 easypdf 流水线中使用的云端 OCR 引擎提供通用基础。它处理
+//! HTTP 传输、认证、重试、限流和图像编码，使各引擎只需关注其专用的
+//! 请求/响应格式。
 
 pub mod auth;
+pub mod builder;
 pub mod client;
 pub mod error;
+pub mod http_ocr_engine;
 pub mod image;
 pub mod rate_limit;
 pub mod request;
 pub mod response;
 pub mod retry;
 
-use easypdf_core::CapabilityLevel;
-use easypdf_markdown::ocr::{OcrEngine, OcrImage, OcrResult};
-
-use self::client::{HttpClientConfig, OcrHttpClient};
-use self::error::Result;
-use self::request::{OcrRequest, RequestConfig};
-use self::response::OcrResponseParser;
-
-// Re-exports for convenience.
+// 公共路径重导出，保持 `easypdf_ocr::http::HttpOcrEngine` 等路径不变。
 pub use auth::AuthMethod as Auth;
+pub use builder::{build_http_engine, build_http_engine_with_config};
 pub use client::HttpClientConfig as Config;
 pub use error::OcrHttpError;
+pub use http_ocr_engine::HttpOcrEngine;
 pub use image::{EncodedImage, ImageEncoding};
 pub use rate_limit::RateLimitConfig;
 pub use retry::BackoffStrategy;
-
-/// Generic HTTP-based OCR engine.
-///
-/// Combines an [`OcrRequest`] (builds the engine-specific request body)
-/// with an [`OcrResponseParser`] (parses the engine-specific response)
-/// and an [`OcrHttpClient`] (handles transport, auth, retry, rate limiting).
-///
-/// This struct implements [`OcrEngine`] from `easypdf-markdown-ocr`, so it
-/// can be used directly in the OCR processor pipeline.
-pub struct HttpOcrEngine<R: OcrRequest, P: OcrResponseParser> {
-    request: R,
-    parser: P,
-    client: OcrHttpClient,
-    request_config: RequestConfig,
-}
-
-impl<R: OcrRequest, P: OcrResponseParser> std::fmt::Debug for HttpOcrEngine<R, P> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("HttpOcrEngine")
-            .field("engine_name", &self.request.engine_name())
-            .field("endpoint", &self.request.endpoint())
-            .field("client", &self.client)
-            .finish_non_exhaustive()
-    }
-}
-
-impl<R: OcrRequest, P: OcrResponseParser> HttpOcrEngine<R, P> {
-    /// Create a new HTTP OCR engine with default configuration.
-    ///
-    /// # Errors
-    ///
-    /// Returns `OcrHttpError::Transport` if the HTTP client cannot be built.
-    pub fn new(request: R, parser: P) -> Result<Self> {
-        let client = OcrHttpClient::new(request.endpoint(), request.auth().clone())?;
-        Ok(Self {
-            request,
-            parser,
-            client,
-            request_config: RequestConfig::default(),
-        })
-    }
-
-    /// Create a new HTTP OCR engine with custom configuration.
-    ///
-    /// # Errors
-    ///
-    /// Returns `OcrHttpError::Transport` if the HTTP client cannot be built.
-    pub fn with_config(
-        request: R,
-        parser: P,
-        config: HttpClientConfig,
-        request_config: RequestConfig,
-    ) -> Result<Self> {
-        let client =
-            OcrHttpClient::with_config(request.endpoint(), request.auth().clone(), config)?;
-        Ok(Self {
-            request,
-            parser,
-            client,
-            request_config,
-        })
-    }
-
-    /// Get a reference to the underlying HTTP client.
-    #[must_use]
-    pub fn client(&self) -> &OcrHttpClient {
-        &self.client
-    }
-}
-
-impl<R: OcrRequest, P: OcrResponseParser> OcrEngine for HttpOcrEngine<R, P> {
-    fn recognize(
-        &self,
-        image: &OcrImage,
-    ) -> std::result::Result<OcrResult, Box<dyn std::error::Error + Send + Sync>> {
-        let body = self
-            .request
-            .build_request_body(image, &self.request_config)?;
-        let extra = self.request.extra_headers();
-        let extra_ref = if extra.is_empty() { None } else { Some(&extra) };
-
-        let raw: serde_json::Value = self.client.post_json(&body, extra_ref)?;
-
-        // Check for engine-level errors in the response.
-        self.parser.parse_response(&raw).map_err(Into::into)
-    }
-
-    fn name(&self) -> &'static str {
-        self.request.engine_name()
-    }
-
-    fn languages(&self) -> &[&str] {
-        self.request.languages()
-    }
-
-    fn level(&self) -> CapabilityLevel {
-        CapabilityLevel::Cloud
-    }
-}
-
-/// Build an HTTP OCR engine with default configuration.
-///
-/// This is the simplest way to create an HTTP-based OCR engine.
-///
-/// # Errors
-///
-/// Returns `OcrHttpError::Transport` if the HTTP client cannot be built.
-pub fn build_http_engine<R, P>(request: R, parser: P) -> Result<HttpOcrEngine<R, P>>
-where
-    R: OcrRequest,
-    P: OcrResponseParser,
-{
-    HttpOcrEngine::new(request, parser)
-}
-
-/// Build an HTTP OCR engine with custom configuration.
-///
-/// # Errors
-///
-/// Returns `OcrHttpError::Transport` if the HTTP client cannot be built.
-pub fn build_http_engine_with_config<R, P>(
-    request: R,
-    parser: P,
-    config: HttpClientConfig,
-) -> Result<HttpOcrEngine<R, P>>
-where
-    R: OcrRequest,
-    P: OcrResponseParser,
-{
-    HttpOcrEngine::with_config(request, parser, config, RequestConfig::default())
-}
 
 #[cfg(test)]
 mod tests {
     #![allow(clippy::similar_names, clippy::float_cmp)]
     use super::auth::AuthMethod;
-    use super::*;
+    use super::builder::{build_http_engine, build_http_engine_with_config};
+    use super::client::HttpClientConfig;
+    use super::http_ocr_engine::HttpOcrEngine;
+    use super::image::ImageEncoding;
+    use super::rate_limit::RateLimitConfig;
+    use super::request::{OcrRequest, RequestConfig};
+    use super::response::OcrResponseParser;
+    use super::retry::BackoffStrategy;
+    use super::{Auth, Config};
+    use easypdf_core::CapabilityLevel;
+    use easypdf_markdown::ocr::{OcrEngine, OcrImage, OcrResult};
 
-    /// A mock request builder for testing.
+    /// 测试用模拟请求构建器。
     struct MockRequest {
         endpoint: String,
         auth: AuthMethod,
@@ -186,7 +60,7 @@ mod tests {
             &self,
             _image: &OcrImage,
             _config: &RequestConfig,
-        ) -> Result<serde_json::Value> {
+        ) -> super::error::Result<serde_json::Value> {
             Ok(serde_json::json!({ "test": true }))
         }
 
@@ -199,11 +73,11 @@ mod tests {
         }
     }
 
-    /// A mock response parser for testing.
+    /// 测试用模拟响应解析器。
     struct MockParser;
 
     impl OcrResponseParser for MockParser {
-        fn parse_response(&self, _raw: &serde_json::Value) -> Result<OcrResult> {
+        fn parse_response(&self, _raw: &serde_json::Value) -> super::error::Result<OcrResult> {
             Ok(OcrResult {
                 text: "mock result".to_owned(),
                 confidence: Some(0.99),
@@ -253,7 +127,7 @@ mod tests {
 
     #[test]
     fn test_re_exports() {
-        // Verify re-exports are accessible.
+        // 验证重导出是否可访问。
         let _ = Auth::None;
         let _ = Config::default();
         let _ = ImageEncoding::Base64Inline;
@@ -281,7 +155,7 @@ mod tests {
         use std::net::TcpListener;
         use std::thread;
 
-        // Start a mock server.
+        // 启动模拟服务器。
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let addr = listener.local_addr().unwrap();
         let response_body = r#"{"text":"hello","confidence":0.95,"words_result":[]}"#;
@@ -291,7 +165,7 @@ mod tests {
                 stream
                     .set_read_timeout(Some(std::time::Duration::from_secs(2)))
                     .ok();
-                // Read request.
+                // 读取请求。
                 let mut reader = BufReader::new(&stream);
                 let mut content_length = 0usize;
                 loop {
@@ -369,7 +243,7 @@ mod tests {
                 &self,
                 _image: &OcrImage,
                 _config: &RequestConfig,
-            ) -> Result<serde_json::Value> {
+            ) -> super::error::Result<serde_json::Value> {
                 Ok(serde_json::json!({ "test": true }))
             }
             fn extra_headers(&self) -> std::collections::HashMap<String, String> {

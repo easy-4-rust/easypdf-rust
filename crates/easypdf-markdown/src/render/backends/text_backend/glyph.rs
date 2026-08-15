@@ -1,9 +1,9 @@
-/// Minimal bitmap font glyph (5 wide x 7 tall, stored as 7 bytes).
-/// Each byte represents one row; bit 4 is the leftmost pixel.
+/// 最小位图字体字形（宽 5 x 高 7，存储为 7 字节）。
+/// 每字节表示一行；bit 4 为最左侧像素。
 pub(crate) type Glyph = [u8; 7];
 
-/// Return the 5x7 bitmap glyph for an ASCII character.
-/// Unknown characters return a filled block.
+/// 返回 ASCII 字符的 5x7 位图字形。
+/// 未知字符返回填充块。
 pub(crate) fn glyph_for(ch: u8) -> Glyph {
     match ch {
         b' ' => [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
@@ -101,7 +101,7 @@ pub(crate) fn glyph_for(ch: u8) -> Glyph {
         b'|' => [0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04],
         b'}' => [0x02, 0x04, 0x04, 0x08, 0x04, 0x04, 0x02],
         b'~' => [0x00, 0x04, 0x02, 0x1F, 0x02, 0x04, 0x00],
-        // Fallback: filled block for unknown characters.
+        // 回退：未知字符使用填充块。
         _ => [0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F],
     }
 }

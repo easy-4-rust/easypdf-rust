@@ -1,60 +1,60 @@
-//! Metadata types for PDF documents.
+//! PDF 文档的元数据类型。
 
-/// PDF document-level metadata.
+/// PDF 文档级元数据。
 ///
-/// Maps to the `/Info` dictionary in a PDF file.
+/// 映射到 PDF 文件中的 `/Info` 字典。
 #[derive(Debug, Clone, Default)]
 pub struct PdfMetadata {
-    /// Document title.
+    /// 文档标题。
     pub title: Option<String>,
-    /// Document author.
+    /// 文档作者。
     pub author: Option<String>,
-    /// Document subject.
+    /// 文档主题。
     pub subject: Option<String>,
-    /// Keywords associated with the document.
+    /// 与文档关联的关键词。
     pub keywords: Option<String>,
-    /// The application that created the original document.
+    /// 创建原始文档的应用程序。
     pub creator: Option<String>,
-    /// The application that produced this PDF (filled automatically).
+    /// 生成此 PDF 的应用程序（自动填充）。
     pub producer: Option<String>,
 }
 
 impl PdfMetadata {
-    /// Create new metadata with all fields empty.
+    /// 创建所有字段为空的元数据。
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Set the title.
+    /// 设置标题。
     #[must_use]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = Some(title.into());
         self
     }
 
-    /// Set the author.
+    /// 设置作者。
     #[must_use]
     pub fn author(mut self, author: impl Into<String>) -> Self {
         self.author = Some(author.into());
         self
     }
 
-    /// Set the subject.
+    /// 设置主题。
     #[must_use]
     pub fn subject(mut self, subject: impl Into<String>) -> Self {
         self.subject = Some(subject.into());
         self
     }
 
-    /// Set keywords (comma-separated).
+    /// 设置关键词（逗号分隔）。
     #[must_use]
     pub fn keywords(mut self, keywords: impl Into<String>) -> Self {
         self.keywords = Some(keywords.into());
         self
     }
 
-    /// Generate XMP metadata XML string for PDF/A compatibility.
+    /// 生成用于 PDF/A 兼容性的 XMP 元数据 XML 字符串。
     #[must_use]
     pub fn to_xmp(&self) -> String {
         let title = self.title.as_deref().unwrap_or("");
@@ -79,19 +79,19 @@ impl PdfMetadata {
     }
 }
 
-/// A single bookmark / outline entry.
+/// 单个书签/大纲条目。
 #[derive(Debug, Clone)]
 pub struct PdfBookmark {
-    /// The display title.
+    /// 显示标题。
     pub title: String,
-    /// Target page number (1-based).
+    /// 目标页码（一基）。
     pub page: usize,
-    /// Child bookmarks (for hierarchical outlines).
+    /// 子书签（用于层级大纲）。
     pub children: Vec<PdfBookmark>,
 }
 
 impl PdfBookmark {
-    /// Create a new top-level bookmark.
+    /// 创建新的顶层书签。
     #[must_use]
     pub fn new(title: impl Into<String>, page: usize) -> Self {
         Self {
@@ -101,7 +101,7 @@ impl PdfBookmark {
         }
     }
 
-    /// Add a child bookmark.
+    /// 添加子书签。
     #[must_use]
     pub fn child(mut self, child: PdfBookmark) -> Self {
         self.children.push(child);

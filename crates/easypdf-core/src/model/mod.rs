@@ -1,8 +1,8 @@
-//! Engine-neutral semantic document model.
+//! 与引擎无关的语义文档模型。
 //!
-//! [`PdfBlock`] is the core enum of the model, covering headings, paragraphs,
-//! lists, tables, images, code, formulas, footnotes, quotes and other semantic blocks.
-//! Organized by page via [`PdfPageModel`], aggregated into [`PdfDocumentModel`].
+//! [`PdfBlock`] 是模型的核心枚举，涵盖标题、段落、
+//! 列表、表格、图片、代码、公式、脚注、引用及其他语义块。
+//! 通过 [`PdfPageModel`] 按页组织，聚合为 [`PdfDocumentModel`]。
 
 mod image_data;
 mod list_item;

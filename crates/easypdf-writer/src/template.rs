@@ -1,36 +1,36 @@
-//! PDF template and form filling (lopdf backend).
+//! PDF 模板与表单填充（lopdf 后端）。
 //!
-//! Supports filling PDF form fields with typed data.
+//! 支持使用类型化数据填充 PDF 表单字段。
 
 use easypdf_core::AtomicFileOutput;
 use easypdf_core::error::{PdfError, Result};
 use std::path::Path;
 
-/// A template filler for populating PDF forms and placeholders.
+/// 用于填充 PDF 表单和占位符的模板填充器。
 pub struct PdfTemplateFiller {
     doc: lopdf::Document,
 }
 
 impl PdfTemplateFiller {
-    /// Open a PDF template for filling.
+    /// 打开 PDF 模板进行填充。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the template cannot be opened or is not a valid PDF.
+    /// 当模板无法打开或不是有效的 PDF 时返回 `PdfError::Parse`。
     pub fn open(template_path: impl AsRef<Path>) -> Result<Self> {
         let doc =
             lopdf::Document::load(template_path).map_err(|e| PdfError::Parse(e.to_string()))?;
         Ok(Self { doc })
     }
 
-    /// Fill a named form field with a text value.
+    /// 使用文本值填充命名的表单字段。
     ///
-    /// This modifies the field's value (`/V`) in the PDF's AcroForm.
+    /// 此方法修改 PDF AcroForm 中字段的值（`/V`）。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::UnsupportedFeature` if the field is not found.
-    /// Returns `PdfError::Parse` if the field object cannot be read.
+    /// 当字段未找到时返回 `PdfError::UnsupportedFeature`。
+    /// 当字段对象无法读取时返回 `PdfError::Parse`。
     pub fn fill_field(&mut self, field_name: &str, value: &str) -> Result<&mut Self> {
         let mut found = false;
         let object_ids: Vec<lopdf::ObjectId> = self.doc.objects.keys().copied().collect();
@@ -58,11 +58,11 @@ impl PdfTemplateFiller {
         Ok(self)
     }
 
-    /// Fill multiple form fields from a key-value iterator.
+    /// 从键值迭代器填充多个表单字段。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::UnsupportedFeature` if any field is not found.
+    /// 当任何字段未找到时返回 `PdfError::UnsupportedFeature`。
     pub fn fill_fields(
         &mut self,
         fields: impl IntoIterator<Item = (impl AsRef<str>, impl AsRef<str>)>,
@@ -73,24 +73,24 @@ impl PdfTemplateFiller {
         Ok(self)
     }
 
-    /// Get the number of pages in the template.
+    /// 获取模板中的页数。
     #[must_use]
     pub fn page_count(&self) -> usize {
         self.doc.get_pages().len()
     }
 
-    /// Save the filled PDF to a file.
+    /// 将填充后的 PDF 保存到文件。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Io` if the file cannot be written.
+    /// 当文件无法写入时返回 `PdfError::Io`。
     pub fn save(mut self, output_path: impl AsRef<Path>) -> Result<()> {
         let mut bytes = Vec::new();
         self.doc.save_to(&mut bytes)?;
         AtomicFileOutput::new(output_path.as_ref()).write(&bytes)
     }
 
-    /// Consume and return the inner `lopdf::Document` for advanced use.
+    /// 消费并返回内部的 `lopdf::Document`，供高级用途使用。
     #[must_use]
     pub fn into_inner(self) -> lopdf::Document {
         self.doc

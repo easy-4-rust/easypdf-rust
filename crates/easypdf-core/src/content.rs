@@ -1,25 +1,25 @@
-//! Content model types for PDF elements — text, tables, images, and shapes.
+//! PDF 元素的内容模型类型——文本、表格、图片和形状。
 
 use crate::enums::{TextAlignment, VerticalAlignment};
 use crate::style::{PdfColor, PdfFont};
 
-// --- Text ---
+// --- 文本 ---
 
-/// A block of positioned text with formatting.
+/// 带格式的定位文本块。
 #[derive(Debug, Clone)]
 pub struct PdfText {
-    /// The text string to render.
+    /// 要渲染的文本字符串。
     pub content: String,
-    /// Horizontal alignment within the text block.
+    /// 文本块内的水平对齐方式。
     pub alignment: TextAlignment,
-    /// Font specification for this text.
+    /// 此文本的字体规格。
     pub font: PdfFont,
-    /// Text color.
+    /// 文本颜色。
     pub color: PdfColor,
 }
 
 impl PdfText {
-    /// Create a new text element with the given content.
+    /// 使用给定内容创建新的文本元素。
     #[must_use]
     pub fn new(content: impl Into<String>) -> Self {
         Self {
@@ -30,21 +30,21 @@ impl PdfText {
         }
     }
 
-    /// Set the font for this text.
+    /// 设置此文本的字体。
     #[must_use]
     pub fn font(mut self, font: PdfFont) -> Self {
         self.font = font;
         self
     }
 
-    /// Set the alignment for this text.
+    /// 设置此文本的对齐方式。
     #[must_use]
     pub const fn alignment(mut self, alignment: TextAlignment) -> Self {
         self.alignment = alignment;
         self
     }
 
-    /// Set the color for this text.
+    /// 设置此文本的颜色。
     #[must_use]
     pub const fn color(mut self, color: PdfColor) -> Self {
         self.color = color;
@@ -52,23 +52,23 @@ impl PdfText {
     }
 }
 
-// --- Table ---
+// --- 表格 ---
 
-/// Configuration for a table to be rendered in a PDF.
+/// 要在 PDF 中渲染的表格配置。
 #[derive(Debug, Clone)]
 pub struct PdfTable {
-    /// Table headers.
+    /// 表头。
     pub headers: Vec<String>,
-    /// Row data (each row is a vec of string values).
+    /// 行数据（每行为字符串值的向量）。
     pub rows: Vec<Vec<String>>,
-    /// Column widths in PDF points. If empty, columns are evenly distributed.
+    /// 列宽（PDF 点）。为空时列均匀分配。
     pub column_widths: Vec<f64>,
-    /// Overall table width in PDF points.
+    /// 表格总宽度（PDF 点）。
     pub width: f64,
 }
 
 impl PdfTable {
-    /// Create a new table with the given headers.
+    /// 使用给定表头创建新表格。
     #[must_use]
     pub fn new(headers: Vec<String>) -> Self {
         Self {
@@ -79,21 +79,21 @@ impl PdfTable {
         }
     }
 
-    /// Add a data row to the table.
+    /// 向表格添加一行数据。
     #[must_use]
     pub fn row(mut self, row: Vec<String>) -> Self {
         self.rows.push(row);
         self
     }
 
-    /// Add multiple data rows to the table.
+    /// 向表格添加多行数据。
     #[must_use]
     pub fn rows(mut self, rows: Vec<Vec<String>>) -> Self {
         self.rows.extend(rows);
         self
     }
 
-    /// Set the table width.
+    /// 设置表格宽度。
     #[must_use]
     pub const fn width(mut self, width: f64) -> Self {
         self.width = width;
@@ -101,38 +101,38 @@ impl PdfTable {
     }
 }
 
-// --- Table Cell ---
+// --- 表格单元格 ---
 
-/// A single cell within a table.
+/// 表格中的单个单元格。
 #[derive(Debug, Clone, Default)]
 pub struct PdfTableCell {
-    /// Cell text content.
+    /// 单元格文本内容。
     pub content: String,
-    /// Horizontal alignment within the cell.
+    /// 单元格内的水平对齐方式。
     pub h_alignment: TextAlignment,
-    /// Vertical alignment within the cell.
+    /// 单元格内的垂直对齐方式。
     pub v_alignment: VerticalAlignment,
-    /// Font specification.
+    /// 字体规格。
     pub font: PdfFont,
-    /// Text color.
+    /// 文本颜色。
     pub color: PdfColor,
 }
 
-// --- Image ---
+// --- 图片 ---
 
-/// An image to be embedded in a PDF.
+/// 要嵌入 PDF 的图片。
 #[derive(Debug, Clone)]
 pub struct PdfImage {
-    /// Raw image bytes (PNG, JPEG, etc. — format auto-detected).
+    /// 原始图片字节（PNG、JPEG 等——格式自动检测）。
     pub data: Vec<u8>,
-    /// Desired width in PDF points (0 = use natural size at 72 DPI).
+    /// 期望宽度（PDF 点，0 = 按 72 DPI 使用原始尺寸）。
     pub width: f64,
-    /// Desired height in PDF points (0 = use natural size at 72 DPI).
+    /// 期望高度（PDF 点，0 = 按 72 DPI 使用原始尺寸）。
     pub height: f64,
 }
 
 impl PdfImage {
-    /// Create an image from raw bytes.
+    /// 从原始字节创建图片。
     #[must_use]
     pub fn from_bytes(data: Vec<u8>) -> Self {
         Self {
@@ -142,52 +142,52 @@ impl PdfImage {
         }
     }
 
-    /// Create an image from a file path.
+    /// 从文件路径创建图片。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Io` if the file cannot be read.
+    /// 文件无法读取时返回 `PdfError::Io`。
     pub fn from_path(path: impl AsRef<std::path::Path>) -> crate::error::Result<Self> {
         let data = std::fs::read(path)?;
         Ok(Self::from_bytes(data))
     }
 }
 
-// --- Shape ---
+// --- 形状 ---
 
-/// A line segment.
+/// 线段。
 #[derive(Debug, Clone, Copy)]
 pub struct PdfLine {
-    /// Start x coordinate.
+    /// 起点 x 坐标。
     pub x1: f64,
-    /// Start y coordinate.
+    /// 起点 y 坐标。
     pub y1: f64,
-    /// End x coordinate.
+    /// 终点 x 坐标。
     pub x2: f64,
-    /// End y coordinate.
+    /// 终点 y 坐标。
     pub y2: f64,
-    /// Line width in PDF points.
+    /// 线宽（PDF 点）。
     pub width: f64,
-    /// Line color.
+    /// 线条颜色。
     pub color: PdfColor,
 }
 
-/// A rectangle.
+/// 矩形。
 #[derive(Debug, Clone, Copy)]
 pub struct PdfRect {
-    /// Lower-left x.
+    /// 左下角 x。
     pub x: f64,
-    /// Lower-left y.
+    /// 左下角 y。
     pub y: f64,
-    /// Width.
+    /// 宽度。
     pub w: f64,
-    /// Height.
+    /// 高度。
     pub h: f64,
-    /// Border width (0 = no border).
+    /// 边框宽度（0 = 无边框）。
     pub border_width: f64,
-    /// Border color.
+    /// 边框颜色。
     pub border_color: PdfColor,
-    /// Fill color (transparent if `None`).
+    /// 填充颜色（`None` 时透明）。
     pub fill_color: Option<PdfColor>,
 }
 

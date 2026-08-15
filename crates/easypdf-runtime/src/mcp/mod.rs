@@ -1,6 +1,6 @@
-//! MCP (Model Context Protocol) server for easypdf.
+//! easypdf 的 MCP（Model Context Protocol）服务器。
 //!
-//! Exposes PDF operations to LLM agents via the standard MCP protocol over stdio.
+//! 通过标准 MCP 协议（基于 stdio）向 LLM agent 暴露 PDF 操作。
 
 pub mod error;
 pub mod protocol;

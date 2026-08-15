@@ -1,43 +1,42 @@
-//! Encryption, decryption, and encryption-info operations.
+//! 加密、解密和加密信息操作。
 
 use super::{EncryptionInfo, PdfEncryption, PdfEncryptionAlgorithm};
 use crate::crypto::CryptoError;
 
 // ============================================================================
-// Encryption
+// 加密
 // ============================================================================
 
-/// Encrypt a PDF byte slice using the Standard Security Handler.
+/// 使用标准安全处理器加密 PDF 字节切片。
 ///
-/// The input must be a valid, **unencrypted** PDF. The output is a valid PDF
-/// with the `/Encrypt` dictionary embedded in the trailer and all strings and
-/// streams encrypted per ISO 32000 transparent encryption rules.
+/// 输入必须是有效的**未加密** PDF。输出是有效的 PDF，
+/// 在 trailer 中嵌入 `/Encrypt` 字典，所有字符串和流
+/// 按 ISO 32000 透明加密规则加密。
 ///
 /// # Errors
 ///
-/// - `CryptoError::InvalidEncryptedPdf` if the input cannot be parsed as PDF
-///   or is already encrypted.
-/// - `CryptoError::Aes` if the underlying encryption fails.
+/// - 输入无法解析为 PDF 或已加密时返回 `CryptoError::InvalidEncryptedPdf`。
+/// - 底层加密失败时返回 `CryptoError::Aes`。
 pub fn encrypt_pdf(pdf_bytes: &[u8], encryption: &PdfEncryption) -> Result<Vec<u8>, CryptoError> {
-    // 1. Parse the PDF.
+    // 1. 解析 PDF。
     let mut doc = lopdf::Document::load_mem(pdf_bytes)
         .map_err(|e| CryptoError::InvalidEncryptedPdf(format!("failed to parse PDF: {e}")))?;
 
-    // 2. Generate the file encryption key (needed for V5; V4 ignores it).
+    // 2. 生成文件加密密钥（V5 需要；V4 忽略）。
     let fek = generate_file_encryption_key(encryption);
 
-    // 3. Build the lopdf EncryptionVersion.
+    // 3. 构建 lopdf EncryptionVersion。
     let version = build_encryption_version(&doc, encryption, &fek);
 
-    // 4. Derive the EncryptionState (runs all key-derivation algorithms).
+    // 4. 派生 EncryptionState（运行所有密钥派生算法）。
     let state = lopdf::EncryptionState::try_from(version)
         .map_err(|e| CryptoError::Aes(format!("encryption state derivation failed: {e}")))?;
 
-    // 5. Transparently encrypt all objects in-place.
+    // 5. 透明地原地加密所有对象。
     doc.encrypt(&state)
         .map_err(|e| CryptoError::Aes(format!("encrypt failed: {e}")))?;
 
-    // 6. Serialize back to bytes.
+    // 6. 序列化回字节。
     let mut buf = Vec::new();
     doc.save_to(&mut buf)
         .map_err(|e| CryptoError::Io(std::io::Error::other(e.to_string())))?;
@@ -45,27 +44,25 @@ pub fn encrypt_pdf(pdf_bytes: &[u8], encryption: &PdfEncryption) -> Result<Vec<u
     Ok(buf)
 }
 
-/// Decrypt a PDF byte slice that was encrypted with [`encrypt_pdf`].
+/// 解密使用 [`encrypt_pdf`] 加密的 PDF 字节切片。
 ///
-/// The function tries the password as both the user and owner password. If it
-/// matches either, the PDF is fully decrypted (all strings and streams restored
-/// to plaintext).
+/// 函数将密码同时作为用户密码和所有者密码尝试。如果匹配任一，
+/// PDF 将被完全解密（所有字符串和流恢复为明文）。
 ///
 /// # Errors
 ///
-/// - `CryptoError::InvalidEncryptedPdf` if the input cannot be parsed as PDF
-///   or has no `/Encrypt` dictionary.
-/// - `CryptoError::InvalidPassword` if the password does not match either the
-///   user or owner password.
+/// - 输入无法解析为 PDF 或没有 `/Encrypt` 字典时返回
+///   `CryptoError::InvalidEncryptedPdf`。
+/// - 密码不匹配用户或所有者密码时返回 `CryptoError::InvalidPassword`。
 pub fn decrypt_pdf(encrypted_bytes: &[u8], password: &str) -> Result<Vec<u8>, CryptoError> {
-    // 1. Parse the encrypted PDF.
+    // 1. 解析加密 PDF。
     let mut doc = lopdf::Document::load_mem(encrypted_bytes)
         .map_err(|e| CryptoError::InvalidEncryptedPdf(format!("failed to parse PDF: {e}")))?;
 
-    // 2. Decrypt (tries user and owner passwords internally).
+    // 2. 解密（内部尝试用户和所有者密码）。
     doc.decrypt(password).map_err(|e| map_decrypt_error(&e))?;
 
-    // 3. Serialize back to bytes.
+    // 3. 序列化回字节。
     let mut buf = Vec::new();
     doc.save_to(&mut buf)
         .map_err(|e| CryptoError::Io(std::io::Error::other(e.to_string())))?;
@@ -73,13 +70,13 @@ pub fn decrypt_pdf(encrypted_bytes: &[u8], password: &str) -> Result<Vec<u8>, Cr
     Ok(buf)
 }
 
-/// Query the encryption metadata of an encrypted PDF without decrypting it.
+/// 在不解密的情况下查询加密 PDF 的加密元数据。
 ///
-/// Returns `Ok(None)` if the PDF is not encrypted.
+/// PDF 未加密时返回 `Ok(None)`。
 ///
 /// # Errors
 ///
-/// Returns `CryptoError::InvalidEncryptedPdf` if the PDF cannot be parsed.
+/// PDF 无法解析时返回 `CryptoError::InvalidEncryptedPdf`。
 pub fn get_encryption_info(encrypted_bytes: &[u8]) -> Result<Option<EncryptionInfo>, CryptoError> {
     let doc = lopdf::Document::load_mem(encrypted_bytes)
         .map_err(|e| CryptoError::InvalidEncryptedPdf(format!("failed to parse PDF: {e}")))?;
@@ -125,15 +122,15 @@ pub fn get_encryption_info(encrypted_bytes: &[u8]) -> Result<Option<EncryptionIn
 }
 
 // ============================================================================
-// Internal helpers
+// 内部辅助函数
 // ============================================================================
 
-/// Generate the file encryption key.
+/// 生成文件加密密钥。
 ///
-/// For AES-256 (`/V 5`) this is a random 32-byte key that is itself encrypted
-/// and stored in the `/Encrypt` dictionary. For AES-128 (`/V 4`) the key is
-/// derived by lopdf from passwords + document data, so we generate a placeholder
-/// that will be ignored.
+/// 对于 AES-256（`/V 5`），这是一个随机的 32 字节密钥，
+/// 本身被加密并存储在 `/Encrypt` 字典中。对于 AES-128（`/V 4`），
+/// 密钥由 lopdf 从密码 + 文档数据派生，因此我们生成一个
+/// 将被忽略的占位符。
 fn generate_file_encryption_key(enc: &PdfEncryption) -> [u8; 32] {
     use rand::RngCore;
     match enc.algorithm {
@@ -142,11 +139,11 @@ fn generate_file_encryption_key(enc: &PdfEncryption) -> [u8; 32] {
             rand::thread_rng().fill_bytes(&mut key);
             key
         }
-        PdfEncryptionAlgorithm::Aes128 => [0u8; 32], // unused for V4
+        PdfEncryptionAlgorithm::Aes128 => [0u8; 32], // V4 不使用
     }
 }
 
-/// Map a lopdf decryption error to our `CryptoError`.
+/// 将 lopdf 解密错误映射到我们的 `CryptoError`。
 fn map_decrypt_error(e: &lopdf::Error) -> CryptoError {
     match e {
         lopdf::Error::InvalidPassword | lopdf::Error::Decryption(_) => {
@@ -156,7 +153,7 @@ fn map_decrypt_error(e: &lopdf::Error) -> CryptoError {
     }
 }
 
-/// Build an `lopdf::EncryptionVersion` from our `PdfEncryption` config.
+/// 从我们的 `PdfEncryption` 配置构建 `lopdf::EncryptionVersion`。
 fn build_encryption_version<'a>(
     doc: &'a lopdf::Document,
     enc: &'a PdfEncryption,

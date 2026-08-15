@@ -1,4 +1,4 @@
-//! Feature-gated facade methods for [`EasyPdf`].
+//! [`EasyPdf`] 的 feature-gated 门面方法。
 
 #[cfg(any(feature = "render", feature = "resident"))]
 use std::path::Path;
@@ -17,12 +17,12 @@ use crate::TableDetectorProcessor;
 use crate::{MarkdownProfile, ProcessorPipeline};
 
 impl EasyPdf {
-    /// Create a PDF Writer with backend selection.
+    /// 创建一个带后端选择的 PDF Writer。
     ///
-    /// Returns a `PdfWriterBuilder` for configuring the write backend
-    /// (`InMemory` or `Spill`), handler priorities, and constant-memory mode.
+    /// 返回一个 `PdfWriterBuilder`，用于配置写入后端
+    /// （`InMemory` 或 `Spill`）、处理器优先级和常量内存模式。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -37,12 +37,12 @@ impl EasyPdf {
         crate::PdfWriterBuilder::new(title)
     }
 
-    /// Create a Markdown conversion pipeline.
+    /// 创建一个 Markdown 转换管道。
     ///
-    /// Returns a [`ProcessorPipeline`] pre-configured for the given profile.
-    /// Register additional processors (table detector, OCR) before running.
+    /// 返回一个针对给定 profile 预配置的 [`ProcessorPipeline`]。
+    /// 在运行前注册额外的处理器（表格检测器、OCR）。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -58,13 +58,12 @@ impl EasyPdf {
         ProcessorPipeline::new()
     }
 
-    /// Create a table detector processor.
+    /// 创建一个表格检测器处理器。
     ///
-    /// Returns a [`TableDetectorProcessor`] with default configuration.
-    /// Register it into a [`ProcessorPipeline`] to enable table detection
-    /// during markdown conversion.
+    /// 返回一个使用默认配置的 [`TableDetectorProcessor`]。
+    /// 将其注册到 [`ProcessorPipeline`] 以在 Markdown 转换期间启用表格检测。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -77,16 +76,15 @@ impl EasyPdf {
         TableDetectorProcessor::new()
     }
 
-    /// Render a single PDF page to a PNG file.
+    /// 将单个 PDF 页面渲染为 PNG 文件。
     ///
-    /// Uses the default render backend (text renderer or pdfium if available).
+    /// 使用默认渲染后端（文本渲染器或 pdfium，如果可用）。
     ///
     /// # Errors
     ///
-    /// Returns [`RenderError`] if the page cannot be rendered or the output
-    /// cannot be written.
+    /// 如果页面无法渲染或输出无法写入，返回 [`RenderError`]。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -103,12 +101,12 @@ impl EasyPdf {
         easypdf_markdown::render::render_page_to_png(pdf_path, page, output, dpi)
     }
 
-    /// Launch the MCP (Model Context Protocol) server.
+    /// 启动 MCP（Model Context Protocol）服务器。
     ///
-    /// The server reads JSON-RPC 2.0 requests from stdin and writes
-    /// responses to stdout, exposing PDF operations to LLM agents.
+    /// 服务器从 stdin 读取 JSON-RPC 2.0 请求并将响应写入 stdout，
+    /// 向 LLM agent 暴露 PDF 操作。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -122,17 +120,17 @@ impl EasyPdf {
         McpServer::new()
     }
 
-    /// Start the resident daemon that keeps PDF documents open in memory.
+    /// 启动常驻守护进程，在内存中保持 PDF 文档打开。
     ///
-    /// Binds to a Unix socket and waits for client connections.
-    /// If `socket` is `None`, uses the default socket path.
+    /// 绑定到 Unix socket 并等待客户端连接。
+    /// 如果 `socket` 为 `None`，使用默认 socket 路径。
     ///
     /// # Errors
     ///
-    /// Returns [`ResidentError`] if the socket cannot be bound or the
-    /// server encounters an I/O error.
+    /// 如果 socket 无法绑定或服务器遇到 I/O 错误，
+    /// 返回 [`ResidentError`]。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;
@@ -146,12 +144,12 @@ impl EasyPdf {
         easypdf_runtime::resident::serve(socket)
     }
 
-    /// Attach to a running resident daemon.
+    /// 连接到正在运行的 resident 守护进程。
     ///
-    /// Returns `Some(ResidentClient)` if a daemon is listening on the
-    /// default socket, or `None` if no daemon is running.
+    /// 如果守护进程正在默认 socket 上监听，返回 `Some(ResidentClient)`；
+    /// 如果没有守护进程在运行，返回 `None`。
     ///
-    /// # Examples
+    /// # 示例
     ///
     /// ```ignore
     /// use easypdf::EasyPdf;

@@ -1,19 +1,19 @@
-//! Heuristic table detection for PDF-to-Markdown conversion.
+//! 用于 PDF 转 Markdown 的启发式表格检测。
 //!
-//! This module provides [`TableDetectorProcessor`], an implementation of
-//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor) that
-//! scans paragraph blocks for table patterns and replaces them with
-//! [`PdfBlock::Table`](easypdf_core::PdfBlock::Table) blocks.
+//! 本模块提供 [`TableDetectorProcessor`]，它是
+//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor) 的一个实现，
+//! 扫描段落块中的表格模式并将其替换为
+//! [`PdfBlock::Table`](easypdf_core::PdfBlock::Table) 块。
 //!
-//! # Supported patterns
+//! # 支持的模式
 //!
-//! | Pattern | Example | Separator |
-//! |---------|---------|-----------|
-//! | Pipe | `\| Name \| Age \|` | `\|` character |
-//! | Tab | `Name\tAge` | Tab character |
-//! | Whitespace | `Name    Age    City` | 2+ consecutive spaces |
+//! | 模式 | 示例 | 分隔符 |
+//! |------|------|--------|
+//! | 管道 | `\| Name \| Age \|` | `\|` 字符 |
+//! | 制表符 | `Name\tAge` | 制表符 |
+//! | 空格 | `Name    Age    City` | 2 个以上连续空格 |
 //!
-//! # Quick start
+//! # 快速开始
 //!
 //! ```
 //! use easypdf_markdown::{ProcessorPipeline, PdfMarkdownProcessor};
@@ -23,12 +23,12 @@
 //! pipeline.register(Box::new(TableDetectorProcessor::new()));
 //! ```
 //!
-//! # Configuration
+//! # 配置
 //!
-//! Use [`TableDetectionConfig`](crate::table::TableDetectionConfig) to tune:
-//! - Minimum row/column counts
-//! - Column separator strategy (Pipe, Tab, Whitespace, or Auto)
-//! - Whether to allow irregular column counts
+//! 使用 [`TableDetectionConfig`](crate::table::TableDetectionConfig) 调整：
+//! - 最小行/列数
+//! - 列分隔策略（Pipe、Tab、Whitespace 或 Auto）
+//! - 是否允许不规则列数
 
 pub mod config;
 mod detector;

@@ -1,4 +1,4 @@
-//! Text, metadata, and document model extraction for [`PdfReader`].
+//! [`PdfReader`] 的文本、元数据和文档模型提取。
 
 use easypdf_core::error::{PdfError, Result};
 use easypdf_core::{PageIndex, PdfMetadata, PdfReadListener};
@@ -11,14 +11,14 @@ use super::PdfReader;
 use super::usize_to_u64_saturating;
 
 impl PdfReader {
-    /// Extract text from all selected pages, joined with newlines.
+    /// 从所有选定页面提取文本，以换行符连接。
     ///
-    /// For [`ReadStrategy::Streaming`], this scans the raw bytes directly
-    /// without building a `lopdf::Document` object tree.
+    /// 对于 [`ReadStrategy::Streaming`]，直接扫描原始字节而不构建
+    /// `lopdf::Document` 对象树。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the PDF content cannot be read.
+    /// 当 PDF 内容无法读取时返回 `PdfError::Parse`。
     pub fn extract_text(&self) -> Result<String> {
         if self.strategy == ReadStrategy::Streaming {
             return self.extract_text_streaming();
@@ -36,27 +36,27 @@ impl PdfReader {
         Ok(all_text)
     }
 
-    /// Extract metadata from the PDF document.
+    /// 从 PDF 文档中提取元数据。
     ///
-    /// For [`ReadStrategy::Streaming`], this performs a heuristic scan of the
-    /// raw bytes (no xref resolution).  For other strategies, it reads the
-    /// `/Info` dictionary via the parsed `lopdf::Document`.
+    /// 对于 [`ReadStrategy::Streaming`]，对原始字节进行启发式扫描
+    /// （不解析 xref）。对于其他策略，通过已解析的 `lopdf::Document`
+    /// 读取 `/Info` 字典。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the document cannot be read.
+    /// 当文档无法读取时返回 `PdfError::Parse`。
     ///
     /// # Panics
     ///
-    /// Panics if called on a non-Streaming reader whose `document` is `None`
-    /// (should never happen in normal usage).
+    /// 在非 Streaming 读取器上调用且 `document` 为 `None` 时 panic
+    /// （正常使用中不应发生）。
     pub fn extract_metadata(&self) -> Result<PdfMetadata> {
         if self.strategy == ReadStrategy::Streaming {
             let scanner = StreamScanner::new(&self.raw_bytes, self.limits);
             return Ok(scanner.extract_metadata_quick());
         }
 
-        // Non-Streaming: read /Info dictionary from the parsed document.
+        // 非 Streaming：从已解析文档中读取 /Info 字典。
         let doc = self
             .document
             .as_ref()
@@ -96,19 +96,19 @@ impl PdfReader {
         })
     }
 
-    /// Get the total number of pages in the document.
+    /// 获取文档的总页数。
     ///
-    /// For [`ReadStrategy::Streaming`], this returns a heuristic count based
-    /// on `/Type /Page` entries found in the raw bytes.
+    /// 对于 [`ReadStrategy::Streaming`]，基于原始字节中 `/Type /Page`
+    /// 条目的启发式计数返回结果。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the document cannot be read.
+    /// 当文档无法读取时返回 `PdfError::Parse`。
     ///
     /// # Panics
     ///
-    /// Panics if called on a non-Streaming reader whose `document` is `None`
-    /// (should never happen in normal usage).
+    /// 在非 Streaming 读取器上调用且 `document` 为 `None` 时 panic
+    /// （正常使用中不应发生）。
     pub fn page_count(&self) -> Result<usize> {
         if self.strategy == ReadStrategy::Streaming {
             let scanner = StreamScanner::new(&self.raw_bytes, self.limits);
@@ -122,14 +122,14 @@ impl PdfReader {
             .len())
     }
 
-    /// Extract an engine-neutral semantic document model.
+    /// 提取引擎中立的语义文档模型。
     ///
-    /// The initial reader backend emits paragraph blocks. Higher-level analyzers can
-    /// later enrich these blocks with headings, tables, images, and OCR results.
+    /// 初始读取器后端输出段落块。更高级的分析器可以后续用标题、
+    /// 表格、图片和 OCR 结果来丰富这些块。
     ///
     /// # Errors
     ///
-    /// Returns an error when text extraction fails or a resource limit is exceeded.
+    /// 当文本提取失败或超出资源限制时返回错误。
     pub fn extract_document_model(&self) -> Result<PdfDocumentModel> {
         if self.strategy == ReadStrategy::Streaming {
             let text = self.extract_text_streaming()?;
@@ -157,14 +157,14 @@ impl PdfReader {
         Ok(PdfDocumentModel::new(self.extract_metadata()?, pages))
     }
 
-    /// Read the document with an event-driven listener (dynamic dispatch).
+    /// 使用事件驱动监听器读取文档（动态分发）。
     ///
-    /// This method uses `&mut dyn PdfReadListener` for dynamic dispatch.
-    /// For zero-cost monomorphization, use [`Self::read_with_listener_typed`].
+    /// 此方法使用 `&mut dyn PdfReadListener` 进行动态分发。
+    /// 如需零开销单态化，请使用 [`Self::read_with_listener_typed`]。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the document cannot be read.
+    /// 当文档无法读取时返回 `PdfError::Parse`。
     pub fn read_with_listener(&self, listener: &mut dyn PdfReadListener) -> Result<()> {
         if self.strategy == ReadStrategy::Streaming {
             let scanner = StreamScanner::new(&self.raw_bytes, self.limits);
@@ -185,15 +185,14 @@ impl PdfReader {
         Ok(())
     }
 
-    /// Read the document with a typed event-driven listener (static dispatch).
+    /// 使用类型化的事件驱动监听器读取文档（静态分发）。
     ///
-    /// This is the monomorphized version of [`read_with_listener`](Self::read_with_listener).
-    /// The compiler generates a specialized version for each concrete listener type,
-    /// eliminating vtable overhead.
+    /// 这是 [`read_with_listener`](Self::read_with_listener) 的单态化版本。
+    /// 编译器为每个具体的监听器类型生成特化版本，消除 vtable 开销。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the document cannot be read.
+    /// 当文档无法读取时返回 `PdfError::Parse`。
     pub fn read_with_listener_typed<L: PdfReadListener>(&self, listener: &mut L) -> Result<()> {
         if self.strategy == ReadStrategy::Streaming {
             let scanner = StreamScanner::new(&self.raw_bytes, self.limits);
@@ -214,21 +213,21 @@ impl PdfReader {
         Ok(())
     }
 
-    /// Extract text using the lazy loading strategy.
+    /// 使用懒加载策略提取文本。
     ///
-    /// When the reader was opened with [`ReadStrategy::Lazy`], this method
-    /// uses a lazy page loader to load page content on demand with caching.
-    /// For [`ReadStrategy::Full`], it delegates to [`extract_text`](Self::extract_text).
-    /// For [`ReadStrategy::Streaming`], it delegates to the streaming scanner.
+    /// 当读取器以 [`ReadStrategy::Lazy`] 打开时，此方法使用懒加载页面
+    /// 加载器按需加载页面内容并带缓存。对于 [`ReadStrategy::Full`]，
+    /// 委托给 [`extract_text`](Self::extract_text)。对于
+    /// [`ReadStrategy::Streaming`]，委托给流式扫描器。
     ///
     /// # Errors
     ///
-    /// Returns an error when page content cannot be decoded.
+    /// 当页面内容无法解码时返回错误。
     ///
     /// # Panics
     ///
-    /// Panics if called on a non-Streaming reader whose `document` is `None`
-    /// (should never happen in normal usage).
+    /// 在非 Streaming 读取器上调用且 `document` 为 `None` 时 panic
+    /// （正常使用中不应发生）。
     pub fn extract_text_lazy(&mut self) -> Result<String> {
         if self.strategy == ReadStrategy::Streaming {
             return self.extract_text_streaming();
@@ -257,9 +256,9 @@ impl PdfReader {
         Ok(all_text)
     }
 
-    // --- Private helpers ---
+    // --- 私有辅助方法 ---
 
-    /// Streaming text extraction via `StreamScanner`.
+    /// 通过 `StreamScanner` 进行流式文本提取。
     pub(super) fn extract_text_streaming(&self) -> Result<String> {
         struct TextCollector {
             parts: Vec<String>,
@@ -286,11 +285,11 @@ impl PdfReader {
         Ok(all_text)
     }
 
-    /// Return selected pages for non-Streaming strategies.
+    /// 返回非 Streaming 策略下的选定页面。
     ///
     /// # Panics
     ///
-    /// Panics if `self.document` is `None` (Streaming strategy).
+    /// 当 `self.document` 为 `None`（Streaming 策略）时 panic。
     pub(super) fn selected_pages(&self) -> impl Iterator<Item = (usize, u32)> + '_ {
         self.document
             .as_ref()
@@ -305,11 +304,11 @@ impl PdfReader {
             })
     }
 
-    /// Extract text from a single page (non-Streaming strategies).
+    /// 从单个页面提取文本（非 Streaming 策略）。
     ///
     /// # Panics
     ///
-    /// Panics if `self.document` is `None` (Streaming strategy).
+    /// 当 `self.document` 为 `None`（Streaming 策略）时 panic。
     pub(super) fn extract_page_text(&self, page_number: u32) -> Result<String> {
         self.document
             .as_ref()
@@ -330,7 +329,7 @@ impl PdfReader {
     }
 }
 
-/// Split text into paragraphs on double newlines.
+/// 在双换行符处分割文本为段落。
 fn split_paragraphs(text: &str) -> impl Iterator<Item = String> + '_ {
     text.split("\n\n")
         .map(str::trim)
@@ -338,18 +337,17 @@ fn split_paragraphs(text: &str) -> impl Iterator<Item = String> + '_ {
         .map(ToOwned::to_owned)
 }
 
-/// Decode a PDF string object to a Rust `String`.
+/// 将 PDF 字符串对象解码为 Rust `String`。
 ///
-/// PDF strings in the `/Info` dictionary may be encoded as:
-/// - **UTF-16BE** with a BOM (`\xFE\xFF`) prefix -- used by printpdf and
-///   most modern PDF producers for non-ASCII or even all text.
-/// - **`PDFDocEncoding`** (a superset of Latin-1) -- the default when no BOM
-///   is present.
+/// PDF `/Info` 字典中的字符串可能采用以下编码：
+/// - **UTF-16BE** 带 BOM（`\xFE\xFF`）前缀 -- printpdf 和大多数现代
+///   PDF 生产者对非 ASCII 甚至所有文本使用的编码。
+/// - **`PDFDocEncoding`**（Latin-1 的超集）-- 无 BOM 时的默认编码。
 ///
-/// This function checks for the UTF-16BE BOM and decodes accordingly,
-/// falling back to UTF-8 lossy decoding for `PDFDocEncoding` / Latin-1 bytes.
+/// 此函数检测 UTF-16BE BOM 并相应解码，对 `PDFDocEncoding` / Latin-1
+/// 字节回退到有损 UTF-8 解码。
 fn decode_pdf_string(bytes: &[u8]) -> String {
-    // Check for UTF-16BE BOM (0xFE 0xFF).
+    // 检测 UTF-16BE BOM（0xFE 0xFF）。
     if bytes.len() >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF {
         let utf16: Vec<u16> = bytes[2..]
             .chunks(2)
@@ -357,14 +355,14 @@ fn decode_pdf_string(bytes: &[u8]) -> String {
                 if chunk.len() == 2 {
                     u16::from_be_bytes([chunk[0], chunk[1]])
                 } else {
-                    // Trailing single byte -- replace with U+FFFD.
+                    // 尾部单字节 -- 替换为 U+FFFD。
                     0xFFFD
                 }
             })
             .collect();
         return String::from_utf16_lossy(&utf16);
     }
-    // No BOM: treat as PDFDocEncoding / Latin-1 / UTF-8.
-    // from_utf8_lossy handles invalid bytes with U+FFFD replacement.
+    // 无 BOM：按 PDFDocEncoding / Latin-1 / UTF-8 处理。
+    // from_utf8_lossy 对无效字节使用 U+FFFD 替换。
     String::from_utf8_lossy(bytes).into_owned()
 }

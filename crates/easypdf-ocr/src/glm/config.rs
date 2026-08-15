@@ -1,13 +1,13 @@
-//! Configuration types for the Zhipu GLM-OCR engine.
+//! 智谱 GLM-OCR 引擎配置类型。
 
 use std::fmt;
 
-/// Configuration for the Zhipu `BigModel` GLM-OCR engine.
+/// 智谱 `BigModel` GLM-OCR 引擎配置。
 ///
-/// # API Documentation
+/// # API 文档
 ///
-/// - Official guide: <https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>
-/// - Model info: <https://huggingface.co/zai-org/GLM-OCR>
+/// - 官方指南：<https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr>
+/// - 模型信息：<https://huggingface.co/zai-org/GLM-OCR>
 ///
 /// # Examples
 ///
@@ -22,35 +22,34 @@ use std::fmt;
 /// ```
 #[derive(Clone)]
 pub struct GlmConfig {
-    /// API endpoint URL.
+    /// API 端点 URL。
     ///
-    /// Default: `"https://open.bigmodel.cn/api/paas/v4/layout_parsing"`
-    /// (GLM-OCR layout parsing endpoint).
+    /// 默认值：`"https://open.bigmodel.cn/api/paas/v4/layout_parsing"`
+    ///（GLM-OCR 版面解析端点）。
     pub endpoint: String,
 
-    /// Zhipu `BigModel` API key.
+    /// 智谱 `BigModel` API 密钥。
     ///
-    /// Required for authentication. Obtain from <https://open.bigmodel.cn/>.
+    /// 认证必需。从 <https://open.bigmodel.cn/> 获取。
     pub api_key: String,
 
-    /// Model identifier.
+    /// 模型标识符。
     ///
-    /// Default: `"glm-ocr"`.
+    /// 默认值：`"glm-ocr"`。
     pub model: String,
 
-    /// Optional language hint to force OCR in a specific language.
+    /// 可选的语言提示，用于强制以特定语言进行 OCR。
     ///
-    /// Supported values include `"zh"` (Chinese), `"en"` (English), `"fr"` (French),
-    /// `"es"` (Spanish), `"ru"` (Russian), `"de"` (German), `"ja"` (Japanese),
-    /// `"ko"` (Korean), etc.
+    /// 支持的值包括 `"zh"`（中文）、`"en"`（英文）、`"fr"`（法文）、
+    /// `"es"`（西班牙文）、`"ru"`（俄文）、`"de"`（德文）、`"ja"`（日文）、
+    /// `"ko"`（韩文）等。
     ///
-    /// When `None`, the engine auto-detects the language.
+    /// 为 `None` 时，引擎自动检测语言。
     pub language: Option<String>,
 
-    /// Output format preference.
+    /// 输出格式偏好。
     ///
-    /// Controls whether the response includes only text or text with
-    /// positional bounding-box information.
+    /// 控制响应是仅包含文本还是同时包含位置边界框信息。
     pub output_format: GlmOutputFormat,
 }
 
@@ -78,14 +77,14 @@ impl fmt::Debug for GlmConfig {
     }
 }
 
-/// Output format for GLM-OCR results.
+/// GLM-OCR 结果的输出格式。
 ///
-/// Controls the level of detail returned by the engine.
+/// 控制引擎返回的详细程度。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GlmOutputFormat {
-    /// Return only the extracted text content.
+    /// 仅返回提取的文本内容。
     Text,
-    /// Return text along with positional bounding-box coordinates.
+    /// 返回文本及位置边界框坐标。
     TextWithBoxes,
 }
 

@@ -1,17 +1,16 @@
-//! PDF creation and writing (printpdf backend).
+//! PDF 创建与写入（printpdf 后端）。
 //!
-//! Provides `PdfWriter` for creating new PDF documents with text, tables,
-//! images, shapes, and custom fonts. Backed by the `printpdf` crate.
+//! 提供 `PdfWriter` 用于创建包含文本、表格、图片、图形和自定义字体的
+//! 新 PDF 文档。底层使用 `printpdf` crate。
 //!
-//! # Write backends
+//! # 写入后端
 //!
-//! The [`WriteBackend`] enum controls how finalized pages are stored:
+//! [`WriteBackend`] 枚举控制已完成页面的存储方式：
 //!
-//! - [`InMemory`](WriteBackend::InMemory) -- default, suitable for small documents.
-//! - [`Spill`](WriteBackend::Spill) -- page-level spill to temp files for large documents.
+//! - [`InMemory`](WriteBackend::InMemory) -- 默认，适合小型文档。
+//! - [`Spill`](WriteBackend::Spill) -- 页面级溢出到临时文件，适合大型文档。
 //!
-//! Use [`PdfWriterBuilder`] to configure the backend, handler priorities,
-//! and constant-memory mode.
+//! 使用 [`PdfWriterBuilder`] 配置后端、处理器优先级和常量内存模式。
 //!
 //! # Examples
 //!
@@ -19,10 +18,10 @@
 //! use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
 //! use easypdf_core::*;
 //!
-//! // Simple (backward-compatible).
+//! // 简单用法（向后兼容）。
 //! let mut w = PdfWriter::new("title");
 //!
-//! // Builder with spill backend.
+//! // 使用溢出后端的构建器。
 //! let w = PdfWriterBuilder::new("Big Report")
 //!     .backend(WriteBackend::auto(500))
 //!     .build()

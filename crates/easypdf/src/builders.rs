@@ -1,4 +1,4 @@
-//! Builder types for PDF creation, reading, splitting, and manipulation.
+//! PDF 创建、读取、拆分和操作的 Builder 类型。
 
 use std::path::{Path, PathBuf};
 
@@ -12,7 +12,7 @@ use easypdf_reader::{PdfManipulator, PdfReader, ReadStrategy};
 // PdfCreateBuilder
 // ======================================================================
 
-/// Builder for creating new PDF documents.
+/// 用于创建新 PDF 文档的 Builder。
 #[must_use]
 pub struct PdfCreateBuilder {
     pub(crate) path: PathBuf,
@@ -38,48 +38,48 @@ impl PdfCreateBuilder {
         }
     }
 
-    /// Set the document title.
+    /// 设置文档标题。
     #[must_use = "builder method"]
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self
     }
 
-    /// Set the default page size.
+    /// 设置默认页面大小。
     #[must_use = "builder method"]
     pub const fn page_size(mut self, size: PageSize) -> Self {
         self.page_size = size;
         self
     }
 
-    /// Set the page orientation.
+    /// 设置页面方向。
     #[must_use = "builder method"]
     pub const fn orientation(mut self, orientation: Orientation) -> Self {
         self.orientation = orientation;
         self
     }
 
-    /// Set document metadata.
+    /// 设置文档元数据。
     #[must_use = "builder method"]
     pub fn metadata(mut self, metadata: PdfMetadata) -> Self {
         self.metadata = metadata;
         self
     }
 
-    /// Register a write handler.
+    /// 注册一个写入处理器。
     #[must_use = "builder method"]
     pub fn register_handler(mut self, handler: Box<dyn PdfWriteHandler>) -> Self {
         self.handlers.push(handler);
         self
     }
 
-    /// Write text and finalize the document in one call.
+    /// 写入文本并一步完成文档创建。
     ///
-    /// This is a convenience method for simple single-page PDFs.
+    /// 这是简单单页 PDF 的便捷方法。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be written.
+    /// 如果 PDF 无法写入，返回错误。
     pub fn add_text(self, content: impl Into<String>) -> PdfTextBuilder<Self> {
         PdfTextBuilder {
             parent: self,
@@ -87,10 +87,9 @@ impl PdfCreateBuilder {
         }
     }
 
-    /// Add a table to the current page.
+    /// 向当前页面添加表格。
     ///
-    /// Renders headers and data rows with grid lines. Column widths and row height
-    /// are specified in PDF points.
+    /// 使用网格线渲染表头和数据行。列宽和行高以 PDF point 为单位。
     #[must_use = "builder method"]
     pub fn add_table(self, table: &PdfTable) -> PdfTableBuilder {
         PdfTableBuilder {
@@ -104,7 +103,7 @@ impl PdfCreateBuilder {
         }
     }
 
-    /// Add an image to the current page.
+    /// 向当前页面添加图片。
     #[must_use = "builder method"]
     pub fn add_image(self, image: &PdfImage) -> PdfImageBuilder {
         PdfImageBuilder {
@@ -117,11 +116,11 @@ impl PdfCreateBuilder {
         }
     }
 
-    /// Build the writer for manual page-by-page construction.
+    /// 构建写入器以进行手动逐页构建。
     ///
     /// # Errors
     ///
-    /// Returns an error if the writer cannot be initialized.
+    /// 如果写入器无法初始化，返回错误。
     pub fn build(self) -> Result<easypdf_writer::PdfWriter> {
         let mut writer = easypdf_writer::PdfWriter::new(&self.title);
         writer = writer.metadata(self.metadata);
@@ -131,11 +130,11 @@ impl PdfCreateBuilder {
         Ok(writer)
     }
 
-    /// Build, add a default page, write text, and save -- all in one call.
+    /// 构建、添加默认页面、写入文本并保存 -- 一步完成。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be created or written.
+    /// 如果 PDF 无法创建或写入，返回错误。
     pub fn do_write(self) -> Result<PathBuf> {
         let path = self.path.clone();
         let page_size = self.page_size;
@@ -151,7 +150,7 @@ impl PdfCreateBuilder {
 // PdfTextBuilder
 // ======================================================================
 
-/// Builder for adding text to a PDF, returned by [`PdfCreateBuilder::add_text`].
+/// 用于向 PDF 添加文本的 Builder，由 [`PdfCreateBuilder::add_text`] 返回。
 #[must_use]
 pub struct PdfTextBuilder<P> {
     pub(crate) parent: P,
@@ -159,14 +158,14 @@ pub struct PdfTextBuilder<P> {
 }
 
 impl PdfTextBuilder<PdfCreateBuilder> {
-    /// Set the font for this text.
+    /// 设置此文本的字体。
     #[must_use = "builder method"]
     pub fn font(mut self, font: PdfFont) -> Self {
         self.text = self.text.font(font);
         self
     }
 
-    /// Set the position as (x, y) in PDF points.
+    /// 设置位置为 (x, y)，单位为 PDF point。
     #[must_use = "builder method"]
     pub fn position(self, x: f64, y: f64) -> PdfPositionedTextBuilder {
         PdfPositionedTextBuilder {
@@ -177,11 +176,11 @@ impl PdfTextBuilder<PdfCreateBuilder> {
         }
     }
 
-    /// Finalize by writing the text at the default position (100, 700).
+    /// 以默认位置 (100, 700) 写入文本来完成操作。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be created or written.
+    /// 如果 PDF 无法创建或写入，返回错误。
     pub fn do_write(self) -> Result<PathBuf> {
         let path = self.parent.path.clone();
         let page_size = self.parent.page_size;
@@ -198,7 +197,7 @@ impl PdfTextBuilder<PdfCreateBuilder> {
 // PdfTableBuilder
 // ======================================================================
 
-/// Builder for table placement within a PDF, returned by [`PdfCreateBuilder::add_table`].
+/// 用于在 PDF 中放置表格的 Builder，由 [`PdfCreateBuilder::add_table`] 返回。
 #[must_use]
 pub struct PdfTableBuilder {
     parent: PdfCreateBuilder,
@@ -211,7 +210,7 @@ pub struct PdfTableBuilder {
 }
 
 impl PdfTableBuilder {
-    /// Set the table position.
+    /// 设置表格位置。
     #[must_use = "builder method"]
     pub fn position(mut self, x: f64, y: f64) -> Self {
         self.x = x;
@@ -219,32 +218,32 @@ impl PdfTableBuilder {
         self
     }
 
-    /// Set column widths in PDF points.
+    /// 设置列宽，单位为 PDF point。
     #[must_use = "builder method"]
     pub fn column_widths(mut self, widths: Vec<f64>) -> Self {
         self.col_widths = widths;
         self
     }
 
-    /// Set row height in PDF points.
+    /// 设置行高，单位为 PDF point。
     #[must_use = "builder method"]
     pub fn row_height(mut self, height: f64) -> Self {
         self.row_height = height;
         self
     }
 
-    /// Set the font for cell text.
+    /// 设置单元格文本的字体。
     #[must_use = "builder method"]
     pub fn font(mut self, font: PdfFont) -> Self {
         self.font = font;
         self
     }
 
-    /// Finalize by writing the table and saving the PDF.
+    /// 写入表格并保存 PDF 以完成操作。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be created or written.
+    /// 如果 PDF 无法创建或写入，返回错误。
     pub fn do_write(self) -> easypdf_core::Result<PathBuf> {
         let path = self.parent.path.clone();
         let page_size = self.parent.page_size;
@@ -269,7 +268,7 @@ impl PdfTableBuilder {
 // PdfImageBuilder
 // ======================================================================
 
-/// Builder for image placement within a PDF, returned by [`PdfCreateBuilder::add_image`].
+/// 用于在 PDF 中放置图片的 Builder，由 [`PdfCreateBuilder::add_image`] 返回。
 #[must_use]
 pub struct PdfImageBuilder {
     parent: PdfCreateBuilder,
@@ -281,7 +280,7 @@ pub struct PdfImageBuilder {
 }
 
 impl PdfImageBuilder {
-    /// Set the image position in PDF points.
+    /// 设置图片位置，单位为 PDF point。
     #[must_use = "builder method"]
     pub fn position(mut self, x: f64, y: f64) -> Self {
         self.x = x;
@@ -289,7 +288,7 @@ impl PdfImageBuilder {
         self
     }
 
-    /// Set the image dimensions in PDF points.
+    /// 设置图片尺寸，单位为 PDF point。
     #[must_use = "builder method"]
     pub fn size(mut self, w: f64, h: f64) -> Self {
         self.w = w;
@@ -297,11 +296,11 @@ impl PdfImageBuilder {
         self
     }
 
-    /// Finalize by writing the image and saving the PDF.
+    /// 写入图片并保存 PDF 以完成操作。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be created or the image cannot be written.
+    /// 如果 PDF 无法创建或图片无法写入，返回错误。
     pub fn do_write(self) -> easypdf_core::Result<PathBuf> {
         let path = self.parent.path.clone();
         let page_size = self.parent.page_size;
@@ -318,7 +317,7 @@ impl PdfImageBuilder {
 // PdfPositionedTextBuilder
 // ======================================================================
 
-/// Builder for text with an explicit position.
+/// 带显式位置的文本 Builder。
 #[must_use]
 pub struct PdfPositionedTextBuilder {
     parent: PdfCreateBuilder,
@@ -328,11 +327,11 @@ pub struct PdfPositionedTextBuilder {
 }
 
 impl PdfPositionedTextBuilder {
-    /// Finalize and write the PDF.
+    /// 完成操作并写入 PDF。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be created or written.
+    /// 如果 PDF 无法创建或写入，返回错误。
     pub fn do_write(self) -> Result<PathBuf> {
         let path = self.parent.path.clone();
         let page_size = self.parent.page_size;
@@ -349,7 +348,7 @@ impl PdfPositionedTextBuilder {
 // PdfReadBuilder
 // ======================================================================
 
-/// Builder for reading/extracting content from PDFs.
+/// 用于从 PDF 中读取/提取内容的 Builder。
 #[must_use]
 pub struct PdfReadBuilder {
     path: PathBuf,
@@ -366,25 +365,25 @@ impl PdfReadBuilder {
         }
     }
 
-    /// Limit extraction to a specific page range (0-based).
+    /// 限制提取到指定的页面范围（0 起始）。
     #[must_use = "builder method"]
     pub fn pages(mut self, range: std::ops::Range<usize>) -> Self {
         self.pages = Some(range);
         self
     }
 
-    /// Set the reading strategy (default: auto-selected by file size).
+    /// 设置读取策略（默认：按文件大小自动选择）。
     #[must_use = "builder method"]
     pub const fn strategy(mut self, strategy: ReadStrategy) -> Self {
         self.strategy = Some(strategy);
         self
     }
 
-    /// Open a reusable, single-parse reader session.
+    /// 打开一个可复用的、单次解析的读取器会话。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be read or parsed.
+    /// 如果 PDF 无法读取或解析，返回错误。
     pub fn open(self) -> Result<PdfReader> {
         let mut reader = match self.strategy {
             Some(strategy) => PdfReader::open_with_strategy(&self.path, strategy)?,
@@ -396,29 +395,29 @@ impl PdfReadBuilder {
         Ok(reader)
     }
 
-    /// Extract all text from the PDF.
+    /// 提取 PDF 中的所有文本。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the PDF cannot be read.
+    /// 如果 PDF 无法读取，返回 `PdfError::Parse`。
     pub fn extract_text(self) -> Result<String> {
         self.open()?.extract_text()
     }
 
-    /// Extract PDF metadata.
+    /// 提取 PDF 元数据。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the PDF cannot be read.
+    /// 如果 PDF 无法读取，返回 `PdfError::Parse`。
     pub fn metadata(self) -> Result<PdfMetadata> {
         self.open()?.extract_metadata()
     }
 
-    /// Get the number of pages.
+    /// 获取页数。
     ///
     /// # Errors
     ///
-    /// Returns `PdfError::Parse` if the PDF cannot be read.
+    /// 如果 PDF 无法读取，返回 `PdfError::Parse`。
     pub fn page_count(self) -> Result<usize> {
         self.open()?.page_count()
     }
@@ -428,7 +427,7 @@ impl PdfReadBuilder {
 // PdfSplitBuilder
 // ======================================================================
 
-/// Builder for splitting a PDF into individual pages.
+/// 用于将 PDF 拆分为单页文件的 Builder。
 #[must_use]
 pub struct PdfSplitBuilder {
     path: PathBuf,
@@ -443,20 +442,20 @@ impl PdfSplitBuilder {
         }
     }
 
-    /// Set the number of pages per split file (default: 1).
+    /// 设置每个拆分文件的页数（默认：1）。
     #[must_use = "builder method"]
     pub const fn every_n_pages(mut self, n: usize) -> Self {
         self.pages_per_file = n;
         self
     }
 
-    /// Split the PDF and save pages to a directory.
+    /// 将 PDF 拆分并保存页面到目录。
     ///
-    /// Files are named `page_001.pdf`, `page_002.pdf`, etc.
+    /// 文件命名为 `page_001.pdf`、`page_002.pdf` 等。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be read or split files cannot be written.
+    /// 如果 PDF 无法读取或拆分文件无法写入，返回错误。
     pub fn save_to_dir(self, output_dir: impl AsRef<Path>) -> Result<Vec<PathBuf>> {
         let manipulator = PdfManipulator::open(&self.path)?;
         let total_pages = manipulator.page_count();
@@ -484,7 +483,7 @@ impl PdfSplitBuilder {
 // PdfManipulateBuilder
 // ======================================================================
 
-/// Builder for PDF manipulation operations (rotate, reorder, watermark).
+/// 用于 PDF 操作（旋转、重排、水印）的 Builder。
 #[must_use]
 pub struct PdfManipulateBuilder {
     path: PathBuf,
@@ -501,45 +500,44 @@ impl PdfManipulateBuilder {
         }
     }
 
-    /// Rotate a specific page (1-based index).
+    /// 旋转指定页面（1 起始索引）。
     #[must_use = "builder method"]
     pub fn rotate_page(mut self, page_number: usize, rotation: Rotation) -> Self {
         self.rotations.push((page_number, rotation));
         self
     }
 
-    /// Rotate all pages.
+    /// 旋转所有页面。
     #[must_use = "builder method"]
     pub fn rotate_all(self, rotation: Rotation) -> Self {
-        // This will be applied inside save() by iterating all pages
         self.rotate(rotation)
     }
 
-    /// Rotate all pages (alias for builder chain).
+    /// 旋转所有页面（builder 链别名）。
     #[must_use = "builder method"]
     pub fn rotate(mut self, rotation: Rotation) -> Self {
-        self.rotations.push((0, rotation)); // 0 means "all pages"
+        self.rotations.push((0, rotation)); // 0 表示"所有页面"
         self
     }
 
-    /// Reorder pages according to the given permutation (0-based).
+    /// 按给定排列重排页面（0 起始）。
     #[must_use = "builder method"]
     pub fn reorder_pages(mut self, order: &[usize]) -> Self {
         self.order = Some(order.to_vec());
         self
     }
 
-    /// Apply all manipulations and save to the output file.
+    /// 应用所有操作并保存到输出文件。
     ///
     /// # Errors
     ///
-    /// Returns an error if the PDF cannot be read or saved.
+    /// 如果 PDF 无法读取或保存，返回错误。
     pub fn save(self, output: impl AsRef<Path>) -> Result<()> {
         let mut manipulator = PdfManipulator::open(&self.path)?;
 
         for (page_num, rotation) in &self.rotations {
             if *page_num == 0 {
-                // Apply to all pages
+                // 应用到所有页面
                 let count = manipulator.page_count();
                 for p in 1..=count {
                     manipulator.rotate_page(p, *rotation)?;

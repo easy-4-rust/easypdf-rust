@@ -424,336 +424,336 @@ pub mod easypdf_core::crypto::encrypt
 #[non_exhaustive] pub enum easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Aes128
 pub easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Aes256
-impl core::clone::Clone for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone(&self) -> easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::eq(&self, &easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm) -> bool
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::hash::Hash for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::hash<__H: core::hash::Hasher>(&self, &mut __H)
-impl core::marker::Copy for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'a
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Owned = T
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Init = T
-pub const easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::vzip(self) -> V
+impl core::clone::Clone for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone(&self) -> easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::cmp::Eq for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::cmp::PartialEq for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::eq(&self, &easypdf_core::crypto::PdfEncryptionAlgorithm) -> bool
+impl core::fmt::Debug for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::hash::Hash for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::hash<__H: core::hash::Hasher>(&self, &mut __H)
+impl core::marker::Copy for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Freeze for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Send for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Sync for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Unpin for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'a
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::PdfEncryptionAlgorithm where T: core::clone::Clone
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Owned = T
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::PdfEncryptionAlgorithm where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Init = T
+pub const easypdf_core::crypto::PdfEncryptionAlgorithm::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfEncryptionAlgorithm where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::vzip(self) -> V
 pub struct easypdf_core::crypto::encrypt::EncryptionInfo
-pub easypdf_core::crypto::encrypt::EncryptionInfo::algorithm: easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
+pub easypdf_core::crypto::encrypt::EncryptionInfo::algorithm: easypdf_core::crypto::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::encrypt::EncryptionInfo::key_length_bits: core::option::Option<u16>
 pub easypdf_core::crypto::encrypt::EncryptionInfo::revision: i64
 pub easypdf_core::crypto::encrypt::EncryptionInfo::version: i64
-impl core::clone::Clone for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::clone(&self) -> easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::eq(&self, &easypdf_core::crypto::encrypt::EncryptionInfo) -> bool
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Send for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Sync for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'a
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::EncryptionInfo where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Owned = T
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::EncryptionInfo where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::EncryptionInfo
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Init = T
-pub const easypdf_core::crypto::encrypt::EncryptionInfo::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::EncryptionInfo
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::EncryptionInfo where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::vzip(self) -> V
+impl core::clone::Clone for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::clone(&self) -> easypdf_core::crypto::EncryptionInfo
+impl core::cmp::Eq for easypdf_core::crypto::EncryptionInfo
+impl core::cmp::PartialEq for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::eq(&self, &easypdf_core::crypto::EncryptionInfo) -> bool
+impl core::fmt::Debug for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Freeze for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Send for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Sync for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Unpin for easypdf_core::crypto::EncryptionInfo
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::EncryptionInfo
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::EncryptionInfo
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::EncryptionInfo
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::EncryptionInfo where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::EncryptionInfo where T: 'a
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::From<T>
+pub fn easypdf_core::crypto::EncryptionInfo::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::Into<T>
+pub type easypdf_core::crypto::EncryptionInfo::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::EncryptionInfo::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::EncryptionInfo::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::EncryptionInfo::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::EncryptionInfo where T: core::clone::Clone
+pub type easypdf_core::crypto::EncryptionInfo::Owned = T
+pub fn easypdf_core::crypto::EncryptionInfo::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::EncryptionInfo::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::EncryptionInfo where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::EncryptionInfo where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::EncryptionInfo
+pub type easypdf_core::crypto::EncryptionInfo::Init = T
+pub const easypdf_core::crypto::EncryptionInfo::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::drop(usize)
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::EncryptionInfo
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::EncryptionInfo
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::EncryptionInfo
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::EncryptionInfo
+pub type easypdf_core::crypto::EncryptionInfo::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::EncryptionInfo where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::EncryptionInfo::vzip(self) -> V
 pub struct easypdf_core::crypto::encrypt::PdfEncryption
-pub easypdf_core::crypto::encrypt::PdfEncryption::algorithm: easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
+pub easypdf_core::crypto::encrypt::PdfEncryption::algorithm: easypdf_core::crypto::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::encrypt::PdfEncryption::owner_password: alloc::string::String
-pub easypdf_core::crypto::encrypt::PdfEncryption::permissions: easypdf_core::crypto::encrypt::PdfPermissions
+pub easypdf_core::crypto::encrypt::PdfEncryption::permissions: easypdf_core::crypto::PdfPermissions
 pub easypdf_core::crypto::encrypt::PdfEncryption::user_password: alloc::string::String
-impl easypdf_core::crypto::encrypt::PdfEncryption
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::new(impl core::convert::Into<alloc::string::String>, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::with_algorithm(self, easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::with_permissions(self, easypdf_core::crypto::encrypt::PdfPermissions) -> Self
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfEncryption
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryption where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryption where T: 'a
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfEncryption where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::borrow_mut(&mut self) -> &mut T
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfEncryption
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfEncryption
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Init = T
-pub const easypdf_core::crypto::encrypt::PdfEncryption::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfEncryption
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfEncryption where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::vzip(self) -> V
+impl easypdf_core::crypto::PdfEncryption
+pub fn easypdf_core::crypto::PdfEncryption::new(impl core::convert::Into<alloc::string::String>, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn easypdf_core::crypto::PdfEncryption::with_algorithm(self, easypdf_core::crypto::PdfEncryptionAlgorithm) -> Self
+pub fn easypdf_core::crypto::PdfEncryption::with_permissions(self, easypdf_core::crypto::PdfPermissions) -> Self
+impl core::marker::Freeze for easypdf_core::crypto::PdfEncryption
+impl core::marker::Send for easypdf_core::crypto::PdfEncryption
+impl core::marker::Sync for easypdf_core::crypto::PdfEncryption
+impl core::marker::Unpin for easypdf_core::crypto::PdfEncryption
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfEncryption
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfEncryption
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfEncryption
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfEncryption where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfEncryption where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfEncryption::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfEncryption::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfEncryption::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfEncryption::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfEncryption::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_core::crypto::PdfEncryption where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfEncryption
+pub fn easypdf_core::crypto::PdfEncryption::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfEncryption
+pub type easypdf_core::crypto::PdfEncryption::Init = T
+pub const easypdf_core::crypto::PdfEncryption::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfEncryption::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfEncryption::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfEncryption::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfEncryption::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfEncryption
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfEncryption
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfEncryption
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfEncryption
+pub type easypdf_core::crypto::PdfEncryption::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfEncryption where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfEncryption::vzip(self) -> V
 pub struct easypdf_core::crypto::encrypt::PdfPermissions(_)
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ADD_ANNOTATIONS: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ASSEMBLE: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::COPY: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::EXTRACT: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::FILL_FORMS: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::HIGH_QUALITY_PRINT: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::MODIFY: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::PRINT: Self
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::all() -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::bits(&self) -> u32
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::complement(self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::contains(&self, Self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::difference(self, Self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::empty() -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits(u32) -> core::option::Option<Self>
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_retain(u32) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_truncate(u32) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_name(&str) -> core::option::Option<Self>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::insert(&mut self, Self)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::intersection(self, Self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::intersects(&self, Self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::is_all(&self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::is_empty(&self) -> bool
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::remove(&mut self, Self)
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::set(&mut self, Self, bool)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::symmetric_difference(self, Self) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::toggle(&mut self, Self)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::union(self, Self) -> Self
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::iter(&self) -> bitflags::iter::Iter<easypdf_core::crypto::encrypt::PdfPermissions>
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::iter_names(&self) -> bitflags::iter::IterNames<easypdf_core::crypto::encrypt::PdfPermissions>
-impl bitflags::traits::Flags for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Bits = u32
-pub const easypdf_core::crypto::encrypt::PdfPermissions::FLAGS: &'static [bitflags::traits::Flag<easypdf_core::crypto::encrypt::PdfPermissions>]
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::all_named() -> easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bits(&self) -> u32
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_retain(u32) -> easypdf_core::crypto::encrypt::PdfPermissions
-impl core::clone::Clone for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::clone(&self) -> easypdf_core::crypto::encrypt::PdfPermissions
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::cmp::Ord for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::cmp(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> core::cmp::Ordering
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::eq(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> bool
-impl core::cmp::PartialOrd for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::partial_cmp(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> core::option::Option<core::cmp::Ordering>
-impl core::fmt::Binary for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::LowerHex for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::Octal for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::UpperHex for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::hash::Hash for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::hash<__H: core::hash::Hasher>(&self, &mut __H)
-impl core::iter::traits::collect::Extend<easypdf_core::crypto::encrypt::PdfPermissions> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::extend<T: core::iter::traits::collect::IntoIterator<Item = Self>>(&mut self, T)
-impl core::iter::traits::collect::FromIterator<easypdf_core::crypto::encrypt::PdfPermissions> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_iter<T: core::iter::traits::collect::IntoIterator<Item = Self>>(T) -> Self
-impl core::iter::traits::collect::IntoIterator for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::IntoIter = bitflags::iter::Iter<easypdf_core::crypto::encrypt::PdfPermissions>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Item = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::into_iter(self) -> Self::IntoIter
-impl core::marker::Copy for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::ops::arith::Sub for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::sub(self, Self) -> Self
-impl core::ops::arith::SubAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::sub_assign(&mut self, Self)
-impl core::ops::bit::BitAnd for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitand(self, Self) -> Self
-impl core::ops::bit::BitAndAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitand_assign(&mut self, Self)
-impl core::ops::bit::BitOr for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitor(self, easypdf_core::crypto::encrypt::PdfPermissions) -> Self
-impl core::ops::bit::BitOrAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitor_assign(&mut self, Self)
-impl core::ops::bit::BitXor for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitxor(self, Self) -> Self
-impl core::ops::bit::BitXorAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitxor_assign(&mut self, Self)
-impl core::ops::bit::Not for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::not(self) -> Self
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfPermissions
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfPermissions where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfPermissions where T: 'a
-impl<Q, K> equivalent::Comparable<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Ord + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::compare(&self, &K) -> core::cmp::Ordering
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::PdfPermissions where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Owned = T
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfPermissions where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::PdfPermissions where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Init = T
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfPermissions where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::vzip(self) -> V
+impl easypdf_core::crypto::PdfPermissions
+pub const easypdf_core::crypto::PdfPermissions::ADD_ANNOTATIONS: Self
+pub const easypdf_core::crypto::PdfPermissions::ASSEMBLE: Self
+pub const easypdf_core::crypto::PdfPermissions::COPY: Self
+pub const easypdf_core::crypto::PdfPermissions::EXTRACT: Self
+pub const easypdf_core::crypto::PdfPermissions::FILL_FORMS: Self
+pub const easypdf_core::crypto::PdfPermissions::HIGH_QUALITY_PRINT: Self
+pub const easypdf_core::crypto::PdfPermissions::MODIFY: Self
+pub const easypdf_core::crypto::PdfPermissions::PRINT: Self
+impl easypdf_core::crypto::PdfPermissions
+pub const fn easypdf_core::crypto::PdfPermissions::all() -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::bits(&self) -> u32
+pub const fn easypdf_core::crypto::PdfPermissions::complement(self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::contains(&self, Self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::difference(self, Self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::empty() -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits(u32) -> core::option::Option<Self>
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits_retain(u32) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits_truncate(u32) -> Self
+pub fn easypdf_core::crypto::PdfPermissions::from_name(&str) -> core::option::Option<Self>
+pub fn easypdf_core::crypto::PdfPermissions::insert(&mut self, Self)
+pub const fn easypdf_core::crypto::PdfPermissions::intersection(self, Self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::intersects(&self, Self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::is_all(&self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::is_empty(&self) -> bool
+pub fn easypdf_core::crypto::PdfPermissions::remove(&mut self, Self)
+pub fn easypdf_core::crypto::PdfPermissions::set(&mut self, Self, bool)
+pub const fn easypdf_core::crypto::PdfPermissions::symmetric_difference(self, Self) -> Self
+pub fn easypdf_core::crypto::PdfPermissions::toggle(&mut self, Self)
+pub const fn easypdf_core::crypto::PdfPermissions::union(self, Self) -> Self
+impl easypdf_core::crypto::PdfPermissions
+pub const fn easypdf_core::crypto::PdfPermissions::iter(&self) -> bitflags::iter::Iter<easypdf_core::crypto::PdfPermissions>
+pub const fn easypdf_core::crypto::PdfPermissions::iter_names(&self) -> bitflags::iter::IterNames<easypdf_core::crypto::PdfPermissions>
+impl bitflags::traits::Flags for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Bits = u32
+pub const easypdf_core::crypto::PdfPermissions::FLAGS: &'static [bitflags::traits::Flag<easypdf_core::crypto::PdfPermissions>]
+pub fn easypdf_core::crypto::PdfPermissions::all_named() -> easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bits(&self) -> u32
+pub fn easypdf_core::crypto::PdfPermissions::from_bits_retain(u32) -> easypdf_core::crypto::PdfPermissions
+impl core::clone::Clone for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::clone(&self) -> easypdf_core::crypto::PdfPermissions
+impl core::cmp::Eq for easypdf_core::crypto::PdfPermissions
+impl core::cmp::Ord for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::cmp(&self, &easypdf_core::crypto::PdfPermissions) -> core::cmp::Ordering
+impl core::cmp::PartialEq for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::eq(&self, &easypdf_core::crypto::PdfPermissions) -> bool
+impl core::cmp::PartialOrd for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::partial_cmp(&self, &easypdf_core::crypto::PdfPermissions) -> core::option::Option<core::cmp::Ordering>
+impl core::fmt::Binary for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Debug for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::LowerHex for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Octal for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::UpperHex for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::hash::Hash for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::hash<__H: core::hash::Hasher>(&self, &mut __H)
+impl core::iter::traits::collect::Extend<easypdf_core::crypto::PdfPermissions> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::extend<T: core::iter::traits::collect::IntoIterator<Item = Self>>(&mut self, T)
+impl core::iter::traits::collect::FromIterator<easypdf_core::crypto::PdfPermissions> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::from_iter<T: core::iter::traits::collect::IntoIterator<Item = Self>>(T) -> Self
+impl core::iter::traits::collect::IntoIterator for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::IntoIter = bitflags::iter::Iter<easypdf_core::crypto::PdfPermissions>
+pub type easypdf_core::crypto::PdfPermissions::Item = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::into_iter(self) -> Self::IntoIter
+impl core::marker::Copy for easypdf_core::crypto::PdfPermissions
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::PdfPermissions
+impl core::ops::arith::Sub for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::sub(self, Self) -> Self
+impl core::ops::arith::SubAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::sub_assign(&mut self, Self)
+impl core::ops::bit::BitAnd for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitand(self, Self) -> Self
+impl core::ops::bit::BitAndAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitand_assign(&mut self, Self)
+impl core::ops::bit::BitOr for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitor(self, easypdf_core::crypto::PdfPermissions) -> Self
+impl core::ops::bit::BitOrAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitor_assign(&mut self, Self)
+impl core::ops::bit::BitXor for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitxor(self, Self) -> Self
+impl core::ops::bit::BitXorAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitxor_assign(&mut self, Self)
+impl core::ops::bit::Not for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::not(self) -> Self
+impl core::marker::Freeze for easypdf_core::crypto::PdfPermissions
+impl core::marker::Send for easypdf_core::crypto::PdfPermissions
+impl core::marker::Sync for easypdf_core::crypto::PdfPermissions
+impl core::marker::Unpin for easypdf_core::crypto::PdfPermissions
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfPermissions
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfPermissions
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfPermissions
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfPermissions where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfPermissions where T: 'a
+impl<Q, K> equivalent::Comparable<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Ord + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::compare(&self, &K) -> core::cmp::Ordering
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfPermissions::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfPermissions::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfPermissions::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfPermissions::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfPermissions::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::PdfPermissions where T: core::clone::Clone
+pub type easypdf_core::crypto::PdfPermissions::Owned = T
+pub fn easypdf_core::crypto::PdfPermissions::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::PdfPermissions::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::PdfPermissions where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::PdfPermissions where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::PdfPermissions::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Init = T
+pub const easypdf_core::crypto::PdfPermissions::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfPermissions::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfPermissions::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfPermissions::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfPermissions::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfPermissions
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfPermissions
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfPermissions
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfPermissions where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfPermissions::vzip(self) -> V
 pub fn easypdf_core::crypto::encrypt::decrypt_pdf(&[u8], &str) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
-pub fn easypdf_core::crypto::encrypt::encrypt_pdf(&[u8], &easypdf_core::crypto::encrypt::PdfEncryption) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
-pub fn easypdf_core::crypto::encrypt::get_encryption_info(&[u8]) -> core::result::Result<core::option::Option<easypdf_core::crypto::encrypt::EncryptionInfo>, easypdf_core::crypto::CryptoError>
+pub fn easypdf_core::crypto::encrypt::encrypt_pdf(&[u8], &easypdf_core::crypto::PdfEncryption) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
+pub fn easypdf_core::crypto::encrypt::get_encryption_info(&[u8]) -> core::result::Result<core::option::Option<easypdf_core::crypto::EncryptionInfo>, easypdf_core::crypto::CryptoError>
 pub mod easypdf_core::crypto::sign
 pub struct easypdf_core::crypto::sign::PdfSigner
 pub easypdf_core::crypto::sign::PdfSigner::certificate: alloc::vec::Vec<u8>
@@ -940,333 +940,333 @@ pub fn easypdf_core::crypto::CryptoError::vzip(self) -> V
 #[non_exhaustive] pub enum easypdf_core::crypto::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::PdfEncryptionAlgorithm::Aes128
 pub easypdf_core::crypto::PdfEncryptionAlgorithm::Aes256
-impl core::clone::Clone for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone(&self) -> easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::eq(&self, &easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm) -> bool
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::hash::Hash for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::hash<__H: core::hash::Hasher>(&self, &mut __H)
-impl core::marker::Copy for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'a
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Owned = T
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Init = T
-pub const easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
-pub type easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm::vzip(self) -> V
+impl core::clone::Clone for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone(&self) -> easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::cmp::Eq for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::cmp::PartialEq for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::eq(&self, &easypdf_core::crypto::PdfEncryptionAlgorithm) -> bool
+impl core::fmt::Debug for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::hash::Hash for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::hash<__H: core::hash::Hasher>(&self, &mut __H)
+impl core::marker::Copy for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Freeze for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Send for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Sync for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::Unpin for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'a
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::PdfEncryptionAlgorithm where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfEncryptionAlgorithm where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfEncryptionAlgorithm where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::PdfEncryptionAlgorithm where T: core::clone::Clone
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Owned = T
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::PdfEncryptionAlgorithm where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::PdfEncryptionAlgorithm where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Init = T
+pub const easypdf_core::crypto::PdfEncryptionAlgorithm::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfEncryptionAlgorithm::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfEncryptionAlgorithm
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfEncryptionAlgorithm
+pub type easypdf_core::crypto::PdfEncryptionAlgorithm::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfEncryptionAlgorithm where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfEncryptionAlgorithm where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfEncryptionAlgorithm::vzip(self) -> V
 pub struct easypdf_core::crypto::EncryptionInfo
-pub easypdf_core::crypto::EncryptionInfo::algorithm: easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
+pub easypdf_core::crypto::EncryptionInfo::algorithm: easypdf_core::crypto::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::EncryptionInfo::key_length_bits: core::option::Option<u16>
 pub easypdf_core::crypto::EncryptionInfo::revision: i64
 pub easypdf_core::crypto::EncryptionInfo::version: i64
-impl core::clone::Clone for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::clone(&self) -> easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::eq(&self, &easypdf_core::crypto::encrypt::EncryptionInfo) -> bool
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Send for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Sync for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::EncryptionInfo
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'a
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::EncryptionInfo where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::EncryptionInfo where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Owned = T
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::EncryptionInfo where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::EncryptionInfo where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::EncryptionInfo
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::EncryptionInfo
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Init = T
-pub const easypdf_core::crypto::encrypt::EncryptionInfo::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::EncryptionInfo::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::EncryptionInfo
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::EncryptionInfo
-pub type easypdf_core::crypto::encrypt::EncryptionInfo::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::EncryptionInfo where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::EncryptionInfo where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::EncryptionInfo::vzip(self) -> V
+impl core::clone::Clone for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::clone(&self) -> easypdf_core::crypto::EncryptionInfo
+impl core::cmp::Eq for easypdf_core::crypto::EncryptionInfo
+impl core::cmp::PartialEq for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::eq(&self, &easypdf_core::crypto::EncryptionInfo) -> bool
+impl core::fmt::Debug for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Freeze for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Send for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Sync for easypdf_core::crypto::EncryptionInfo
+impl core::marker::Unpin for easypdf_core::crypto::EncryptionInfo
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::EncryptionInfo
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::EncryptionInfo
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::EncryptionInfo
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::EncryptionInfo where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::EncryptionInfo where T: 'a
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::EncryptionInfo where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::EncryptionInfo where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::From<T>
+pub fn easypdf_core::crypto::EncryptionInfo::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::Into<T>
+pub type easypdf_core::crypto::EncryptionInfo::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::EncryptionInfo::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::EncryptionInfo where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::EncryptionInfo::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::EncryptionInfo::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::EncryptionInfo where T: core::clone::Clone
+pub type easypdf_core::crypto::EncryptionInfo::Owned = T
+pub fn easypdf_core::crypto::EncryptionInfo::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::EncryptionInfo::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::EncryptionInfo where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::EncryptionInfo::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::EncryptionInfo where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::EncryptionInfo
+pub fn easypdf_core::crypto::EncryptionInfo::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::EncryptionInfo
+pub type easypdf_core::crypto::EncryptionInfo::Init = T
+pub const easypdf_core::crypto::EncryptionInfo::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::drop(usize)
+pub unsafe fn easypdf_core::crypto::EncryptionInfo::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::EncryptionInfo
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::EncryptionInfo
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::EncryptionInfo
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::EncryptionInfo
+pub type easypdf_core::crypto::EncryptionInfo::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::EncryptionInfo where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::EncryptionInfo where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::EncryptionInfo::vzip(self) -> V
 pub struct easypdf_core::crypto::PdfEncryption
-pub easypdf_core::crypto::PdfEncryption::algorithm: easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm
+pub easypdf_core::crypto::PdfEncryption::algorithm: easypdf_core::crypto::PdfEncryptionAlgorithm
 pub easypdf_core::crypto::PdfEncryption::owner_password: alloc::string::String
-pub easypdf_core::crypto::PdfEncryption::permissions: easypdf_core::crypto::encrypt::PdfPermissions
+pub easypdf_core::crypto::PdfEncryption::permissions: easypdf_core::crypto::PdfPermissions
 pub easypdf_core::crypto::PdfEncryption::user_password: alloc::string::String
-impl easypdf_core::crypto::encrypt::PdfEncryption
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::new(impl core::convert::Into<alloc::string::String>, impl core::convert::Into<alloc::string::String>) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::with_algorithm(self, easypdf_core::crypto::encrypt::PdfEncryptionAlgorithm) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::with_permissions(self, easypdf_core::crypto::encrypt::PdfPermissions) -> Self
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfEncryption
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfEncryption
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryption where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfEncryption where T: 'a
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfEncryption where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfEncryption where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::borrow_mut(&mut self) -> &mut T
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfEncryption
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfEncryption
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Init = T
-pub const easypdf_core::crypto::encrypt::PdfEncryption::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfEncryption::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfEncryption
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfEncryption
-pub type easypdf_core::crypto::encrypt::PdfEncryption::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfEncryption where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfEncryption where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfEncryption::vzip(self) -> V
+impl easypdf_core::crypto::PdfEncryption
+pub fn easypdf_core::crypto::PdfEncryption::new(impl core::convert::Into<alloc::string::String>, impl core::convert::Into<alloc::string::String>) -> Self
+pub fn easypdf_core::crypto::PdfEncryption::with_algorithm(self, easypdf_core::crypto::PdfEncryptionAlgorithm) -> Self
+pub fn easypdf_core::crypto::PdfEncryption::with_permissions(self, easypdf_core::crypto::PdfPermissions) -> Self
+impl core::marker::Freeze for easypdf_core::crypto::PdfEncryption
+impl core::marker::Send for easypdf_core::crypto::PdfEncryption
+impl core::marker::Sync for easypdf_core::crypto::PdfEncryption
+impl core::marker::Unpin for easypdf_core::crypto::PdfEncryption
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfEncryption
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfEncryption
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfEncryption
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfEncryption where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfEncryption where T: 'a
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfEncryption where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfEncryption::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfEncryption::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfEncryption::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfEncryption where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfEncryption::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfEncryption::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> core::any::Any for easypdf_core::crypto::PdfEncryption where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfEncryption::borrow_mut(&mut self) -> &mut T
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfEncryption
+pub fn easypdf_core::crypto::PdfEncryption::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfEncryption
+pub type easypdf_core::crypto::PdfEncryption::Init = T
+pub const easypdf_core::crypto::PdfEncryption::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfEncryption::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfEncryption::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfEncryption::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfEncryption::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfEncryption
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfEncryption
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfEncryption
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfEncryption
+pub type easypdf_core::crypto::PdfEncryption::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfEncryption where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfEncryption where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfEncryption::vzip(self) -> V
 pub struct easypdf_core::crypto::PdfPermissions(_)
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ADD_ANNOTATIONS: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ASSEMBLE: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::COPY: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::EXTRACT: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::FILL_FORMS: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::HIGH_QUALITY_PRINT: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::MODIFY: Self
-pub const easypdf_core::crypto::encrypt::PdfPermissions::PRINT: Self
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::all() -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::bits(&self) -> u32
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::complement(self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::contains(&self, Self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::difference(self, Self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::empty() -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits(u32) -> core::option::Option<Self>
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_retain(u32) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_truncate(u32) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_name(&str) -> core::option::Option<Self>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::insert(&mut self, Self)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::intersection(self, Self) -> Self
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::intersects(&self, Self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::is_all(&self) -> bool
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::is_empty(&self) -> bool
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::remove(&mut self, Self)
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::set(&mut self, Self, bool)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::symmetric_difference(self, Self) -> Self
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::toggle(&mut self, Self)
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::union(self, Self) -> Self
-impl easypdf_core::crypto::encrypt::PdfPermissions
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::iter(&self) -> bitflags::iter::Iter<easypdf_core::crypto::encrypt::PdfPermissions>
-pub const fn easypdf_core::crypto::encrypt::PdfPermissions::iter_names(&self) -> bitflags::iter::IterNames<easypdf_core::crypto::encrypt::PdfPermissions>
-impl bitflags::traits::Flags for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Bits = u32
-pub const easypdf_core::crypto::encrypt::PdfPermissions::FLAGS: &'static [bitflags::traits::Flag<easypdf_core::crypto::encrypt::PdfPermissions>]
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::all_named() -> easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bits(&self) -> u32
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_bits_retain(u32) -> easypdf_core::crypto::encrypt::PdfPermissions
-impl core::clone::Clone for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::clone(&self) -> easypdf_core::crypto::encrypt::PdfPermissions
-impl core::cmp::Eq for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::cmp::Ord for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::cmp(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> core::cmp::Ordering
-impl core::cmp::PartialEq for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::eq(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> bool
-impl core::cmp::PartialOrd for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::partial_cmp(&self, &easypdf_core::crypto::encrypt::PdfPermissions) -> core::option::Option<core::cmp::Ordering>
-impl core::fmt::Binary for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::Debug for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::LowerHex for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::Octal for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::fmt::UpperHex for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
-impl core::hash::Hash for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::hash<__H: core::hash::Hasher>(&self, &mut __H)
-impl core::iter::traits::collect::Extend<easypdf_core::crypto::encrypt::PdfPermissions> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::extend<T: core::iter::traits::collect::IntoIterator<Item = Self>>(&mut self, T)
-impl core::iter::traits::collect::FromIterator<easypdf_core::crypto::encrypt::PdfPermissions> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from_iter<T: core::iter::traits::collect::IntoIterator<Item = Self>>(T) -> Self
-impl core::iter::traits::collect::IntoIterator for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::IntoIter = bitflags::iter::Iter<easypdf_core::crypto::encrypt::PdfPermissions>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Item = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::into_iter(self) -> Self::IntoIter
-impl core::marker::Copy for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::StructuralPartialEq for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::ops::arith::Sub for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::sub(self, Self) -> Self
-impl core::ops::arith::SubAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::sub_assign(&mut self, Self)
-impl core::ops::bit::BitAnd for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitand(self, Self) -> Self
-impl core::ops::bit::BitAndAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitand_assign(&mut self, Self)
-impl core::ops::bit::BitOr for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitor(self, easypdf_core::crypto::encrypt::PdfPermissions) -> Self
-impl core::ops::bit::BitOrAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitor_assign(&mut self, Self)
-impl core::ops::bit::BitXor for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitxor(self, Self) -> Self
-impl core::ops::bit::BitXorAssign for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::bitxor_assign(&mut self, Self)
-impl core::ops::bit::Not for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::not(self) -> Self
-impl core::marker::Freeze for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Send for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Sync for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::Unpin for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::marker::UnsafeUnpin for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::encrypt::PdfPermissions
-impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::encrypt::PdfPermissions
-impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::encrypt::PdfPermissions where T: 'a
-impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::encrypt::PdfPermissions where T: 'a
-impl<Q, K> equivalent::Comparable<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Ord + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::compare(&self, &K) -> core::cmp::Ordering
-impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::equivalent(&self, &K) -> bool
-impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::encrypt::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::equivalent(&self, &K) -> bool
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::encrypt::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::encrypt::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
-impl<T, U> core::convert::Into<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::From<T>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::into(self) -> U
-impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::Into<T>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Error = core::convert::Infallible
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
-impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::encrypt::PdfPermissions where U: core::convert::TryFrom<T>
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Error = <U as core::convert::TryFrom<T>>::Error
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
-impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::encrypt::PdfPermissions where T: core::clone::Clone
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Owned = T
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::clone_into(&self, &mut T)
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::to_owned(&self) -> T
-impl<T> core::any::Any for easypdf_core::crypto::encrypt::PdfPermissions where T: 'static + ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::type_id(&self) -> core::any::TypeId
-impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::borrow(&self) -> &T
-impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::borrow_mut(&mut self) -> &mut T
-impl<T> core::clone::CloneToUninit for easypdf_core::crypto::encrypt::PdfPermissions where T: core::clone::Clone
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::clone_to_uninit(&self, *mut u8)
-impl<T> core::convert::From<T> for easypdf_core::crypto::encrypt::PdfPermissions
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::from(T) -> T
-impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Init = T
-pub const easypdf_core::crypto::encrypt::PdfPermissions::ALIGN: usize
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::deref<'a>(usize) -> &'a T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::deref_mut<'a>(usize) -> &'a mut T
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::drop(usize)
-pub unsafe fn easypdf_core::crypto::encrypt::PdfPermissions::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
-impl<T> either::into_either::IntoEither for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> tracing::instrument::Instrument for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::encrypt::PdfPermissions
-impl<T> typenum::type_operators::Same for easypdf_core::crypto::encrypt::PdfPermissions
-pub type easypdf_core::crypto::encrypt::PdfPermissions::Output = T
-impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::encrypt::PdfPermissions where T: ?core::marker::Sized
-impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::encrypt::PdfPermissions where V: ppv_lite86::types::MultiLane<T>
-pub fn easypdf_core::crypto::encrypt::PdfPermissions::vzip(self) -> V
+impl easypdf_core::crypto::PdfPermissions
+pub const easypdf_core::crypto::PdfPermissions::ADD_ANNOTATIONS: Self
+pub const easypdf_core::crypto::PdfPermissions::ASSEMBLE: Self
+pub const easypdf_core::crypto::PdfPermissions::COPY: Self
+pub const easypdf_core::crypto::PdfPermissions::EXTRACT: Self
+pub const easypdf_core::crypto::PdfPermissions::FILL_FORMS: Self
+pub const easypdf_core::crypto::PdfPermissions::HIGH_QUALITY_PRINT: Self
+pub const easypdf_core::crypto::PdfPermissions::MODIFY: Self
+pub const easypdf_core::crypto::PdfPermissions::PRINT: Self
+impl easypdf_core::crypto::PdfPermissions
+pub const fn easypdf_core::crypto::PdfPermissions::all() -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::bits(&self) -> u32
+pub const fn easypdf_core::crypto::PdfPermissions::complement(self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::contains(&self, Self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::difference(self, Self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::empty() -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits(u32) -> core::option::Option<Self>
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits_retain(u32) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::from_bits_truncate(u32) -> Self
+pub fn easypdf_core::crypto::PdfPermissions::from_name(&str) -> core::option::Option<Self>
+pub fn easypdf_core::crypto::PdfPermissions::insert(&mut self, Self)
+pub const fn easypdf_core::crypto::PdfPermissions::intersection(self, Self) -> Self
+pub const fn easypdf_core::crypto::PdfPermissions::intersects(&self, Self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::is_all(&self) -> bool
+pub const fn easypdf_core::crypto::PdfPermissions::is_empty(&self) -> bool
+pub fn easypdf_core::crypto::PdfPermissions::remove(&mut self, Self)
+pub fn easypdf_core::crypto::PdfPermissions::set(&mut self, Self, bool)
+pub const fn easypdf_core::crypto::PdfPermissions::symmetric_difference(self, Self) -> Self
+pub fn easypdf_core::crypto::PdfPermissions::toggle(&mut self, Self)
+pub const fn easypdf_core::crypto::PdfPermissions::union(self, Self) -> Self
+impl easypdf_core::crypto::PdfPermissions
+pub const fn easypdf_core::crypto::PdfPermissions::iter(&self) -> bitflags::iter::Iter<easypdf_core::crypto::PdfPermissions>
+pub const fn easypdf_core::crypto::PdfPermissions::iter_names(&self) -> bitflags::iter::IterNames<easypdf_core::crypto::PdfPermissions>
+impl bitflags::traits::Flags for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Bits = u32
+pub const easypdf_core::crypto::PdfPermissions::FLAGS: &'static [bitflags::traits::Flag<easypdf_core::crypto::PdfPermissions>]
+pub fn easypdf_core::crypto::PdfPermissions::all_named() -> easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bits(&self) -> u32
+pub fn easypdf_core::crypto::PdfPermissions::from_bits_retain(u32) -> easypdf_core::crypto::PdfPermissions
+impl core::clone::Clone for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::clone(&self) -> easypdf_core::crypto::PdfPermissions
+impl core::cmp::Eq for easypdf_core::crypto::PdfPermissions
+impl core::cmp::Ord for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::cmp(&self, &easypdf_core::crypto::PdfPermissions) -> core::cmp::Ordering
+impl core::cmp::PartialEq for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::eq(&self, &easypdf_core::crypto::PdfPermissions) -> bool
+impl core::cmp::PartialOrd for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::partial_cmp(&self, &easypdf_core::crypto::PdfPermissions) -> core::option::Option<core::cmp::Ordering>
+impl core::fmt::Binary for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Debug for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::LowerHex for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::Octal for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::fmt::UpperHex for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::fmt(&self, &mut core::fmt::Formatter<'_>) -> core::fmt::Result
+impl core::hash::Hash for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::hash<__H: core::hash::Hasher>(&self, &mut __H)
+impl core::iter::traits::collect::Extend<easypdf_core::crypto::PdfPermissions> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::extend<T: core::iter::traits::collect::IntoIterator<Item = Self>>(&mut self, T)
+impl core::iter::traits::collect::FromIterator<easypdf_core::crypto::PdfPermissions> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::from_iter<T: core::iter::traits::collect::IntoIterator<Item = Self>>(T) -> Self
+impl core::iter::traits::collect::IntoIterator for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::IntoIter = bitflags::iter::Iter<easypdf_core::crypto::PdfPermissions>
+pub type easypdf_core::crypto::PdfPermissions::Item = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::into_iter(self) -> Self::IntoIter
+impl core::marker::Copy for easypdf_core::crypto::PdfPermissions
+impl core::marker::StructuralPartialEq for easypdf_core::crypto::PdfPermissions
+impl core::ops::arith::Sub for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::sub(self, Self) -> Self
+impl core::ops::arith::SubAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::sub_assign(&mut self, Self)
+impl core::ops::bit::BitAnd for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitand(self, Self) -> Self
+impl core::ops::bit::BitAndAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitand_assign(&mut self, Self)
+impl core::ops::bit::BitOr for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitor(self, easypdf_core::crypto::PdfPermissions) -> Self
+impl core::ops::bit::BitOrAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitor_assign(&mut self, Self)
+impl core::ops::bit::BitXor for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitxor(self, Self) -> Self
+impl core::ops::bit::BitXorAssign for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::bitxor_assign(&mut self, Self)
+impl core::ops::bit::Not for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::not(self) -> Self
+impl core::marker::Freeze for easypdf_core::crypto::PdfPermissions
+impl core::marker::Send for easypdf_core::crypto::PdfPermissions
+impl core::marker::Sync for easypdf_core::crypto::PdfPermissions
+impl core::marker::Unpin for easypdf_core::crypto::PdfPermissions
+impl core::marker::UnsafeUnpin for easypdf_core::crypto::PdfPermissions
+impl core::panic::unwind_safe::RefUnwindSafe for easypdf_core::crypto::PdfPermissions
+impl core::panic::unwind_safe::UnwindSafe for easypdf_core::crypto::PdfPermissions
+impl<'a, T, E> asn1_rs::traits::AsTaggedExplicit<'a, E> for easypdf_core::crypto::PdfPermissions where T: 'a
+impl<'a, T, E> asn1_rs::traits::AsTaggedImplicit<'a, E> for easypdf_core::crypto::PdfPermissions where T: 'a
+impl<Q, K> equivalent::Comparable<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Ord + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::compare(&self, &K) -> core::cmp::Ordering
+impl<Q, K> equivalent::Equivalent<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::equivalent(&self, &K) -> bool
+impl<Q, K> hashbrown::Equivalent<K> for easypdf_core::crypto::PdfPermissions where Q: core::cmp::Eq + ?core::marker::Sized, K: core::borrow::Borrow<Q> + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::equivalent(&self, &K) -> bool
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Initialized, zerocopy::pointer::invariant::Initialized> for easypdf_core::crypto::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<ST, DT> zerocopy::pointer::invariant::CastableFrom<ST, zerocopy::pointer::invariant::Uninit, zerocopy::pointer::invariant::Uninit> for easypdf_core::crypto::PdfPermissions where ST: ?core::marker::Sized, DT: ?core::marker::Sized
+impl<T, U> core::convert::Into<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::From<T>
+pub fn easypdf_core::crypto::PdfPermissions::into(self) -> U
+impl<T, U> core::convert::TryFrom<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::Into<T>
+pub type easypdf_core::crypto::PdfPermissions::Error = core::convert::Infallible
+pub fn easypdf_core::crypto::PdfPermissions::try_from(U) -> core::result::Result<T, <T as core::convert::TryFrom<U>>::Error>
+impl<T, U> core::convert::TryInto<U> for easypdf_core::crypto::PdfPermissions where U: core::convert::TryFrom<T>
+pub type easypdf_core::crypto::PdfPermissions::Error = <U as core::convert::TryFrom<T>>::Error
+pub fn easypdf_core::crypto::PdfPermissions::try_into(self) -> core::result::Result<U, <U as core::convert::TryFrom<T>>::Error>
+impl<T> alloc::borrow::ToOwned for easypdf_core::crypto::PdfPermissions where T: core::clone::Clone
+pub type easypdf_core::crypto::PdfPermissions::Owned = T
+pub fn easypdf_core::crypto::PdfPermissions::clone_into(&self, &mut T)
+pub fn easypdf_core::crypto::PdfPermissions::to_owned(&self) -> T
+impl<T> core::any::Any for easypdf_core::crypto::PdfPermissions where T: 'static + ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::type_id(&self) -> core::any::TypeId
+impl<T> core::borrow::Borrow<T> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::borrow(&self) -> &T
+impl<T> core::borrow::BorrowMut<T> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+pub fn easypdf_core::crypto::PdfPermissions::borrow_mut(&mut self) -> &mut T
+impl<T> core::clone::CloneToUninit for easypdf_core::crypto::PdfPermissions where T: core::clone::Clone
+pub unsafe fn easypdf_core::crypto::PdfPermissions::clone_to_uninit(&self, *mut u8)
+impl<T> core::convert::From<T> for easypdf_core::crypto::PdfPermissions
+pub fn easypdf_core::crypto::PdfPermissions::from(T) -> T
+impl<T> crossbeam_epoch::atomic::Pointable for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Init = T
+pub const easypdf_core::crypto::PdfPermissions::ALIGN: usize
+pub unsafe fn easypdf_core::crypto::PdfPermissions::deref<'a>(usize) -> &'a T
+pub unsafe fn easypdf_core::crypto::PdfPermissions::deref_mut<'a>(usize) -> &'a mut T
+pub unsafe fn easypdf_core::crypto::PdfPermissions::drop(usize)
+pub unsafe fn easypdf_core::crypto::PdfPermissions::init(<T as crossbeam_epoch::atomic::Pointable>::Init) -> usize
+impl<T> either::into_either::IntoEither for easypdf_core::crypto::PdfPermissions
+impl<T> tracing::instrument::Instrument for easypdf_core::crypto::PdfPermissions
+impl<T> tracing::instrument::WithSubscriber for easypdf_core::crypto::PdfPermissions
+impl<T> typenum::type_operators::Same for easypdf_core::crypto::PdfPermissions
+pub type easypdf_core::crypto::PdfPermissions::Output = T
+impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusive, zerocopy::pointer::invariant::BecauseExclusive> for easypdf_core::crypto::PdfPermissions where T: ?core::marker::Sized
+impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::PdfPermissions where V: ppv_lite86::types::MultiLane<T>
+pub fn easypdf_core::crypto::PdfPermissions::vzip(self) -> V
 pub struct easypdf_core::crypto::PdfSigner
 pub easypdf_core::crypto::PdfSigner::certificate: alloc::vec::Vec<u8>
 pub easypdf_core::crypto::PdfSigner::contact_info: core::option::Option<alloc::string::String>
@@ -1385,8 +1385,8 @@ impl<T> zerocopy::pointer::invariant::Read<zerocopy::pointer::invariant::Exclusi
 impl<V, T> ppv_lite86::types::VZip<V> for easypdf_core::crypto::sign::SignatureInfo where V: ppv_lite86::types::MultiLane<T>
 pub fn easypdf_core::crypto::sign::SignatureInfo::vzip(self) -> V
 pub fn easypdf_core::crypto::decrypt_pdf(&[u8], &str) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
-pub fn easypdf_core::crypto::encrypt_pdf(&[u8], &easypdf_core::crypto::encrypt::PdfEncryption) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
-pub fn easypdf_core::crypto::get_encryption_info(&[u8]) -> core::result::Result<core::option::Option<easypdf_core::crypto::encrypt::EncryptionInfo>, easypdf_core::crypto::CryptoError>
+pub fn easypdf_core::crypto::encrypt_pdf(&[u8], &easypdf_core::crypto::PdfEncryption) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
+pub fn easypdf_core::crypto::get_encryption_info(&[u8]) -> core::result::Result<core::option::Option<easypdf_core::crypto::EncryptionInfo>, easypdf_core::crypto::CryptoError>
 pub fn easypdf_core::crypto::sign_pdf(&[u8], &easypdf_core::crypto::sign::PdfSigner) -> core::result::Result<alloc::vec::Vec<u8>, easypdf_core::crypto::CryptoError>
 pub fn easypdf_core::crypto::verify_pdf_signature(&[u8]) -> core::result::Result<easypdf_core::crypto::sign::SignatureInfo, easypdf_core::crypto::CryptoError>
 pub mod easypdf_core::enums

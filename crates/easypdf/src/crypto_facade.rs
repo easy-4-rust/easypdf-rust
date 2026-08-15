@@ -1,23 +1,21 @@
-//! Encrypt and sign facade methods for [`EasyPdf`].
+//! [`EasyPdf`] 的加密与签名门面方法。
 
 use std::path::Path;
 
 use crate::{EasyPdf, PdfError, Result};
 
 impl EasyPdf {
-    /// Encrypt an existing PDF with a password using AES-256-CBC.
+    /// 使用密码对现有 PDF 进行 AES-256-CBC 加密。
     ///
-    /// Both `input` and `output` are file paths. The same password is used as
-    /// both user and owner password for simplicity.
+    /// `input` 和 `output` 均为文件路径。为简便起见，
+    /// 同一密码同时用作用户密码和所有者密码。
     ///
-    /// **Implementation note**: This uses a simplified encryption container
-    /// (not full PDF 2.0 stream-level encryption). See
-    /// [`easypdf_core::crypto`] for details on limitations.
+    /// **实现说明**：使用简化的加密容器（非完整的 PDF 2.0 流级加密）。
+    /// 详见 [`easypdf_core::crypto`] 了解限制。
     ///
     /// # Errors
     ///
-    /// Returns an error if the input file cannot be read, the encryption
-    /// fails, or the output cannot be written.
+    /// 如果输入文件无法读取、加密失败或输出无法写入，返回错误。
     pub fn encrypt(
         input: impl AsRef<Path>,
         output: impl AsRef<Path>,
@@ -31,20 +29,18 @@ impl EasyPdf {
         Ok(())
     }
 
-    /// Digitally sign a PDF using RSA PKCS#1 v1.5 with SHA-256.
+    /// 使用 RSA PKCS#1 v1.5 和 SHA-256 对 PDF 进行数字签名。
     ///
-    /// Reads the RSA private key from the file at the path given in
-    /// `private_key_path` (PKCS#1 or PKCS#8 DER format). The signing
-    /// certificate is read from `cert_path` (DER-encoded X.509).
+    /// 从 `private_key_path` 指定的文件路径读取 RSA 私钥
+    /// （PKCS#1 或 PKCS#8 DER 格式）。签名证书从 `cert_path`
+    /// 读取（DER 编码的 X.509）。
     ///
-    /// **Implementation note**: This embeds a simplified `/Sig` dictionary,
-    /// not a full PKCS#7 `SignedData` container. See [`easypdf_core::crypto`]
-    /// for details on limitations.
+    /// **实现说明**：嵌入简化的 `/Sig` 字典，非完整的
+    /// PKCS#7 `SignedData` 容器。详见 [`easypdf_core::crypto`] 了解限制。
     ///
     /// # Errors
     ///
-    /// Returns an error if the input file, key, or certificate cannot be
-    /// read, or if the signing operation fails.
+    /// 如果输入文件、密钥或证书无法读取，或签名操作失败，返回错误。
     pub fn sign(
         input: impl AsRef<Path>,
         output: impl AsRef<Path>,
