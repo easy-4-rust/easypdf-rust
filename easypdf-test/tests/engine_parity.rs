@@ -10,7 +10,6 @@
 
 #![cfg(feature = "writer-krilla")]
 
-use easypdf::PdfWriter;
 use easypdf::prelude::*;
 use std::path::Path;
 
@@ -59,7 +58,9 @@ fn build_with_printpdf(
 
 /// 用公共 API 构建测试 PDF（krilla 引擎）。
 fn build_with_krilla(path: &Path, font_data: Option<&[u8]>, font_key: &str) -> easypdf::Result<()> {
-    let mut writer = PdfWriter::new_with_krilla("Parity Test - krilla");
+    let mut writer = PdfWriterBuilder::new("Parity Test - krilla")
+        .engine(WriteEngineKind::Krilla)
+        .build()?;
 
     if let Some(data) = font_data {
         writer.register_font_from_bytes(font_key, data)?;
@@ -291,7 +292,10 @@ fn parity_font_subsetting() {
     let font_key = "subset_test_font";
     let krilla_path = std::env::temp_dir().join("parity_subset_krilla.pdf");
 
-    let mut writer = PdfWriter::new_with_krilla("Subset Test");
+    let mut writer = PdfWriterBuilder::new("Subset Test")
+        .engine(WriteEngineKind::Krilla)
+        .build()
+        .expect("failed to build krilla writer");
     writer
         .register_font_from_bytes(font_key, &font_data)
         .unwrap();

@@ -74,7 +74,7 @@ pub use easypdf_core::{
 };
 
 // --- 写入器 ---
-pub use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
+pub use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend, WriteEngineKind};
 
 // --- 操作器 ---
 pub use easypdf_reader::PdfManipulator;

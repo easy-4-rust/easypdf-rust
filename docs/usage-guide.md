@@ -10,6 +10,7 @@
 1. [Installation 安装](#1-installation-安装)
 2. [Quick Start 快速开始](#2-quick-start-快速开始)
 3. [Creating PDFs 创建 PDF](#3-creating-pdfs-创建-pdf)
+   - [3.11 选择写入引擎 / Choosing a Write Engine](#311-选择写入引擎--choosing-a-write-engine)
 4. [Reading PDFs 读取 PDF](#4-reading-pdfs-读取-pdf)
 5. [Manipulating PDFs 操作 PDF](#5-manipulating-pdfs-操作-pdf)
 6. [Template & Form Filling 模板与表单填充](#6-template--form-filling-模板与表单填充)
@@ -332,6 +333,54 @@ impl PdfWriteHandler for MyHandler {
 let writer = EasyPdf::create("out.pdf")
     .register_handler(Box::new(MyHandler))
     .build()?;
+```
+
+### 3.11 选择写入引擎 / Choosing a Write Engine
+
+easypdf-rust 支持两个写入引擎，通过 `WriteEngineKind` 在构建时选择：
+easypdf-rust supports two write engines, selectable at build time via `WriteEngineKind`:
+
+| 引擎 / Engine | Feature | 特点 / Characteristics |
+|---|---|---|
+| `Printpdf`（默认） | 内置 | Base14 字体、SVG、成熟稳定 |
+| `Krilla` | `writer-krilla` | 字体子集化、CJK 体积优化 |
+
+**使用默认引擎（printpdf）：**
+
+```rust
+use easypdf::prelude::*;
+
+// 默认引擎，无需指定
+let writer = PdfWriterBuilder::new("Default Engine")
+    .build()?;
+```
+
+**显式选择引擎：**
+
+```rust
+use easypdf::prelude::*;
+
+// 使用 printpdf 引擎
+let writer = PdfWriterBuilder::new("Printpdf Engine")
+    .engine(WriteEngineKind::Printpdf)
+    .build()?;
+
+// 使用 krilla 引擎（需要 writer-krilla feature）
+let writer = PdfWriterBuilder::new("Krilla Engine")
+    .engine(WriteEngineKind::Krilla)
+    .build()?;
+```
+
+**krilla 引擎注意事项：**
+
+- krilla 不支持 PDF 标准 14 内置字体，需通过 `register_font_from_bytes` 提供真实字体文件。
+- krilla 不支持 SVG 嵌入。
+- krilla 的字体子集化对 CJK 大字体文件效果显著（可将 10MB+ 字体缩减至数百 KB）。
+
+```toml
+# 启用 krilla 引擎
+[dependencies]
+easypdf = { version = "0.1.1", features = ["writer-krilla"] }
 ```
 
 ---

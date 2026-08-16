@@ -18,7 +18,7 @@ use std::path::Path;
 
 use crate::backend::{PageSpillWriter, SpilledPageData, WriteBackend};
 use crate::engine::op::WriterOp;
-use crate::engine::{FontKey, PrintpdfEngine, WriteEngine, resolve_font_key};
+use crate::engine::{FontKey, WriteEngine, WriteEngineKind, resolve_font_key};
 
 /// 动态分发的写入引擎类型别名。
 type DynEngine = Box<dyn WriteEngine>;
@@ -92,37 +92,12 @@ pub struct PdfWriter {
 impl PdfWriter {
     /// 创建新的 PDF 文档（通过 `finish` 写入文件）。
     ///
-    /// 使用默认的内存后端。如需高级配置，
+    /// 使用默认的内存后端和默认引擎（printpdf）。如需高级配置，
     /// 请使用 [`PdfWriterBuilder`](crate::PdfWriterBuilder)。
     #[must_use]
     pub fn new(title: &str) -> Self {
         Self {
-            engine: Box::new(PrintpdfEngine::new(title)),
-            current_page_ops: Vec::new(),
-            current_page_size: PageSize::A4.dimensions(),
-            current_page_number: 0,
-            current_page_open: false,
-            document_started: false,
-            custom_font_keys: HashMap::new(),
-            metadata: PdfMetadata::default(),
-            chain: WriteHandlerChain::new(),
-            text_cursor: (DEFAULT_MARGIN, 0.0),
-            output: None,
-            backend: WriteBackend::default(),
-            spill_writer: None,
-        }
-    }
-
-    /// 使用 krilla 引擎创建 PDF 写入器（仅测试用途）。
-    ///
-    /// 此方法在 `writer-krilla` feature 启用时可用。
-    /// 用于双后端对等测试，不属于公共 API。
-    #[cfg(feature = "writer-krilla")]
-    #[doc(hidden)]
-    #[must_use]
-    pub fn new_with_krilla(_title: &str) -> Self {
-        Self {
-            engine: Box::new(crate::engine::krilla_engine::KrillaEngine::new()),
+            engine: WriteEngineKind::default().create_engine(title),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,
@@ -156,6 +131,7 @@ impl PdfWriter {
         metadata: PdfMetadata,
         backend: WriteBackend,
         chain: WriteHandlerChain,
+        engine_kind: WriteEngineKind,
     ) -> Result<Self> {
         let spill_writer = match &backend {
             WriteBackend::Spill {
@@ -171,7 +147,7 @@ impl PdfWriter {
         };
 
         Ok(Self {
-            engine: Box::new(PrintpdfEngine::new(title)),
+            engine: engine_kind.create_engine(title),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,

@@ -17,7 +17,7 @@ pub use easypdf_core::{AtomicFileOutput, PdfInput, ResourceLimits};
 
 // 读取器 / 写入器
 pub use easypdf_reader::{PdfReader, ReadStrategy};
-pub use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
+pub use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend, WriteEngineKind};
 
 // 操作器 / 模板
 pub use easypdf_reader::PdfManipulator;

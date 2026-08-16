@@ -1,7 +1,13 @@
-//! PDF 创建与写入（printpdf 后端）。
+//! PDF 创建与写入（printpdf / krilla 后端）。
 //!
-//! 提供 `PdfWriter` 用于创建包含文本、表格、图片、图形和自定义字体的
-//! 新 PDF 文档。底层使用 `printpdf` crate。
+//! 提供 [`PdfWriter`] 用于创建包含文本、表格、图片、图形和自定义字体的
+//! 新 PDF 文档。支持多个写入引擎：
+//!
+//! - **printpdf**（默认）：成熟的 PDF 后端，支持 base14 内置字体和 SVG。
+//! - **krilla**（`writer-krilla` feature）：字体子集化、CJK 体积优化。
+//!
+//! 使用 [`WriteEngineKind`] 在构建时选择引擎，或通过 [`PdfWriterBuilder::engine`]
+//! 显式指定。未指定时默认使用 printpdf。
 //!
 //! # 写入后端
 //!
@@ -10,15 +16,15 @@
 //! - [`InMemory`](WriteBackend::InMemory) -- 默认，适合小型文档。
 //! - [`Spill`](WriteBackend::Spill) -- 页面级溢出到临时文件，适合大型文档。
 //!
-//! 使用 [`PdfWriterBuilder`] 配置后端、处理器优先级和常量内存模式。
+//! 使用 [`PdfWriterBuilder`] 配置后端、处理器优先级、引擎和常量内存模式。
 //!
 //! # Examples
 //!
 //! ```
-//! use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend};
+//! use easypdf_writer::{PdfWriter, PdfWriterBuilder, WriteBackend, WriteEngineKind};
 //! use easypdf_core::*;
 //!
-//! // 简单用法（向后兼容）。
+//! // 简单用法（默认 printpdf 引擎）。
 //! let mut w = PdfWriter::new("title");
 //!
 //! // 使用溢出后端的构建器。
@@ -26,6 +32,12 @@
 //!     .backend(WriteBackend::auto(500))
 //!     .build()
 //!     .unwrap();
+//!
+//! // 显式选择引擎（需要 writer-krilla feature）。
+//! // let w = PdfWriterBuilder::new("CJK Doc")
+//! //     .engine(WriteEngineKind::Krilla)
+//! //     .build()
+//! //     .unwrap();
 //! ```
 
 #![warn(missing_docs)]
@@ -54,6 +66,7 @@ mod writer;
 
 pub use backend::WriteBackend;
 pub use builder::PdfWriterBuilder;
+pub use engine::WriteEngineKind;
 pub use font::map_builtin_font;
 pub use template::PdfTemplateFiller;
 pub use writer::PdfWriter;

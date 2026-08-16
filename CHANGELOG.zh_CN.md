@@ -7,7 +7,17 @@
 
 ## [未发布]
 
-_暂无未发布变更。_
+### 新增
+
+- **写入引擎抽象**：`WriteEngineKind` 枚举支持运行时引擎选择
+  （`Printpdf` 默认 + `Krilla` 通过 `writer-krilla` feature）。
+- **`PdfWriterBuilder::engine()`**：公共 API，构建时选择写入引擎。
+- **`writer-krilla` feature**：krilla 0.8.2 后端，支持字体子集化和 CJK
+  体积优化。限制：不支持 base14 内置字体（需提供真实字体文件）、不支持 SVG。
+- **引擎对等测试**：6 个测试对比 printpdf 与 krilla 输出（页数、文本内容、
+  图形、roundtrip、输出体积、字体子集化）。
+- **引擎对比基准**：`docs/performance/ENGINE_COMPARISON.md`，含实测数据。
+- **CI 扩展**：check/test/clippy 作业增加 `writer-krilla` feature 矩阵。
 
 ## [0.1.1] - 2026-08-16
 

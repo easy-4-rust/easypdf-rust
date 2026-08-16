@@ -40,6 +40,7 @@ pub use easypdf::ResourceLimits
 pub use easypdf::SourceLocation
 pub use easypdf::TablePolicy
 pub use easypdf::WriteBackend
+pub use easypdf::WriteEngineKind
 pub use easypdf::attempt_repair
 pub use easypdf::guard_decompression_bomb
 pub use easypdf::guard_element_explosion
@@ -75,6 +76,7 @@ pub use easypdf::prelude::ResourceLimits
 pub use easypdf::prelude::SourceLocation
 pub use easypdf::prelude::TablePolicy
 pub use easypdf::prelude::WriteBackend
+pub use easypdf::prelude::WriteEngineKind
 pub struct easypdf::prelude::EasyPdf
 impl easypdf::EasyPdf
 pub fn easypdf::EasyPdf::create(impl core::convert::Into<std::path::PathBuf>) -> easypdf::PdfCreateBuilder

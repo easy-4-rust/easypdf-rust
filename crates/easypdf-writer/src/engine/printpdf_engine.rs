@@ -232,73 +232,13 @@ fn to_printpdf_ops(ops: &[WriterOp], custom_fonts: &HashMap<String, FontId>) -> 
     result
 }
 
-/// 从 easypdf-core 的 `PdfFont` 解析出 [`FontKey`]。
-///
-/// 将 `FontFamily` + `FontStyle` 组合解析为具体的内置字体变体，
-/// 或标记为自定义字体键。此函数不依赖 printpdf 类型。
-pub(crate) fn resolve_font_key(font: &easypdf_core::PdfFont) -> FontKey {
-    use easypdf_core::{BuiltInFont, FontFamily};
-
-    match &font.family {
-        FontFamily::BuiltIn(builtin) => {
-            let kind = match builtin {
-                BuiltInFont::Helvetica
-                | BuiltInFont::HelveticaBold
-                | BuiltInFont::HelveticaOblique
-                | BuiltInFont::HelveticaBoldOblique => {
-                    if font.style.bold && font.style.italic {
-                        BuiltinFontKind::HelveticaBoldOblique
-                    } else if font.style.bold {
-                        BuiltinFontKind::HelveticaBold
-                    } else if font.style.italic {
-                        BuiltinFontKind::HelveticaOblique
-                    } else {
-                        BuiltinFontKind::Helvetica
-                    }
-                }
-                BuiltInFont::TimesRoman
-                | BuiltInFont::TimesBold
-                | BuiltInFont::TimesItalic
-                | BuiltInFont::TimesBoldItalic => {
-                    if font.style.bold && font.style.italic {
-                        BuiltinFontKind::TimesBoldItalic
-                    } else if font.style.bold {
-                        BuiltinFontKind::TimesBold
-                    } else if font.style.italic {
-                        BuiltinFontKind::TimesItalic
-                    } else {
-                        BuiltinFontKind::TimesRoman
-                    }
-                }
-                BuiltInFont::Courier
-                | BuiltInFont::CourierBold
-                | BuiltInFont::CourierOblique
-                | BuiltInFont::CourierBoldOblique => {
-                    if font.style.bold && font.style.italic {
-                        BuiltinFontKind::CourierBoldOblique
-                    } else if font.style.bold {
-                        BuiltinFontKind::CourierBold
-                    } else if font.style.italic {
-                        BuiltinFontKind::CourierOblique
-                    } else {
-                        BuiltinFontKind::Courier
-                    }
-                }
-                BuiltInFont::Symbol => BuiltinFontKind::Symbol,
-                BuiltInFont::ZapfDingbats => BuiltinFontKind::ZapfDingbats,
-            };
-            FontKey::Builtin(kind)
-        }
-        FontFamily::Custom(path) => FontKey::Custom(path.to_string()),
-    }
-}
-
 // 需要 ParsedFont 用于字体注册。
 use printpdf::ParsedFont;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::engine::resolve_font_key;
 
     #[test]
     fn resolve_builtin_helvetica() {

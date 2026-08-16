@@ -18,6 +18,10 @@ path = "src/bin/generate_golden.rs"
 name = "generate_special_pdfs"
 path = "src/bin/generate_special_pdfs.rs"
 
+[[bin]]
+name = "engine_bench"
+path = "src/bin/engine_bench.rs"
+
 [dependencies]
 easypdf = { path = "../crates/easypdf", version = "0.1.1", features = ["markdown"] }
 lopdf = { workspace = true }

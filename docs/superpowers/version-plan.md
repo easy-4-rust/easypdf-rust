@@ -92,19 +92,25 @@
 
 ### 目标内容
 
+**写入引擎（已完成）:**
+1. ✅ 写入引擎抽象：`WriteEngine` trait + `WriterOp` IR
+2. ✅ Krilla 后端（`writer-krilla` feature）：krilla 0.8.2，字体子集化/CJK 优化
+3. ✅ `WriteEngineKind` 公共选择器 + `PdfWriterBuilder::engine()` API
+4. ✅ 引擎对等测试（6 个 parity test）+ 基准对比文档
+
 **0.5 Compliance 剩余:**
-1. PDF/A-1b validation
-2. PDF/A-2b validation
-3. PDF/A-3b validation
-4. Document info dictionary standardization
+5. PDF/A-1b validation
+6. PDF/A-2b validation
+7. PDF/A-3b validation
+8. Document info dictionary standardization
 
 **0.6 Converters 剩余:**
-5. PDF to image rasterize（页面光栅化）
-6. Markdown to PDF optimization（性能 / CSS 注入 / 代码高亮）
+9. PDF to image rasterize（页面光栅化）
+10. Markdown to PDF optimization（性能 / CSS 注入 / 代码高亮）
 
 **其他:**
-7. SVG to PDF（若未在 v0.2.0 完成）
-8. PDF Layers (OCG)（若需求明确）
+11. SVG to PDF（若未在 v0.2.0 完成）
+12. PDF Layers (OCG)（若需求明确）
 
 ### 质量门禁
 

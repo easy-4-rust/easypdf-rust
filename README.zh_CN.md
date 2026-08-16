@@ -58,6 +58,7 @@ flowchart TB
 | 能力 | 状态 | 说明 |
 |---|---|---|
 | PDF创建 | 稳定 | Builder模式，文本/图片/形状，自定义字体，元数据 |
+| 写入引擎 | 稳定 | printpdf（默认，base14/SVG）+ krilla（`writer-krilla`，字体子集化/CJK优化） |
 | PDF读取 | 稳定 | 3种策略（Full/Lazy/Streaming），会话复用（约129倍加速） |
 | 页面操作 | 稳定 | 合并、拆分、旋转、重排、水印、提取 |
 | 表单填充 | 稳定 | 通过`#[derive(PdfModel)]`映射AcroForm字段 |
@@ -282,6 +283,7 @@ server.run()?;
 
 | Feature | 启用内容 | 默认 |
 |---|---|:---:|
+| `writer-krilla` | Krilla写入引擎（字体子集化、CJK优化） | 否 |
 | `markdown` | PDF转Markdown管道 | 是 |
 | `markdown-table` | Markdown中的表格检测 | 否 |
 | `markdown-ocr` | 扫描页面的OCR回退 | 否 |

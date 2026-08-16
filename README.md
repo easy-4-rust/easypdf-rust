@@ -58,6 +58,7 @@ flowchart TB
 | Capability | Status | Details |
 |---|---|---|
 | PDF creation | Stable | Builder pattern, text/images/shapes, custom fonts, metadata |
+| Write engines | Stable | printpdf (default, base14/SVG) + krilla (`writer-krilla`, font subsetting/CJK) |
 | PDF reading | Stable | 3 strategies (Full/Lazy/Streaming), session reuse (~129x faster) |
 | Page manipulation | Stable | Merge, split, rotate, reorder, watermark, extract |
 | Form filling | Stable | AcroForm field mapping via `#[derive(PdfModel)]` |
@@ -282,6 +283,7 @@ Benchmarked against pdftotext (Poppler) on Apple M4 Pro:
 
 | Feature | Enables | Default |
 |---|---|:---:|
+| `writer-krilla` | Krilla write engine (font subsetting, CJK optimization) | No |
 | `markdown` | PDF to Markdown pipeline | Yes |
 | `markdown-table` | Table detection in markdown | No |
 | `markdown-ocr` | OCR fallback for scanned pages | No |

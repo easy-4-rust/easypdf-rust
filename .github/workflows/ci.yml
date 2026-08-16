@@ -42,9 +42,12 @@ jobs:
       - name: Test
         run: cargo test --workspace --all-targets
 
+      - name: Test with writer-krilla
+        run: cargo test --workspace --all-targets --features writer-krilla
+
       - name: Clippy
         if: matrix.rust == 'stable'
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: Doctest
         run: cargo test --workspace --doc
@@ -71,6 +74,15 @@ jobs:
 
       - name: Check no default features
         run: cargo check -p easypdf --no-default-features
+
+      - name: Check writer-krilla (easypdf-writer)
+        run: cargo check -p easypdf-writer --features writer-krilla
+
+      - name: Check writer-krilla (easypdf facade)
+        run: cargo check -p easypdf --features writer-krilla
+
+      - name: Clippy with writer-krilla
+        run: cargo clippy -p easypdf-writer --features writer-krilla -- -D warnings
 
   fmt:
     name: Format

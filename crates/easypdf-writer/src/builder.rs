@@ -1,16 +1,17 @@
 //! 构建 [`PdfWriter`] 的构建器模式。
 //!
 //! 提供 [`PdfWriterBuilder`]，用于在构造写入器之前配置写入后端、
-//! 处理器优先级和常量内存模式。
+//! 处理器优先级、写入引擎和常量内存模式。
 //!
 //! # Examples
 //!
 //! ```
-//! use easypdf_writer::{PdfWriterBuilder, WriteBackend};
+//! use easypdf_writer::{PdfWriterBuilder, WriteBackend, WriteEngineKind};
 //! use easypdf_core::handler_chain::PRIORITY_HIGH;
 //!
 //! let writer = PdfWriterBuilder::new("My Document")
 //!     .backend(WriteBackend::InMemory)
+//!     .engine(WriteEngineKind::Printpdf)
 //!     .constant_memory(false)
 //!     .build();
 //! ```
@@ -20,11 +21,13 @@ use easypdf_core::handler_chain::{PRIORITY_NORMAL, WriteHandlerChain};
 use easypdf_core::{PdfMetadata, PdfWriteHandler};
 
 use crate::backend::WriteBackend;
+use crate::engine::WriteEngineKind;
 use crate::writer::PdfWriter;
 
 /// 用于构造具有高级配置的 [`PdfWriter`] 的构建器。
 ///
 /// 支持：
+/// - **写入引擎选择**（printpdf 或 krilla）
 /// - **写入后端选择**（内存模式 vs 页面级溢出）
 /// - **处理器优先级排序**（通过 [`WriteHandlerChain`]）
 /// - **常量内存模式**便捷切换
@@ -33,12 +36,13 @@ use crate::writer::PdfWriter;
 /// # Examples
 ///
 /// ```
-/// use easypdf_writer::{PdfWriterBuilder, WriteBackend};
+/// use easypdf_writer::{PdfWriterBuilder, WriteBackend, WriteEngineKind};
 /// use easypdf_core::PdfMetadata;
 ///
 /// let writer = PdfWriterBuilder::new("Report")
 ///     .metadata(PdfMetadata::new().title("Q4 Report").author("Finance"))
 ///     .backend(WriteBackend::auto(500))
+///     .engine(WriteEngineKind::Printpdf)
 ///     .compress_temp_files(true)
 ///     .build();
 /// ```
@@ -47,6 +51,7 @@ pub struct PdfWriterBuilder {
     metadata: PdfMetadata,
     backend: WriteBackend,
     chain: WriteHandlerChain,
+    engine_kind: WriteEngineKind,
     constant_memory: bool,
     compress_temp_files: bool,
 }
@@ -60,9 +65,31 @@ impl PdfWriterBuilder {
             metadata: PdfMetadata::default(),
             backend: WriteBackend::default(),
             chain: WriteHandlerChain::new(),
+            engine_kind: WriteEngineKind::default(),
             constant_memory: false,
             compress_temp_files: true,
         }
+    }
+
+    /// 选择写入引擎。
+    ///
+    /// 默认使用 [`WriteEngineKind::Printpdf`]。
+    /// 启用 `writer-krilla` feature 后可选择 `WriteEngineKind::Krilla`。
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use easypdf_writer::{PdfWriterBuilder, WriteEngineKind};
+    ///
+    /// let writer = PdfWriterBuilder::new("CJK Report")
+    ///     .engine(WriteEngineKind::Printpdf)
+    ///     .build()
+    ///     .unwrap();
+    /// ```
+    #[must_use]
+    pub fn engine(mut self, engine: WriteEngineKind) -> Self {
+        self.engine_kind = engine;
+        self
     }
 
     /// 设置文档元数据。
@@ -156,7 +183,13 @@ impl PdfWriterBuilder {
             }
         };
 
-        PdfWriter::with_config(&self.title, self.metadata, backend, self.chain)
+        PdfWriter::with_config(
+            &self.title,
+            self.metadata,
+            backend,
+            self.chain,
+            self.engine_kind,
+        )
     }
 }
 

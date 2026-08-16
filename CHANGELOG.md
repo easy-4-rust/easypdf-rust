@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased changes._
+### Added
+
+- **Write engine abstraction**: `WriteEngineKind` enum for runtime engine selection
+  (`Printpdf` default + `Krilla` via `writer-krilla` feature).
+- **`PdfWriterBuilder::engine()`**: public API to select write engine at build time.
+- **`writer-krilla` feature**: krilla 0.8.2 backend with font subsetting and CJK
+  volume optimization. Limitations: no base14 built-in fonts (requires real font
+  file), no SVG support.
+- **Engine parity tests**: 6 tests comparing printpdf vs krilla output (page count,
+  text content, graphics, roundtrip, output size, font subsetting).
+- **Engine comparison benchmark**: `docs/performance/ENGINE_COMPARISON.md` with
+  real measurement data.
+- **CI expansion**: `writer-krilla` feature matrix in check/test/clippy jobs.
 
 ## [0.1.1] - 2026-08-16
 
