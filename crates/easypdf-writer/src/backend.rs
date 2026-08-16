@@ -6,7 +6,7 @@
 //!
 //! # 设计
 //!
-//! 溢出机制以页面粒度运行：页面完成后，其操作（`Vec<printpdf::Op>`）
+//! 溢出机制以页面粒度运行：页面完成后，其操作（`Vec<WriterOp>`）
 //! 和尺寸被序列化到临时文件（可选 gzip 压缩）。在 `finish()` 时，
 //! 所有溢出的页面被读回并合并到最终 PDF 文档中。
 //!
@@ -17,24 +17,25 @@ use easypdf_core::error::{PdfError, Result};
 use flate2::Compression;
 use flate2::read::GzDecoder;
 use flate2::write::GzEncoder;
-use printpdf::Op;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write as _};
 use std::path::PathBuf;
 
-/// Serialized representation of a single page's content, stored in spill files.
+use crate::engine::WriterOp;
+
+/// 单个页面内容的序列化表示，存储在溢出文件中。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct SpilledPageData {
-    /// Page number (1-based).
+    /// 页码（从 1 开始）。
     pub page_number: usize,
-    /// Page width in points.
+    /// 页面宽度（PDF 点）。
     pub width_pt: f64,
-    /// Page height in points.
+    /// 页面高度（PDF 点）。
     pub height_pt: f64,
-    /// The printpdf operations for this page.
-    pub ops: Vec<Op>,
+    /// 该页面的操作列表（引擎无关的中间表示）。
+    pub ops: Vec<WriterOp>,
 }
 
 /// PDF 写入后端选择。

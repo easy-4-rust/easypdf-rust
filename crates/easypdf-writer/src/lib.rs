@@ -45,6 +45,7 @@
 
 mod backend;
 mod builder;
+mod engine;
 mod font;
 mod image;
 mod shape;

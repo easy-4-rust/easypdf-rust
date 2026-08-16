@@ -1,57 +1,62 @@
 //! PdfWriter 的图形绘制方法。
 
+use crate::engine::op::{LineData, LinePointData, WriterOp};
 use crate::writer::PdfWriter;
-use printpdf::{Line, LinePoint, Op, Point, Pt};
 
 impl PdfWriter {
     /// 在当前页面上绘制线段（坐标从左下角开始）。
     pub fn draw_line(&mut self, x1: f64, y1: f64, x2: f64, y2: f64, line_width: f64) {
-        let line = Line {
+        let line = LineData {
             points: vec![
-                LinePoint {
-                    p: Point {
-                        x: Pt(x1 as f32),
-                        y: Pt(y1 as f32),
-                    },
+                LinePointData {
+                    x: x1,
+                    y: y1,
                     bezier: false,
                 },
-                LinePoint {
-                    p: Point {
-                        x: Pt(x2 as f32),
-                        y: Pt(y2 as f32),
-                    },
+                LinePointData {
+                    x: x2,
+                    y: y2,
                     bezier: false,
                 },
             ],
             is_closed: false,
         };
-        self.current_page_ops.push(Op::SetOutlineThickness {
-            pt: Pt(line_width as f32),
-        });
-        self.current_page_ops.push(Op::DrawLine { line });
+        self.current_page_ops
+            .push(WriterOp::SetOutlineThickness { pt: line_width });
+        self.current_page_ops.push(WriterOp::DrawLine { line });
     }
 
     /// 在当前页面上绘制矩形轮廓。
     pub fn draw_rect_stroke(&mut self, x: f64, y: f64, w: f64, h: f64, line_width: f64) {
-        let rect = printpdf::Rect::from_wh(Pt(w as f32), Pt(h as f32));
-        let line = rect.to_line();
-        let translated = Line {
-            points: line
-                .points
-                .into_iter()
-                .map(|mut lp| {
-                    lp.p.x = Pt(lp.p.x.0 + x as f32);
-                    lp.p.y = Pt(lp.p.y.0 + y as f32);
-                    lp
-                })
-                .collect(),
-            is_closed: line.is_closed,
+        // 构建矩形四角的线段点（与重构前 printpdf::Rect::to_line 行为一致）。
+        let line = LineData {
+            points: vec![
+                LinePointData {
+                    x,
+                    y,
+                    bezier: false,
+                },
+                LinePointData {
+                    x: x + w,
+                    y,
+                    bezier: false,
+                },
+                LinePointData {
+                    x: x + w,
+                    y: y + h,
+                    bezier: false,
+                },
+                LinePointData {
+                    x,
+                    y: y + h,
+                    bezier: false,
+                },
+            ],
+            is_closed: true,
         };
-        self.current_page_ops.push(Op::SetOutlineThickness {
-            pt: Pt(line_width as f32),
-        });
         self.current_page_ops
-            .push(Op::DrawLine { line: translated });
+            .push(WriterOp::SetOutlineThickness { pt: line_width });
+        self.current_page_ops.push(WriterOp::DrawLine { line });
     }
 
     /// 使用 4 条三次贝塞尔曲线绘制圆形轮廓（误差 < 0.027%）。
@@ -68,41 +73,32 @@ impl PdfWriter {
         let mut pts = Vec::with_capacity(13);
         for (x1, y1, cx1, cy1, cx2, cy2, x2, y2) in &segments {
             if pts.is_empty() {
-                pts.push(LinePoint {
-                    p: Point {
-                        x: Pt((cx + x1) as f32),
-                        y: Pt((cy + y1) as f32),
-                    },
+                pts.push(LinePointData {
+                    x: cx + x1,
+                    y: cy + y1,
                     bezier: false,
                 });
             }
-            pts.push(LinePoint {
-                p: Point {
-                    x: Pt((cx + cx1) as f32),
-                    y: Pt((cy + cy1) as f32),
-                },
+            pts.push(LinePointData {
+                x: cx + cx1,
+                y: cy + cy1,
                 bezier: true,
             });
-            pts.push(LinePoint {
-                p: Point {
-                    x: Pt((cx + cx2) as f32),
-                    y: Pt((cy + cy2) as f32),
-                },
+            pts.push(LinePointData {
+                x: cx + cx2,
+                y: cy + cy2,
                 bezier: true,
             });
-            pts.push(LinePoint {
-                p: Point {
-                    x: Pt((cx + x2) as f32),
-                    y: Pt((cy + y2) as f32),
-                },
+            pts.push(LinePointData {
+                x: cx + x2,
+                y: cy + y2,
                 bezier: false,
             });
         }
-        self.current_page_ops.push(Op::SetOutlineThickness {
-            pt: Pt(line_width as f32),
-        });
-        self.current_page_ops.push(Op::DrawLine {
-            line: Line {
+        self.current_page_ops
+            .push(WriterOp::SetOutlineThickness { pt: line_width });
+        self.current_page_ops.push(WriterOp::DrawLine {
+            line: LineData {
                 points: pts,
                 is_closed: true,
             },

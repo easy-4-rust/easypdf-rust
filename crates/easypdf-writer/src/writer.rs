@@ -1,27 +1,25 @@
 //! 主 `PdfWriter` 结构体与核心 PDF 写入方法。
 //!
-//! 底层使用 `printpdf` 进行 PDF 构建。支持两种写入后端：
+//! 底层使用引擎抽象层进行 PDF 构建。支持两种写入后端：
 //! - **内存模式**（默认）：整个文档在内存中构建。
 //! - **溢出模式**：已完成的页面序列化到临时文件，限制峰值内存。
 
 use easypdf_core::AtomicFileOutput;
-use easypdf_core::error::{PdfError, Result};
+use easypdf_core::error::Result;
 use easypdf_core::handler_chain::{PRIORITY_NORMAL, WriteHandlerChain};
 use easypdf_core::layout::LayoutSink;
 use easypdf_core::{
     FontFamily, Orientation, PageSize, PdfColor, PdfFont, PdfImage, PdfMetadata, PdfText,
     PdfWriteHandler,
 };
-use printpdf::{Mm, Op, PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, TextItem};
 use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 
 use crate::backend::{PageSpillWriter, SpilledPageData, WriteBackend};
-use crate::font::map_builtin_font;
+use crate::engine::op::WriterOp;
+use crate::engine::{FontKey, PrintpdfEngine, WriteEngine, resolve_font_key};
 
-/// PDF measurement units.
-const PT_TO_MM: f64 = 25.4 / 72.0;
 /// Default margin in points for auto-positioned text.
 const DEFAULT_MARGIN: f64 = 72.0;
 
@@ -60,32 +58,31 @@ const DEFAULT_MARGIN: f64 = 72.0;
 ///     .unwrap();
 /// ```
 pub struct PdfWriter {
-    pub(crate) doc: PdfDocument,
-    /// Accumulated completed pages (in-memory mode only).
-    pages: Vec<PdfPage>,
-    /// Operations being built for the current page.
-    pub(crate) current_page_ops: Vec<Op>,
-    /// Current page size for the page being built.
+    /// PDF 写入引擎（持有文档和字体表）。
+    pub(crate) engine: PrintpdfEngine,
+    /// 当前页面正在构建的操作列表。
+    pub(crate) current_page_ops: Vec<WriterOp>,
+    /// 当前页面尺寸（宽, 高，单位 PDF 点）。
     current_page_size: (f64, f64),
-    /// Current page number (1-based).
+    /// 当前页码（从 1 开始）。
     current_page_number: usize,
-    /// Whether the current page still accepts content and awaits finalization.
+    /// 当前页面是否仍接受内容并等待终结。
     current_page_open: bool,
-    /// Whether the document lifecycle has started.
+    /// 文档生命周期是否已开始。
     document_started: bool,
-    /// Registered custom font IDs keyed by path.
-    custom_fonts: HashMap<String, printpdf::FontId>,
-    /// Document metadata.
+    /// 自定义字体键名 -> FontKey 映射（用于 write_text_with_custom_font 查找）。
+    custom_font_keys: HashMap<String, FontKey>,
+    /// 文档元数据。
     pub(crate) metadata: PdfMetadata,
-    /// Priority-sorted handler chain.
+    /// 按优先级排序的处理器链。
     chain: WriteHandlerChain,
-    /// Auto-cursor for add_text convenience.
+    /// add_text 自动定位光标。
     text_cursor: (f64, f64),
-    /// Output stream for flush-based writing.
+    /// flush 模式的输出流。
     output: Option<Box<dyn Write>>,
-    /// Write backend configuration.
+    /// 写入后端配置。
     backend: WriteBackend,
-    /// Page-level spill writer (active when backend is `Spill`).
+    /// 页面级溢出写入器（后端为 Spill 时激活）。
     spill_writer: Option<PageSpillWriter>,
 }
 
@@ -97,14 +94,13 @@ impl PdfWriter {
     #[must_use]
     pub fn new(title: &str) -> Self {
         Self {
-            doc: PdfDocument::new(title),
-            pages: Vec::new(),
+            engine: PrintpdfEngine::new(title),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,
             current_page_open: false,
             document_started: false,
-            custom_fonts: HashMap::new(),
+            custom_font_keys: HashMap::new(),
             metadata: PdfMetadata::default(),
             chain: WriteHandlerChain::new(),
             text_cursor: (DEFAULT_MARGIN, 0.0),
@@ -147,14 +143,13 @@ impl PdfWriter {
         };
 
         Ok(Self {
-            doc: PdfDocument::new(title),
-            pages: Vec::new(),
+            engine: PrintpdfEngine::new(title),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,
             current_page_open: false,
             document_started: false,
-            custom_fonts: HashMap::new(),
+            custom_font_keys: HashMap::new(),
             metadata,
             chain,
             text_cursor: (DEFAULT_MARGIN, 0.0),
@@ -200,11 +195,9 @@ impl PdfWriter {
 
     /// 从字节数据注册自定义 TTF/OTF 字体。
     pub fn register_font_from_bytes(&mut self, key: &str, font_data: &[u8]) -> Result<String> {
-        let mut warnings = Vec::new();
-        let parsed = printpdf::ParsedFont::from_bytes(font_data, 0, &mut warnings)
-            .ok_or_else(|| PdfError::Parse(format!("Failed to parse font: {key}")))?;
-        let font_id = self.doc.add_font(&parsed);
-        self.custom_fonts.insert(key.to_string(), font_id);
+        self.engine.register_font(key, font_data)?;
+        self.custom_font_keys
+            .insert(key.to_string(), FontKey::Custom(key.to_string()));
         Ok(key.to_string())
     }
 
@@ -217,24 +210,26 @@ impl PdfWriter {
         x_pt: f64,
         y_pt: f64,
     ) -> Result<()> {
-        let font_id = self.custom_fonts.get(font_key).cloned().ok_or_else(|| {
-            PdfError::UnsupportedFeature(format!("Custom font '{font_key}' not registered."))
-        })?;
-        let pos = Point {
-            x: Pt(x_pt as f32),
-            y: Pt(y_pt as f32),
-        };
+        let font_key = self
+            .custom_font_keys
+            .get(font_key)
+            .cloned()
+            .ok_or_else(|| {
+                easypdf_core::error::PdfError::UnsupportedFeature(format!(
+                    "Custom font '{font_key}' not registered."
+                ))
+            })?;
         let ops = vec![
-            Op::StartTextSection,
-            Op::SetTextCursor { pos },
-            Op::SetFont {
-                font: PdfFontHandle::External(font_id),
-                size: Pt(font_size as f32),
+            WriterOp::StartTextSection,
+            WriterOp::SetTextCursor { x: x_pt, y: y_pt },
+            WriterOp::SetFont {
+                font: font_key,
+                size: font_size,
             },
-            Op::ShowText {
-                items: vec![TextItem::Text(text.to_string())],
+            WriterOp::ShowText {
+                text: text.to_string(),
             },
-            Op::EndTextSection,
+            WriterOp::EndTextSection,
         ];
         self.current_page_ops.extend(ops);
         Ok(())
@@ -280,11 +275,7 @@ impl PdfWriter {
         }
 
         // Keep page in memory (in-memory mode, or below spill threshold).
-        self.pages.push(PdfPage::new(
-            Mm(w as f32 * PT_TO_MM as f32),
-            Mm(h as f32 * PT_TO_MM as f32),
-            ops,
-        ));
+        self.engine.add_page(w, h, ops);
         self.current_page_open = false;
         Ok(())
     }
@@ -309,7 +300,7 @@ impl PdfWriter {
     pub fn page_count(&self) -> usize {
         // Include both in-memory pages and spilled pages.
         let spilled = self.spill_writer.as_ref().map_or(0, |s| s.spilled_count());
-        self.pages.len() + spilled
+        self.current_page_number + spilled
     }
 
     /// 返回此写入器是否处于常量内存（溢出）模式。
@@ -354,44 +345,27 @@ impl PdfWriter {
 
     /// 在 PDF 点坐标 (x, y) 处写入文本。
     pub fn write_text(&mut self, text: &PdfText, x_pt: f64, y_pt: f64) -> Result<()> {
-        if let FontFamily::Custom(ref path) = text.font.family
-            && let Some(font_id) = self.custom_fonts.get(path.as_ref())
-        {
-            let pos = Point {
-                x: Pt(x_pt as f32),
-                y: Pt(y_pt as f32),
-            };
-            let ops = vec![
-                Op::StartTextSection,
-                Op::SetTextCursor { pos },
-                Op::SetFont {
-                    font: PdfFontHandle::External(font_id.clone()),
-                    size: Pt(text.font.size as f32),
-                },
-                Op::ShowText {
-                    items: vec![TextItem::Text(text.content.clone())],
-                },
-                Op::EndTextSection,
-            ];
-            self.current_page_ops.extend(ops);
-            return Ok(());
-        }
-        let bf = map_builtin_font(&text.font);
-        let pos = Point {
-            x: Pt(x_pt as f32),
-            y: Pt(y_pt as f32),
+        // 解析字体键：自定义字体优先查表，内置字体实时解析。
+        let font_key = if let FontFamily::Custom(ref path) = text.font.family {
+            self.custom_font_keys
+                .get(path.as_ref())
+                .cloned()
+                .unwrap_or_else(|| resolve_font_key(&text.font))
+        } else {
+            resolve_font_key(&text.font)
         };
+
         let ops = vec![
-            Op::StartTextSection,
-            Op::SetTextCursor { pos },
-            Op::SetFont {
-                font: PdfFontHandle::Builtin(bf),
-                size: Pt(text.font.size as f32),
+            WriterOp::StartTextSection,
+            WriterOp::SetTextCursor { x: x_pt, y: y_pt },
+            WriterOp::SetFont {
+                font: font_key,
+                size: text.font.size,
             },
-            Op::ShowText {
-                items: vec![TextItem::Text(text.content.clone())],
+            WriterOp::ShowText {
+                text: text.content.clone(),
             },
-            Op::EndTextSection,
+            WriterOp::EndTextSection,
         ];
         self.current_page_ops.extend(ops);
         Ok(())
@@ -443,82 +417,35 @@ impl PdfWriter {
         self.finalize_current_page()?;
         self.chain.after_document()?;
 
-        // Apply easypdf metadata to printpdf document info before saving.
-        // This ensures PdfMetadata set via builder methods is written into
-        // the PDF's /Info dictionary, overriding the default title from
-        // PdfDocument::new().
-        self.apply_metadata();
-
-        // Collect spilled pages (if any) and merge with in-memory pages.
-        let mut all_pages = std::mem::take(&mut self.pages);
+        // Collect spilled pages (if any) and add to engine.
         if let Some(ref spill) = self.spill_writer {
             let spilled = spill.collect_all()?;
             for data in spilled {
-                all_pages.push(PdfPage::new(
-                    Mm(data.width_pt as f32 * PT_TO_MM as f32),
-                    Mm(data.height_pt as f32 * PT_TO_MM as f32),
-                    data.ops,
-                ));
+                self.engine
+                    .add_page(data.width_pt, data.height_pt, data.ops);
             }
         }
 
-        self.doc.with_pages(all_pages);
-        let opts = PdfSaveOptions::default();
-        let mut warnings = Vec::new();
-        let bytes = self.doc.save(&opts, &mut warnings);
+        let bytes = self.engine.finish(&self.metadata)?;
         AtomicFileOutput::new(path.as_ref()).write_with_fsync(&bytes)
-    }
-
-    /// 将 easypdf 元数据字段复制到 printpdf 文档信息中。
-    fn apply_metadata(&mut self) {
-        let info = &mut self.doc.metadata.info;
-        if let Some(ref title) = self.metadata.title {
-            info.document_title.clone_from(title);
-        }
-        if let Some(ref author) = self.metadata.author {
-            info.author.clone_from(author);
-        }
-        if let Some(ref subject) = self.metadata.subject {
-            info.subject.clone_from(subject);
-        }
-        if let Some(ref keywords) = self.metadata.keywords {
-            info.keywords = keywords.split(',').map(|s| s.trim().to_string()).collect();
-        }
-        if let Some(ref creator) = self.metadata.creator {
-            info.creator.clone_from(creator);
-        }
-        if let Some(ref producer) = self.metadata.producer {
-            info.producer.clone_from(producer);
-        }
     }
 
     /// 刷新到预配置的输出流。
     #[allow(clippy::similar_names)]
     pub fn flush(&mut self) -> Result<()> {
-        let mut pages = std::mem::take(&mut self.pages);
         let ops = std::mem::take(&mut self.current_page_ops);
         if !ops.is_empty() {
             let (w, h) = self.current_page_size;
-            pages.push(PdfPage::new(
-                Mm(w as f32 * PT_TO_MM as f32),
-                Mm(h as f32 * PT_TO_MM as f32),
-                ops,
-            ));
+            self.engine.add_page(w, h, ops);
         }
-        if pages.is_empty() {
+        // Ensure at least one page exists.
+        if self.current_page_number == 0 {
             let (w, h) = self.current_page_size;
-            pages.push(PdfPage::new(
-                Mm(w as f32 * PT_TO_MM as f32),
-                Mm(h as f32 * PT_TO_MM as f32),
-                Vec::new(),
-            ));
+            self.engine.add_page(w, h, Vec::new());
         }
-        self.apply_metadata();
-        self.doc.with_pages(pages);
-        let opts = PdfSaveOptions::default();
-        let mut warnings = Vec::new();
+        let bytes = self.engine.finish(&self.metadata)?;
         if let Some(ref mut w) = self.output {
-            self.doc.save_writer(w, &opts, &mut warnings);
+            w.write_all(&bytes)?;
         }
         Ok(())
     }
