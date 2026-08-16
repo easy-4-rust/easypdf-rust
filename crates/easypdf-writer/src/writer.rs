@@ -20,6 +20,9 @@ use crate::backend::{PageSpillWriter, SpilledPageData, WriteBackend};
 use crate::engine::op::WriterOp;
 use crate::engine::{FontKey, PrintpdfEngine, WriteEngine, resolve_font_key};
 
+/// 动态分发的写入引擎类型别名。
+type DynEngine = Box<dyn WriteEngine>;
+
 /// Default margin in points for auto-positioned text.
 const DEFAULT_MARGIN: f64 = 72.0;
 
@@ -59,7 +62,7 @@ const DEFAULT_MARGIN: f64 = 72.0;
 /// ```
 pub struct PdfWriter {
     /// PDF 写入引擎（持有文档和字体表）。
-    pub(crate) engine: PrintpdfEngine,
+    pub(crate) engine: DynEngine,
     /// 当前页面正在构建的操作列表。
     pub(crate) current_page_ops: Vec<WriterOp>,
     /// 当前页面尺寸（宽, 高，单位 PDF 点）。
@@ -94,7 +97,32 @@ impl PdfWriter {
     #[must_use]
     pub fn new(title: &str) -> Self {
         Self {
-            engine: PrintpdfEngine::new(title),
+            engine: Box::new(PrintpdfEngine::new(title)),
+            current_page_ops: Vec::new(),
+            current_page_size: PageSize::A4.dimensions(),
+            current_page_number: 0,
+            current_page_open: false,
+            document_started: false,
+            custom_font_keys: HashMap::new(),
+            metadata: PdfMetadata::default(),
+            chain: WriteHandlerChain::new(),
+            text_cursor: (DEFAULT_MARGIN, 0.0),
+            output: None,
+            backend: WriteBackend::default(),
+            spill_writer: None,
+        }
+    }
+
+    /// 使用 krilla 引擎创建 PDF 写入器（仅测试用途）。
+    ///
+    /// 此方法在 `writer-krilla` feature 启用时可用。
+    /// 用于双后端对等测试，不属于公共 API。
+    #[cfg(feature = "writer-krilla")]
+    #[doc(hidden)]
+    #[must_use]
+    pub fn new_with_krilla(_title: &str) -> Self {
+        Self {
+            engine: Box::new(crate::engine::krilla_engine::KrillaEngine::new()),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,
@@ -143,7 +171,7 @@ impl PdfWriter {
         };
 
         Ok(Self {
-            engine: PrintpdfEngine::new(title),
+            engine: Box::new(PrintpdfEngine::new(title)),
             current_page_ops: Vec::new(),
             current_page_size: PageSize::A4.dimensions(),
             current_page_number: 0,

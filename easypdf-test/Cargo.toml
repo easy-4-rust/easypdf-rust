@@ -24,6 +24,9 @@ lopdf = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
+[features]
+writer-krilla = ["easypdf/writer-krilla"]
+
 [dev-dependencies]
 tempfile.workspace = true
 easypdf-core = { path = "../crates/easypdf-core", version = "0.1.1" }

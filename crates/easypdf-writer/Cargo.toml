@@ -20,3 +20,7 @@ serde.workspace = true
 serde_json.workspace = true
 flate2.workspace = true
 tempfile.workspace = true
+krilla = { version = "0.8.2", optional = true }
+
+[features]
+writer-krilla = ["dep:krilla"]

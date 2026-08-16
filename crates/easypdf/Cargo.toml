@@ -26,6 +26,9 @@ easypdf-runtime = { workspace = true, optional = true }
 default = ["markdown"]
 html = ["printpdf/html"]
 
+# --- Krilla backend (透传到 easypdf-writer) ---
+writer-krilla = ["easypdf-writer/writer-krilla"]
+
 # --- Markdown pipeline ---
 markdown = ["dep:easypdf-markdown"]
 markdown-table = ["markdown"]

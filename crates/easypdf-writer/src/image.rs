@@ -1,7 +1,6 @@
 //! PdfWriter 的图片和 SVG 写入方法。
 
 use crate::engine::PendingXObject;
-use crate::engine::WriteEngine;
 use crate::engine::op::{WriterOp, XObjectTransformData};
 use crate::writer::PdfWriter;
 use easypdf_core::PdfImage;
