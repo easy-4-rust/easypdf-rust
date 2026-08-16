@@ -18,12 +18,18 @@ const MACOS_HELVETICA: &str = "/System/Library/Fonts/Helvetica.ttc";
 
 /// 检查系统字体是否存在，不存在则跳过测试。
 fn system_font_data() -> Option<Vec<u8>> {
-    let path = std::path::Path::new(MACOS_HELVETICA);
-    if path.exists() {
-        std::fs::read(path).ok()
-    } else {
-        None
+    // 候选字体：macOS（本地与 macos-latest CI）与 ubuntu-latest 预装 DejaVu。
+    const CANDIDATES: &[&str] = &[
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf",
+    ];
+    for path in CANDIDATES {
+        if let Ok(data) = std::fs::read(path) {
+            return Some(data);
+        }
     }
+    None
 }
 
 /// 用公共 API 构建测试 PDF（printpdf 引擎）。
@@ -113,6 +119,12 @@ fn page_count(pdf_bytes: &[u8]) -> usize {
 /// 测试：页数对等（多页文档）。
 #[test]
 fn parity_page_count() {
+    // krilla 无 base14 内置字体，无系统字体时本测试无法执行文本写入，跳过。
+    if system_font_data().is_none() {
+        eprintln!("跳过：无可用系统字体");
+        return;
+    }
+
     let font_data = system_font_data();
     let font_key = "parity_helvetica";
 
@@ -187,6 +199,12 @@ fn parity_text_content() {
 /// 验证两个引擎都能成功生成包含图形的 PDF，且页数一致。
 #[test]
 fn parity_graphics() {
+    // krilla 无 base14 内置字体，无系统字体时本测试无法执行文本写入，跳过。
+    if system_font_data().is_none() {
+        eprintln!("跳过：无可用系统字体");
+        return;
+    }
+
     let font_data = system_font_data();
     let font_key = "parity_gfx_helvetica";
 
@@ -212,6 +230,12 @@ fn parity_graphics() {
 /// 证明引擎无关性。
 #[test]
 fn parity_krilla_lopdf_roundtrip() {
+    // krilla 无 base14 内置字体，无系统字体时本测试无法执行文本写入，跳过。
+    if system_font_data().is_none() {
+        eprintln!("跳过：无可用系统字体");
+        return;
+    }
+
     let font_data = system_font_data();
     let font_key = "parity_rt_helvetica";
 
@@ -241,6 +265,12 @@ fn parity_krilla_lopdf_roundtrip() {
 /// 测试：krilla 引擎生成的 PDF 体积合理。
 #[test]
 fn parity_krilla_output_size() {
+    // krilla 无 base14 内置字体，无系统字体时本测试无法执行文本写入，跳过。
+    if system_font_data().is_none() {
+        eprintln!("跳过：无可用系统字体");
+        return;
+    }
+
     let font_data = system_font_data();
     let font_key = "parity_size_helvetica";
 
