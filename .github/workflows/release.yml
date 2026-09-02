@@ -38,6 +38,9 @@ jobs:
     outputs:
       version: ${{ steps.extract.outputs.version }}
     steps:
+      # 版本一致性门禁需要读取 Cargo.toml，必须先检出仓库。
+      - uses: actions/checkout@v4
+
       - name: Extract and validate version
         id: extract
         run: |
