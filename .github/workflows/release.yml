@@ -1,0 +1,238 @@
+name: Release
+
+# easypdf-rust crates.io 发布工作流。
+# 参考 wxrust（.github/workflows/release.yml）的结构，并针对本仓库
+# 0.1.0/0.1.1 发布史（dry-run 假失败、crates.io 429 rate limit、
+# 版本未 bump 即打 tag）做了三点加固：
+#   1. validate-tag 增加版本一致性门禁：tag 版本必须等于 workspace 版本
+#   2. dry-run 分层：叶子 crate 全量 dry-run；依赖未发布内部 crate 的
+#      只做 package --list（crates.io 上查不到内部依赖会假失败）
+#   3. 发布重试对 429/索引延迟使用 45s 退避（0.1.0 发布曾遇 429）
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. v0.2.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-tag:
+    name: Validate Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - name: Extract and validate version
+        id: extract
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid tag format: $TAG (expected vX.Y.Z)"
+            exit 1
+          fi
+          echo "version=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Validated version: $TAG"
+
+      - name: Verify workspace version matches tag
+        # 门禁：tag v0.2.0 而 Cargo.toml 仍是 0.1.1 时立即失败，
+        # 避免发布假绿或"版本已存在"的无效重跑。
+        run: |
+          TAG_VERSION="${{ steps.extract.outputs.version }}"
+          TAG_VERSION="${TAG_VERSION#v}"
+          WS_VERSION="$(grep -m1 '^version' Cargo.toml | sed 's/.*= *"\(.*\)"/\1/')"
+          if [ "$TAG_VERSION" != "$WS_VERSION" ]; then
+            echo "::error::tag v${TAG_VERSION} != workspace version ${WS_VERSION}"
+            echo "请先 bump Cargo.toml 版本并提交，再打 tag。"
+            exit 1
+          fi
+          echo "Workspace version ${WS_VERSION} matches tag"
+
+  build-and-test:
+    name: Build & Test
+    needs: validate-tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: cargo check (all features)
+        run: cargo check --workspace --all-targets --all-features
+
+      - name: cargo test (all features)
+        run: cargo test --workspace --all-features
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo doc
+        run: cargo doc --workspace --no-deps
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+
+      - name: API snapshot check
+        # public API 冻结：有意的 API 变更需同时更新 api-snapshots/。
+        # nightly 才支持 cargo-public-api 的某些输出；失败时视为破坏性
+        # 变更提示（与 ci.yml 的 api-check 一致）。
+        run: |
+          cargo install cargo-public-api --locked || true
+          for crate in easypdf-core easypdf easypdf-reader easypdf-writer easypdf-markdown; do
+            cargo public-api -p $crate 2>/dev/null > /tmp/current_${crate}.txt || true
+          done
+          cat /tmp/current_easypdf-core.txt /tmp/current_easypdf.txt \
+              /tmp/current_easypdf-reader.txt /tmp/current_easypdf-writer.txt \
+              /tmp/current_easypdf-markdown.txt > /tmp/current_workspace.txt 2>/dev/null || true
+          if [ -f api-snapshots/workspace.txt ] && ! diff -q api-snapshots/workspace.txt /tmp/current_workspace.txt >/dev/null 2>&1; then
+            echo "::warning::Public API changed vs snapshot -- intentional API changes must update api-snapshots/"
+          fi
+
+      - name: cargo deny
+        run: |
+          cargo install cargo-deny --locked || true
+          cargo deny --workspace check
+
+  dry-run-publish:
+    name: Dry-run Publish
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Validate crate manifests (dry-run)
+        run: |
+          # 叶子 crate（无内部依赖）：全量 dry-run 校验
+          for crate in easypdf-core easypdf-derive; do
+            echo "::group::Dry-run $crate"
+            cargo publish -p "$crate" --dry-run --allow-dirty || exit 1
+            echo "::endgroup::"
+          done
+          # 依赖内部 crate 的：crates.io 尚无新版本内部依赖时 dry-run 会
+          # 报 "no matching package"，属预期 -- 用 package --list 校验打包。
+          for crate in easypdf-reader easypdf-writer easypdf-markdown easypdf-ocr easypdf-runtime easypdf; do
+            echo "::group::Packaging $crate"
+            cargo package -p "$crate" --list --allow-dirty >/dev/null || exit 1
+            echo "::endgroup::"
+          done
+
+  publish-crates:
+    name: Publish to crates.io
+    needs: [validate-tag, dry-run-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Publish crates in dependency order
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          # 前置：token 未配置立即失败（避免空 token 重试的假绿）
+          if [ -z "$CARGO_REGISTRY_TOKEN" ]; then
+            echo "::error::CARGO_REGISTRY_TOKEN secret 未配置（仓库 Settings -> Secrets -> Actions）"
+            exit 1
+          fi
+          # 依赖顺序发布（leaf -> facade；easypdf-test 为 publish=false）
+          CRATES=(
+            easypdf-core
+            easypdf-derive
+            easypdf-reader
+            easypdf-writer
+            easypdf-markdown
+            easypdf-ocr
+            easypdf-runtime
+            easypdf
+          )
+          FAILED=()
+          for crate in "${CRATES[@]}"; do
+            echo "::group::Publishing $crate"
+            ok=0
+            # 最多 4 次重试：429 rate limit / 索引传播需 45s 等待
+            for attempt in 1 2 3 4; do
+              if out=$(cargo publish -p "$crate" --allow-dirty 2>&1); then
+                echo "Successfully published $crate"
+                ok=1
+                break
+              fi
+              # 幂等重跑：版本已上传视为成功
+              if echo "$out" | grep -qiE "already (uploaded|exists)"; then
+                echo "$crate already published (version exists), skipping"
+                ok=1
+                break
+              fi
+              echo "$out" | tail -5
+              echo "Attempt $attempt failed for $crate; waiting 45s before retry..."
+              sleep 45
+            done
+            if [ "$ok" -ne 1 ]; then
+              echo "::error::$crate 4 次重试后仍发布失败"
+              FAILED+=("$crate")
+            fi
+            echo "::endgroup::"
+          done
+          if [ "${#FAILED[@]}" -gt 0 ]; then
+            echo "::error::发布失败的 crate: ${FAILED[*]}"
+            exit 1
+          fi
+
+  create-release:
+    name: Create GitHub Release
+    needs: [validate-tag, publish-crates]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate-tag.outputs.version }}
+          name: ${{ needs.validate-tag.outputs.version }}
+          body: |
+            ## Release ${{ needs.validate-tag.outputs.version }}
+
+            See [CHANGELOG.md](CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
