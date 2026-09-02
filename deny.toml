@@ -63,21 +63,23 @@ ignore = [
     #   - 或将测试证书改为预生成 .pem fixture（无需运行时生成密钥）
     { id = "RUSTSEC-2023-0071", reason = "dev-dep only (test keygen); production uses ring constant-time RSA" },
 
-    # RUSTSEC-2026-0253: lru 0.16.x（azul-layout 传递依赖，上游 hard-pin ^0.16.1）
-    #
-    # 忽略理由：
-    #   lru 由 printpdf -> azul 路径引入，azul-layout 0.0.13 将 lru
-    #   hard-pin 在 ^0.16.1，[patch.crates-io] 无法在 semver 不兼容时
-    #   强制升级（已尝试，Cargo 拒绝）。受影响的 LruCache::pop() panic
-    #   safety 问题仅在 panic 后复用缓存触发，本库不触及该路径。
-    #
-    # 重评估条件：
-    #   - azul-layout 发布解除 pin 的新版本后立即升级并移除本忽略
-    { id = "RUSTSEC-2026-0253", reason = "transitive via azul-layout hard-pin ^0.16.1; pop() panic-safety path not exercised" },
-
     # RUSTSEC-2026-0192: lru 0.16.x LruCache::pop() use-after-free（unsound）
     # 理由与重评估条件同上（同一 crate 同一 pin 约束）。
     { id = "RUSTSEC-2026-0192", reason = "transitive via azul-layout hard-pin ^0.16.1; pop() UAF path not exercised" },
+
+    # RUSTSEC-2026-0258: h2 0.3.x unbounded empty DATA frames（低危，内存放大）
+    #
+    # 忽略理由：
+    #   h2 0.3.27 为 0.3 系列最终版本，官方修复仅在 0.4.16+（major bump）。
+    #   依赖链 reqwest 0.11 -> hyper 0.14 将 h2 锁死在 0.3.x；reqwest 0.12
+    #   才迁移 h2 0.4。rig-core 0.8（easypdf-markdown llm OCR feature 使用）
+    #   仍依赖 reqwest 0.11，本仓库无法单独升级 h2（cargo update 验证 0 可升）。
+    #   该路径仅在启用 llm feature 的 OCR 场景可达，且为 Low severity。
+    #
+    # 重评估条件：
+    #   - rig-core 升级到使用 reqwest 0.12 的版本后执行 cargo update
+    #   - 或 h2 0.3 系列发布安全修复版本
+    { id = "RUSTSEC-2026-0258", reason = "h2 0.3.27 EOL; reqwest 0.11/rig-core lock h2 0.3; fix only in h2 0.4; low severity, llm-feature path" },
 
     # 以下为 unmaintained（信息性）公告，均为传递依赖，无已知漏洞：
     # RUSTSEC-2025-0141 bincode（经 reqwest/ring 路径传入）
