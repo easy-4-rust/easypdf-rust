@@ -142,8 +142,12 @@ jobs:
 
       - name: Compare with snapshot
         run: |
-          diff api-snapshots/workspace.txt current_workspace.txt && echo "API unchanged" || \
-          (echo "::error::Public API changed! Update api-snapshots/ if this is intentional." && exit 1)
+          if diff api-snapshots/workspace.txt current_workspace.txt; then
+            echo "API unchanged"
+          else
+            echo "::error::Public API changed! Update api-snapshots/ if this is intentional."
+            exit 1
+          fi
 
   coverage:
     name: Coverage

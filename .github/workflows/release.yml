@@ -26,6 +26,10 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  # 与本地验证工具链一致（1.97.1），避免 stable 漂移：
+  # 新 clippy lint 会把 -D warnings 的既有代码打成 error（如
+  # chunks_exact_constant_chunk_size），且本地无法复现。
+  RUST_TOOLCHAIN: "1.97.1"
 
 concurrency:
   group: release-${{ github.ref }}
@@ -80,6 +84,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: clippy, rustfmt
 
       - name: Cache cargo
@@ -132,6 +137,8 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
@@ -161,6 +168,8 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
