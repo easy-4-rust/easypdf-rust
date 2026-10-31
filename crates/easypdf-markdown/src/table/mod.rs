@@ -25,7 +25,7 @@
 //!
 //! # 配置
 //!
-//! 使用 [`TableDetectionConfig`](crate::table::TableDetectionConfig) 调整：
+//! 使用 [`TableDetectionConfig`] 调整：
 //! - 最小行/列数
 //! - 列分隔策略（Pipe、Tab、Whitespace 或 Auto）
 //! - 是否允许不规则列数
