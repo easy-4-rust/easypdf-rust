@@ -3,7 +3,7 @@
 /// PDF 到 Markdown 语义处理器能够提供的增强能力。
 ///
 /// 使用布尔值表示是否支持某项能力。对于更细粒度的等级描述，
-/// 请使用 [`DetailedProcessorCapabilities`](crate::DetailedProcessorCapabilities)。
+/// 请使用 [`DetailedProcessorCapabilities`]。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct MarkdownProcessorCapabilities {
