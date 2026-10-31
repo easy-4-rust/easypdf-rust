@@ -16,6 +16,26 @@ permissions:
   contents: read
 
 jobs:
+  msrv:
+    name: MSRV (Rust 1.88)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust 1.88
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.88.0
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check all workspace targets and features
+        run: cargo check --workspace --all-targets --all-features --locked
+
+      - name: Test documentation with all features
+        run: cargo test --workspace --doc --all-features --locked
+
   test:
     name: Test (${{ matrix.os }} / Rust ${{ matrix.rust }})
     strategy:
