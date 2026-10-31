@@ -119,14 +119,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # API snapshots were generated against the August 2026 rustdoc output.
+      # Newer nightly output changes derived signatures without source changes.
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly-2026-08-16
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-public-api
-        run: cargo install cargo-public-api
+        run: cargo install cargo-public-api --version 0.52.0 --locked
 
       - name: Generate current API snapshots
         run: |
