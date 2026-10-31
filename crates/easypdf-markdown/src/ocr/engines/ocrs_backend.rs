@@ -64,7 +64,7 @@ impl OcrEngine for OcrsEngine {
         // 将 RGBA 像素转换为 RGB（HWC 排列）供 ocrs 使用。
         let rgb_pixels: Vec<u8> = image
             .pixels
-            .chunks_exact(4)
+            .as_chunks::<4>().0.iter()
             .flat_map(|rgba| &rgba[..3])
             .copied()
             .collect();
