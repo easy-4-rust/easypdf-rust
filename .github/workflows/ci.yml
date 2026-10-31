@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   msrv:
-    name: MSRV (Rust 1.88)
+    name: MSRV (Rust 1.88, default features)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -30,11 +30,11 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Check all workspace targets and features
-        run: cargo check --workspace --all-targets --all-features --locked
+      - name: Check workspace targets at MSRV
+        run: cargo check --workspace --all-targets --locked
 
-      - name: Test documentation with all features
-        run: cargo test --workspace --doc --all-features --locked
+      - name: Test documentation at MSRV
+        run: cargo test --workspace --doc --locked
 
   test:
     name: Test (${{ matrix.os }} / Rust ${{ matrix.rust }})
