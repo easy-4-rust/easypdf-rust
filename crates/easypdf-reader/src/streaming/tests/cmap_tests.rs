@@ -190,7 +190,7 @@ fn test_extract_to_unicode_ref_missing() {
 fn extract_text_with_cmap_empty_content() {
     let cmaps: HashMap<String, CMap> = HashMap::new();
     let text = extract_text_with_cmap(b"", &cmaps);
-    assert!(text.is_empty());
+    assert_eq!(text.len(), 0);
 }
 
 #[test]
@@ -198,7 +198,7 @@ fn extract_text_with_cmap_only_operators() {
     let cmaps: HashMap<String, CMap> = HashMap::new();
     let content = b"BT ET";
     let text = extract_text_with_cmap(content, &cmaps);
-    assert!(text.is_empty());
+    assert_eq!(text.len(), 0);
 }
 
 #[test]

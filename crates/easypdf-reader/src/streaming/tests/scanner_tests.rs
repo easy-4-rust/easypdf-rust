@@ -156,7 +156,7 @@ fn scan_plaintext_stream() {
     assert!(result.text_extracted);
     assert_eq!(result.streams_processed, 1);
     assert_eq!(result.pages_scanned, 1);
-    assert!(!collector.texts.is_empty());
+    assert_ne!(collector.texts.len(), 0);
     assert!(collector.texts[0].contains("Hello Stream"));
 }
 
@@ -369,7 +369,7 @@ fn test_scan_with_cmap_in_pdf() {
     let result = scanner.scan(&mut collector).unwrap();
 
     assert!(result.text_extracted);
-    assert!(!collector.texts.is_empty());
+    assert_ne!(collector.texts.len(), 0);
     // The CMap maps 0x0048 -> H and 0x0069 -> i, so "Hi" should be
     // extracted (via CMap lookup on the font "F1").
     assert!(
@@ -466,7 +466,7 @@ fn scan_no_text_streams() {
 
     assert!(!result.text_extracted);
     assert_eq!(result.streams_processed, 1);
-    assert!(collector.texts.is_empty());
+    assert_eq!(collector.texts.len(), 0);
 }
 
 // --- scanner: FlateDecode with array filter ---
