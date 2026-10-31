@@ -6,7 +6,7 @@
 //! - `LinkExtractorProcessor`：超链接提取
 //! - `HeadingDetectorProcessor`：标题检测
 //!
-//! 这些处理器可在 [`ProcessorPipeline`](crate::ProcessorPipeline) 中
+//! 这些处理器可在 [`ProcessorPipeline`] 中
 //! 与自定义处理器组合使用。
 
 mod heading_detector;
