@@ -509,7 +509,7 @@ fn sign_empty_content() {
     let (cert, priv_key) = generate_test_cert_and_key();
     let signer = PdfSigner::new(cert, priv_key);
     let signed = crypto::sign_pdf(b"", &signer).expect("sign empty");
-    assert!(!signed.is_empty());
+    assert_ne!(signed.len(), 0);
     assert!(String::from_utf8_lossy(&signed).contains("/Type /Sig"));
 }
 
