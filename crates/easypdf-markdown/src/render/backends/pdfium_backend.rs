@@ -142,7 +142,7 @@ impl PdfRenderer for PdfiumRenderer {
         let raw = bitmap.as_raw_bytes();
         // pdfium 产生 BGRA；转换为 RGBA。
         let mut rgba = Vec::with_capacity(raw.len());
-        for chunk in raw.chunks_exact(4) {
+        for chunk in raw.as_chunks::<4>().0 {
             rgba.push(chunk[2]); // R
             rgba.push(chunk[1]); // G
             rgba.push(chunk[0]); // B
