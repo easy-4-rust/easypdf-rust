@@ -111,7 +111,27 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build docs
-        run: cargo doc --workspace --no-deps
+        run: |
+          cargo doc --workspace --no-deps --message-format=json > /tmp/easypdf-doc-messages.json || {
+            python3 - <<'PY'
+          import json
+          with open('/tmp/easypdf-doc-messages.json') as stream:
+              for line in stream:
+                  try:
+                      event = json.loads(line)
+                  except json.JSONDecodeError:
+                      continue
+                  if event.get('reason') != 'compiler-message':
+                      continue
+                  message = event['message']
+                  if message.get('level') != 'error':
+                      continue
+                  print(event.get('package_id'), message.get('message'))
+                  for span in message.get('spans', []):
+                      print(span.get('file_name'), span.get('line_start'), span.get('label'))
+          PY
+            exit 1
+          }
 
   api-check:
     name: Public API Diff
