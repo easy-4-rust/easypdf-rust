@@ -38,7 +38,7 @@ fn new_creates_renderer() {
     let renderer = MarkdownRenderer::new(MarkdownProfile::Gfm);
     let doc = PdfDocumentModel::default();
     let output = renderer.render(&doc);
-    assert!(output.is_empty());
+    assert_eq!(output.len(), 0);
 }
 
 #[test]
@@ -430,7 +430,7 @@ fn render_empty_doc() {
     let renderer = MarkdownRenderer::new(MarkdownProfile::Gfm);
     let doc = PdfDocumentModel::default();
     let output = renderer.render(&doc);
-    assert!(output.is_empty());
+    assert_eq!(output.len(), 0);
 }
 
 // --- Additional coverage tests ---
@@ -663,7 +663,7 @@ fn render_unknown_block_none() {
     let doc = PdfDocumentModel::new(PdfMetadata::default(), vec![page]);
     let output = renderer.render(&doc);
     // Unknown block produces no output; Plain profile has no page markers
-    assert!(output.is_empty());
+    assert_eq!(output.len(), 0);
 }
 
 #[test]

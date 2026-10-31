@@ -230,7 +230,7 @@ mod tests {
         });
         let parser = HunyuanOcrParser::new(HunyuanMode::GeneralBasic);
         let result = parser.parse_response(&response).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
         assert!(result.confidence.is_none());
     }
 
@@ -260,7 +260,7 @@ mod tests {
         });
         let parser = HunyuanOcrParser::new(HunyuanMode::SmartStructural);
         let result = parser.parse_response(&response).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     #[test]

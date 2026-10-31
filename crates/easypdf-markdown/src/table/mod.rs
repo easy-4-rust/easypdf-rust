@@ -1,7 +1,7 @@
 //! 用于 PDF 转 Markdown 的启发式表格检测。
 //!
 //! 本模块提供 [`TableDetectorProcessor`]，它是
-//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor) 的一个实现，
+//! [`PdfMarkdownProcessor`] 的一个实现，
 //! 扫描段落块中的表格模式并将其替换为
 //! [`PdfBlock::Table`](easypdf_core::PdfBlock::Table) 块。
 //!
@@ -25,7 +25,7 @@
 //!
 //! # 配置
 //!
-//! 使用 [`TableDetectionConfig`](crate::table::TableDetectionConfig) 调整：
+//! 使用 [`TableDetectionConfig`] 调整：
 //! - 最小行/列数
 //! - 列分隔策略（Pipe、Tab、Whitespace 或 Auto）
 //! - 是否允许不规则列数

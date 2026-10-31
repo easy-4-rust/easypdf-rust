@@ -95,7 +95,7 @@ mod tests {
             .with_block(PdfBlock::paragraph("Body", loc));
         let doc = PdfDocumentModel::new(PdfMetadata::default(), vec![page]);
         let (result, warnings) = proc.process(&PdfInput::from_bytes(vec![]), doc).unwrap();
-        assert!(warnings.is_empty());
+        assert_eq!(warnings.len(), 0);
         assert_eq!(result.total_blocks(), 2);
     }
 }

@@ -644,7 +644,7 @@ mod tests {
 
         let mut conn = transport.accept().unwrap();
         // Verify connection was accepted
-        assert!(!conn.peer_addr().is_empty());
+        assert_ne!(conn.peer_addr().len(), 0);
 
         // Read request from connection and write response
         use std::io::{BufRead, Write};

@@ -63,7 +63,7 @@ mod tests {
         assert_eq!(report.pages_read(), 0);
         assert_eq!(report.blocks_written(), 0);
         assert_eq!(report.bytes_written(), 0);
-        assert!(report.warnings().is_empty());
+        assert_eq!(report.warnings().len(), 0);
     }
 
     #[test]

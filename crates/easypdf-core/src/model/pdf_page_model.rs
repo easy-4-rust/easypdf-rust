@@ -186,7 +186,7 @@ mod tests {
         assert_eq!(code.len(), 1);
 
         let tables: Vec<_> = page.blocks_by_type(PdfBlockType::Table).collect();
-        assert!(tables.is_empty());
+        assert_eq!(tables.len(), 0);
     }
 
     #[test]
@@ -213,7 +213,7 @@ mod tests {
     #[test]
     fn empty_page_blocks() {
         let page = PdfPageModel::new(PageIndex::new(0));
-        assert!(page.blocks().is_empty());
+        assert_eq!(page.blocks().len(), 0);
         assert!(page.iter().next().is_none());
     }
 

@@ -389,7 +389,7 @@ mod tests {
         assert_eq!(config.api, BaiduApi::GeneralBasic);
         assert!(config.endpoint.contains("baidubce.com"));
         assert!(config.token_url.contains("baidubce.com"));
-        assert!(config.api_key.is_empty());
+        assert_eq!(config.api_key.len(), 0);
     }
 
     #[test]

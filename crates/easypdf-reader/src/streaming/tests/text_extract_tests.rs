@@ -53,7 +53,7 @@ fn extract_text_tj_array() {
 fn extract_text_empty_stream() {
     let content = b"BT ET";
     let text = extract_text_from_content_stream(content);
-    assert!(text.is_empty());
+    assert_eq!(text.len(), 0);
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn parse_tj_array_simple() {
 fn parse_tj_array_empty() {
     let data = b"[]";
     let (strings, end) = parse_tj_array(data, 0).unwrap();
-    assert!(strings.is_empty());
+    assert_eq!(strings.len(), 0);
     assert_eq!(end, 2);
 }
 
@@ -161,7 +161,7 @@ fn parse_hex_string_not_angle_bracket() {
 fn parse_hex_string_empty() {
     let data = b"<>";
     let (bytes, end) = parse_hex_string(data, 0).unwrap();
-    assert!(bytes.is_empty());
+    assert_eq!(bytes.len(), 0);
     assert_eq!(end, 2);
 }
 

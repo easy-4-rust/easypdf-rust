@@ -158,7 +158,7 @@ mod tests {
         let image = make_test_image(1, 1);
         let encoded = BaiduOcrEngine::encode_image_form(&image).unwrap();
         // 应为 URL 编码的 base64。
-        assert!(!encoded.is_empty());
+        assert_ne!(encoded.len(), 0);
         // 验证解码后为有效的 base64。
         let decoded = urlencoding::decode(&encoded).unwrap();
         let bytes = base64::engine::general_purpose::STANDARD

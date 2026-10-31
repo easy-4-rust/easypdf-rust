@@ -16,6 +16,26 @@ permissions:
   contents: read
 
 jobs:
+  msrv:
+    name: MSRV (Rust 1.88, default features)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust 1.88
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.88.0
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check workspace targets at MSRV
+        run: cargo check --workspace --all-targets --locked
+
+      - name: Test documentation at MSRV
+        run: cargo test --workspace --doc --locked
+
   test:
     name: Test (${{ matrix.os }} / Rust ${{ matrix.rust }})
     strategy:
@@ -47,7 +67,7 @@ jobs:
 
       - name: Clippy
         if: matrix.rust == 'stable'
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features --keep-going -- -D warnings
 
       - name: Doctest
         run: cargo test --workspace --doc
@@ -119,14 +139,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # API snapshots were generated against the August 2026 rustdoc output.
+      # Newer nightly output changes derived signatures without source changes.
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly-2026-08-16
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-public-api
-        run: cargo install cargo-public-api
+        run: cargo install cargo-public-api --version 0.52.0 --locked
 
       - name: Generate current API snapshots
         run: |

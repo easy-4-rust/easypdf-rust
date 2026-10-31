@@ -1,7 +1,7 @@
 //! `easypdf-markdown` 的 OCR 处理器：扫描件 PDF 文本提取。
 //!
 //! 本模块提供 [`OcrProcessor`]，它实现了
-//! [`PdfMarkdownProcessor`](crate::PdfMarkdownProcessor)，通过 OCR 从
+//! [`PdfMarkdownProcessor`]，通过 OCR 从
 //! 图片密集型或扫描件 PDF 页面中提取文本。它被设计为 Markdown 处理器管道中
 //! 的最后回退手段。
 //!

@@ -274,7 +274,7 @@ mod tests {
         let doc = empty_doc();
         let (result, warnings) = pipeline.run(&empty_input(), doc).unwrap();
         assert!(result.is_empty());
-        assert!(warnings.is_empty());
+        assert_eq!(warnings.len(), 0);
     }
 
     #[test]
@@ -388,7 +388,7 @@ mod tests {
         // Last processor wins since AppendProcessor replaces doc
         let blocks: Vec<_> = result.iter_all_blocks().collect();
         assert_eq!(blocks.len(), 1);
-        assert!(warnings.is_empty());
+        assert_eq!(warnings.len(), 0);
     }
 
     #[test]

@@ -580,7 +580,7 @@ mod tests {
         assert!(engine.font_data.is_empty());
         assert!(engine.fonts.is_empty());
         assert!(engine.images.is_empty());
-        assert!(engine.pages.is_empty());
+        assert_eq!(engine.pages.len(), 0);
     }
 
     #[test]

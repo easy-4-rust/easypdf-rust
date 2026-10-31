@@ -31,7 +31,7 @@ fn empty_input() -> PdfInput {
 fn run_process(doc: PdfDocumentModel) -> PdfDocumentModel {
     let proc = TableDetectorProcessor::new();
     let (result, warnings) = proc.process(&empty_input(), doc).unwrap();
-    assert!(warnings.is_empty());
+    assert_eq!(warnings.len(), 0);
     result
 }
 
@@ -299,7 +299,7 @@ fn integrates_into_pipeline() {
 
     let doc = make_doc(vec![para("| A | B |"), para("| 1 | 2 |")]);
     let (result, warnings) = pipeline.run(&empty_input(), doc).unwrap();
-    assert!(warnings.is_empty());
+    assert_eq!(warnings.len(), 0);
     assert_eq!(count_tables(&result), 1);
 }
 
