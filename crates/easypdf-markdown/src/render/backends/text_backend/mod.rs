@@ -234,7 +234,9 @@ mod tests {
         // Count non-white pixels.
         let non_white = img
             .pixels
-            .as_chunks::<4>().0.iter()
+            .as_chunks::<4>()
+            .0
+            .iter()
             .filter(|px| **px != [255, 255, 255, 255])
             .count();
         // There should be at least some non-white pixels from the text or margins.
@@ -355,7 +357,13 @@ mod tests {
         let pixels = TextRenderer::render_text_to_pixels("", 100, 100, 72, Background::White);
         assert_eq!(pixels.len(), 100 * 100 * 4);
         // All white
-        assert!(pixels.as_chunks::<4>().0.iter().all(|px| *px == [255, 255, 255, 255]));
+        assert!(
+            pixels
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .all(|px| *px == [255, 255, 255, 255])
+        );
     }
 
     #[test]
