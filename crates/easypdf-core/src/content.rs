@@ -232,7 +232,7 @@ mod tests {
     fn pdf_table_new() {
         let t = PdfTable::new(vec!["A".into(), "B".into()]);
         assert_eq!(t.headers.len(), 2);
-        assert!(t.rows.is_empty());
+        assert_eq!(t.rows.len(), 0);
     }
 
     #[test]
@@ -280,7 +280,7 @@ mod tests {
     #[test]
     fn pdf_table_cell_default() {
         let cell = PdfTableCell::default();
-        assert!(cell.content.is_empty());
+        assert_eq!(cell.content.len(), 0);
     }
 
     #[test]

@@ -88,7 +88,7 @@ fn signed_data_detached_builds_and_parses() {
     let issuer_der = cert.issuer().as_raw().to_vec();
     let serial = cert.raw_serial();
     let cms = build_cms_signed_data(&cert_der, &dummy_sig, &issuer_der, serial);
-    assert!(!cms.is_empty());
+    assert_ne!(cms.len(), 0);
     let parsed = super::cms::parse_cms_signed_data(&cms).expect("parse CMS");
     assert_eq!(parsed.certificate_der, cert_der);
     assert_eq!(parsed.signature, dummy_sig);
@@ -185,7 +185,7 @@ fn verify_unsigned_pdf_fails() {
 fn sign_empty_content() {
     let (c, k) = generate_test_cert_and_key();
     let signed = sign_pdf(b"", &PdfSigner::new(c, k)).unwrap();
-    assert!(!signed.is_empty());
+    assert_ne!(signed.len(), 0);
     assert!(verify_pdf_signature(&signed).unwrap().is_valid);
 }
 

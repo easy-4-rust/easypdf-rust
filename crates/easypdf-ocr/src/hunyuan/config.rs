@@ -169,8 +169,8 @@ mod tests {
     #[test]
     fn test_default_config() {
         let config = HunyuanConfig::default();
-        assert!(config.secret_id.is_empty());
-        assert!(config.secret_key.is_empty());
+        assert_eq!(config.secret_id.len(), 0);
+        assert_eq!(config.secret_key.len(), 0);
         assert_eq!(config.region, "ap-guangzhou");
         assert_eq!(config.service, "ocr");
         assert_eq!(config.version, "2018-11-19");

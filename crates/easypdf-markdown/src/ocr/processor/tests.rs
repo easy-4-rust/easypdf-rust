@@ -62,7 +62,7 @@ fn mock_engine_ocr_injects_text_on_empty_page() {
     let input = PdfInput::from_bytes(vec![]);
 
     let (result, warnings) = proc.process(&input, doc).unwrap();
-    assert!(warnings.is_empty());
+    assert_eq!(warnings.len(), 0);
     assert_eq!(result.total_blocks(), 1);
 
     let blocks: Vec<_> = result.iter_all_blocks().collect();
@@ -311,7 +311,7 @@ fn processes_multiple_pages() {
     let input = PdfInput::from_bytes(vec![]);
 
     let (result, warnings) = proc.process(&input, doc).unwrap();
-    assert!(warnings.is_empty());
+    assert_eq!(warnings.len(), 0);
     assert_eq!(result.page_count(), 3);
     // Page 0: 1 block (paragraph)
     assert_eq!(result.pages()[0].blocks().len(), 1);
@@ -502,5 +502,5 @@ fn ocr_with_no_confidence() {
     // MockOcrEngine::with_text returns confidence = None by default
     assert_eq!(result.total_blocks(), 1);
     // No confidence warning because confidence is None
-    assert!(warnings.is_empty());
+    assert_eq!(warnings.len(), 0);
 }

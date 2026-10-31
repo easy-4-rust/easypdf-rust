@@ -108,7 +108,7 @@ mod tests {
         let item = ListItem::new("Hello");
         assert_eq!(item.text(), "Hello");
         assert_eq!(item.level(), 0);
-        assert!(item.children().is_empty());
+        assert_eq!(item.children().len(), 0);
     }
 
     #[test]

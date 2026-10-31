@@ -142,7 +142,7 @@ mod tests {
         ));
         let doc = PdfDocumentModel::new(PdfMetadata::default(), vec![page]);
         let (result, warnings) = proc.process(&PdfInput::from_bytes(vec![]), doc).unwrap();
-        assert!(warnings.is_empty());
+        assert_eq!(warnings.len(), 0);
         let blocks: Vec<_> = result.iter_all_blocks().collect();
         // Should have: paragraph "Visit", link "https://example.com", paragraph "for more"
         assert!(blocks.len() >= 2);

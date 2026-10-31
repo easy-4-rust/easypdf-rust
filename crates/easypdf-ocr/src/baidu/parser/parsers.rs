@@ -411,7 +411,7 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::OfficeDocument);
         let result = parser.parse(&raw).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     #[test]
@@ -477,7 +477,7 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::Seal);
         let result = parser.parse(&raw).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     #[test]
@@ -537,7 +537,7 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::Qrcode);
         let result = parser.parse(&raw).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     #[test]
@@ -584,7 +584,7 @@ mod tests {
         });
         let parser = BaiduOcrParser::new(BaiduApi::Structured);
         let result = parser.parse(&raw).unwrap();
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     #[test]
@@ -603,7 +603,7 @@ mod tests {
         let parser = BaiduOcrParser::new(BaiduApi::Structured);
         let result = parser.parse(&raw).unwrap();
         // Missing struct_info is not an error, just yields empty text.
-        assert!(result.text.is_empty());
+        assert_eq!(result.text.len(), 0);
     }
 
     // --- Handwriting and Digit use words_result, verify routing ---

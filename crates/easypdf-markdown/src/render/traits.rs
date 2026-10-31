@@ -240,7 +240,7 @@ mod tests {
         let pixels = vec![255u8; 4 * 2 * 2];
         let img = RenderedImage::new(2, 2, ImageFormat::Png, pixels, 0);
         let png = img.to_png_bytes().unwrap();
-        assert!(!png.is_empty());
+        assert_ne!(png.len(), 0);
         // PNG 魔术字节
         assert_eq!(&png[..4], &[0x89, 0x50, 0x4E, 0x47]);
     }

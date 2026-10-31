@@ -102,7 +102,7 @@ fn test_parse_empty_words_result() {
     });
     let parser = BaiduOcrParser::new(BaiduApi::GeneralBasic);
     let result = parser.parse(&raw).unwrap();
-    assert!(result.text.is_empty());
+    assert_eq!(result.text.len(), 0);
 }
 
 #[test]

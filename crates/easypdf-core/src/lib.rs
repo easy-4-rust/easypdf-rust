@@ -255,7 +255,7 @@ mod tests {
     #[test]
     fn test_pdf_table_cell_default() {
         let c = PdfTableCell::default();
-        assert!(c.content.is_empty());
+        assert_eq!(c.content.len(), 0);
         assert_eq!(c.h_alignment, TextAlignment::Left);
         assert_eq!(c.v_alignment, VerticalAlignment::Top);
     }
